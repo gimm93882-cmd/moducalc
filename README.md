@@ -42,6 +42,18 @@ python3 build.py
 python3 build.py https://moducalc.kr
 ```
 
+## 검사
+
+```bash
+node test.js
+```
+
+각 페이지에서 `Calc.mount` 를 가로채 `compute` 를 기본값으로 실행합니다.
+결과에 `NaN` 이나 `undefined` 가 섞이면 실패로 처리합니다.
+
+문법 검사만으로는 부족합니다. 실제로 `var decided` 의 공백이 사라져 `vardecided` 가 된 적이 있는데,
+이건 문법상 유효한 전역 대입이라 파싱은 통과하고 실행에서만 터졌습니다.
+
 ## 검색엔진 소유 확인
 
 `src/verify.txt` 에 한 줄에 하나씩 `name=content` 로 적으면 모든 페이지 `<head>` 에

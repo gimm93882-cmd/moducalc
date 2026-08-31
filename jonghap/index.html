@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>종합소득세 계산기 | 프리랜서·사업자 5월 신고 세액</title>
+<meta name="description" content="총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.">
+<link rel="canonical" href="https://moducalc.kr/jonghap/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="종합소득세 계산기 | 프리랜서·사업자 5월 신고 세액">
+<meta property="og:description" content="총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.">
+<meta property="og:url" content="https://moducalc.kr/jonghap/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "종합소득세 계산기", "url": "https://moducalc.kr/jonghap/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "프리랜서인데 3.3% 떼고 받았습니다. 또 내야 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "3.3%는 미리 낸 세금입니다. 5월에 실제 세액을 계산해 정산합니다. 수입이 적으면 보통 환급받고, 많으면 추가 납부가 나옵니다."}}, {"@type": "Question", "name": "경비율을 얼마로 넣어야 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "업종별로 국세청이 고시합니다. 홈택스에서 본인 업종 코드의 단순경비율·기준경비율을 확인해 넣으세요. 기본값은 예시입니다."}}, {"@type": "Question", "name": "장부를 쓰는 게 유리한가요?", "acceptedAnswer": {"@type": "Answer", "text": "실제 경비가 경비율보다 많으면 장부가 유리합니다. 수입이 커지면 기준경비율 대상이 되어 인정 경비가 줄기 때문에 장부 작성이 사실상 필요해집니다."}}, {"@type": "Question", "name": "근로소득도 있는데 어떻게 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "근로소득과 사업소득을 합산해 신고해야 합니다. 이 계산기는 사업·기타소득 단독 기준의 개략 계산이므로 합산 신고는 홈택스나 세무 전문가를 이용하세요."}}, {"@type": "Question", "name": "신고 기한을 놓치면 어떻게 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "무신고가산세와 납부지연가산세가 붙습니다. 기한 후 신고를 빨리 할수록 가산세가 줄어듭니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow">사업·세금</p><h1>종합소득세 계산기</h1><p>총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>누가 신고하나</h3>
+<p>근로소득만 있고 연말정산을 마쳤다면 따로 신고하지 않아도 됩니다.
+다음에 해당하면 <strong>5월에 종합소득세를 신고</strong>해야 합니다.</p>
+<ul>
+<li>프리랜서 (3.3% 원천징수를 받는 인적용역 소득자)</li>
+<li>개인사업자</li>
+<li>근로소득 외에 사업·임대·기타소득이 있는 경우</li>
+<li>두 곳 이상에서 근로소득이 있는데 합산 연말정산을 하지 않은 경우</li>
+</ul>
+
+<h3>필요경비를 어떻게 잡느냐가 세금을 좌우합니다</h3>
+<p>수입에서 경비를 빼야 소득금액이 나옵니다. 방법은 두 가지입니다.</p>
+<p><strong>장부 작성 (직접 입력)</strong> — 실제 쓴 비용을 증빙과 함께 경비로 인정받습니다.
+경비가 많은 업종이면 유리하고, 적자면 결손금으로 이월할 수도 있습니다.</p>
+<p><strong>경비율 적용 (추계신고)</strong> — 장부가 없을 때 업종별로 정해진 비율만큼 경비로 인정합니다.
+<strong>단순경비율</strong>은 수입이 적은 사업자에게 적용되고 비율이 높아 유리합니다.
+수입이 일정 규모를 넘으면 비율이 낮은 <strong>기준경비율</strong> 대상이 되어 세금이 크게 늘 수 있습니다.</p>
+<p>업종별 경비율과 적용 대상 기준은 국세청이 고시합니다. 홈택스에서 본인 업종 코드로 확인하세요.</p>
+
+<h3>프리랜서 3.3%는 미리 낸 세금입니다</h3>
+<p>용역비에서 3.3%(소득세 3% + 지방소득세 0.3%)가 원천징수됩니다.
+이것은 <strong>세금을 다 낸 것이 아니라 미리 낸 것</strong>입니다.
+5월에 실제 세액을 계산해 더 냈으면 돌려받고, 덜 냈으면 더 냅니다.</p>
+<p>수입이 적으면 대부분 환급을 받습니다. 반대로 수입이 커서 높은 세율 구간에 들어가면
+추가 납부가 나옵니다. 기납부세액 칸에 원천징수된 금액을 넣어 확인해 보세요.</p>
+
+<h3>세율 구간</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>과세표준</th><th>세율</th><th>누진공제</th></tr></thead>
+<tbody>
+<tr><td>1,400만원 이하</td><td class="n">6%</td><td class="n">—</td></tr>
+<tr><td>5,000만원 이하</td><td class="n">15%</td><td class="n">126만원</td></tr>
+<tr><td>8,800만원 이하</td><td class="n">24%</td><td class="n">576만원</td></tr>
+<tr><td>1억 5,000만원 이하</td><td class="n">35%</td><td class="n">1,544만원</td></tr>
+<tr><td>3억원 이하</td><td class="n">38%</td><td class="n">1,994만원</td></tr>
+<tr><td>5억원 이하</td><td class="n">40%</td><td class="n">2,594만원</td></tr>
+<tr><td>10억원 이하</td><td class="n">42%</td><td class="n">3,594만원</td></tr>
+<tr><td>10억원 초과</td><td class="n">45%</td><td class="n">6,594만원</td></tr>
+</tbody></table></div>
+<p>여기에 지방소득세가 소득세의 10%만큼 더 붙습니다.</p>
+
+<h3>세금을 줄이는 합법적인 방법</h3>
+<ul>
+<li><strong>노란우산공제</strong> — 소기업·소상공인 공제부금. 연 최대 500만원 소득공제</li>
+<li><strong>연금저축·IRP</strong> — 세액공제</li>
+<li><strong>국민연금 보험료</strong> — 전액 소득공제</li>
+<li><strong>장부 작성</strong> — 경비를 제대로 반영하고 기장세액공제도 받을 수 있습니다</li>
+</ul>
+<p>이 계산기는 인적공제와 연금보험료만 반영합니다. 위 항목이 있으면 실제 세금은 더 줄어듭니다.</p>
+
+<h3>부가세와는 다른 세금입니다</h3>
+<p>부가가치세는 1월·7월에 신고하고, 종합소득세는 5월에 신고합니다.
+별개의 세금이니 둘 다 챙기셔야 합니다.
+부가세는 <a href="../bugagse/">부가세 계산기</a>에서 확인하실 수 있습니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>프리랜서인데 3.3% 떼고 받았습니다. 또 내야 하나요?</summary><div class="a">3.3%는 미리 낸 세금입니다. 5월에 실제 세액을 계산해 정산합니다. 수입이 적으면 보통 환급받고, 많으면 추가 납부가 나옵니다.</div></details>
+<details><summary>경비율을 얼마로 넣어야 하나요?</summary><div class="a">업종별로 국세청이 고시합니다. 홈택스에서 본인 업종 코드의 단순경비율·기준경비율을 확인해 넣으세요. 기본값은 예시입니다.</div></details>
+<details><summary>장부를 쓰는 게 유리한가요?</summary><div class="a">실제 경비가 경비율보다 많으면 장부가 유리합니다. 수입이 커지면 기준경비율 대상이 되어 인정 경비가 줄기 때문에 장부 작성이 사실상 필요해집니다.</div></details>
+<details><summary>근로소득도 있는데 어떻게 하나요?</summary><div class="a">근로소득과 사업소득을 합산해 신고해야 합니다. 이 계산기는 사업·기타소득 단독 기준의 개략 계산이므로 합산 신고는 홈택스나 세무 전문가를 이용하세요.</div></details>
+<details><summary>신고 기한을 놓치면 어떻게 되나요?</summary><div class="a">무신고가산세와 납부지연가산세가 붙습니다. 기한 후 신고를 빨리 할수록 가산세가 줄어듭니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"jonghap",
+  formTitle:"소득 정보",
+  sideNote:"단순경비율·기준경비율 적용 대상은 업종과 수입 규모에 따라 다릅니다. 홈택스에서 본인 기준을 확인하세요.",
+  fields:[
+    {k:"revenue", label:"총수입금액", sub:"1년 매출", suffix:"원", value:60000000, step:1000000, min:0},
+    {k:"mode", label:"필요경비", type:"seg", options:[
+      {value:"rate", label:"경비율 적용"}, {value:"direct", label:"직접 입력"}]},
+    {k:"expRate", label:"경비율", sub:"업종별 단순경비율", suffix:"%", value:64.1, step:0.1, min:0},
+    {k:"expense", label:"필요경비 금액", sub:"직접 입력 시", suffix:"원", value:0, step:1000000, min:0},
+    {k:"family", label:"부양가족", sub:"본인 포함", suffix:"명", value:1, step:1, min:1},
+    {k:"pension", label:"연금보험료 공제", sub:"국민연금 등 납부액", suffix:"원", value:0, step:100000, min:0},
+    {k:"prepaid", label:"기납부세액", sub:"원천징수 3.3% 등", suffix:"원", value:0, step:100000, min:0}
+  ],
+  compute:function(v,F){
+    var rev=v.revenue||0;
+    var exp = v.mode==="direct" ? (v.expense||0) : rev*(v.expRate||0)/100;
+    exp=Math.min(exp,rev);
+    var income=rev-exp;
+
+    var personal=1500000*Math.max(1,v.family||1);
+    var ded=personal+(v.pension||0);
+    var base=Math.max(0, income-ded);
+
+    var t=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+           [150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],
+           [1000000000,.42,35940000],[Infinity,.45,65940000]];
+    var tax=0, rateNote="";
+    for(var i=0;i<t.length;i++) if(base<=t[i][0]){ tax=base*t[i][1]-t[i][2]; rateNote=(t[i][1]*100)+"%"; break; }
+    tax=Math.max(0,tax);
+
+    var standard=70000;                       /* 표준세액공제 */
+    var income_tax=Math.max(0, tax-standard);
+    var local=income_tax*0.1;
+    var total=income_tax+local;
+    var due=total-(v.prepaid||0);
+
+    return {
+      hero:{k: due>=0 ? "추가 납부액" : "환급 예상액",
+            v:F.kor(Math.abs(due)), sub:F.won(Math.abs(due)),
+            cls: due>=0 ? "down":"up"},
+      stats:[
+        {k:"소득금액", v:F.won(income), sub:"수입 − 경비"},
+        {k:"결정세액", v:F.won(total), sub:"지방소득세 포함"},
+        {k:"기납부세액", v:F.won(v.prepaid||0), sub:"원천징수 등"}
+      ],
+      hint:"과세표준 "+F.kor(base)+" · 세율 "+rateNote,
+      cols:["단계","금액"],
+      rows:[
+        ["총수입금액", F.won(rev)],
+        ["필요경비", "− "+F.won(exp)],
+        ["소득금액", F.won(income)],
+        ["인적공제 ("+F.num(v.family)+"명)", "− "+F.won(personal)],
+        ["연금보험료공제", "− "+F.won(v.pension||0)],
+        ["과세표준", F.won(base)],
+        ["산출세액 ("+rateNote+")", F.won(tax)],
+        ["표준세액공제", "− "+F.won(Math.min(standard,tax))],
+        ["소득세", F.won(income_tax)],
+        ["지방소득세 10%", F.won(local)],
+        ["결정세액", F.won(total)],
+        ["기납부세액", "− "+F.won(v.prepaid||0)],
+        [due>=0?"추가 납부":"환급", F.won(Math.abs(due))]
+      ],
+      extra:"<div class='note'>종합소득세 신고 기한은 <b>매년 5월 1일~31일</b>입니다 "+
+        "(성실신고확인 대상은 6월 말). 프리랜서는 보통 3.3%가 원천징수되어 있으니 "+
+        "<b>기납부세액</b> 칸에 넣으면 환급인지 추가 납부인지 나옵니다.<br><br>"+
+        "의료비·교육비·기부금·연금저축·노란우산공제 등 개인별 공제는 반영하지 않았습니다. "+
+        "이런 공제가 있으면 실제 세액은 이보다 줄어듭니다.</div>"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>

@@ -2212,3 +2212,729 @@ add(
          u"정확한 값은 이용하시는 은행에서 확인하세요."),
     ],
 )
+
+# ───────────────────────── 만 나이 ─────────────────────────
+add(
+    slug="mannai", name=u"만 나이 계산기", group=u"부동산·생활",
+    title=u"만 나이 계산기 | 생년월일로 만 나이·연 나이 확인",
+    desc=u"생년월일을 넣으면 만 나이와 연 나이를 계산합니다. 다음 생일까지 남은 날짜와 띠도 함께 보여줍니다.",
+    kw=u"생년월일로 만 나이·연 나이, 다음 생일",
+    spec=u"""
+Calc.mount({
+  id:"mannai",
+  formTitle:"생년월일",
+  fields:[
+    {k:"birth", label:"생년월일", type:"date", value:"1990-05-15"},
+    {k:"base", label:"기준일", sub:"비우면 오늘", type:"date", value:""}
+  ],
+  compute:function(v,F){
+    var D=24*3600*1000;
+    var b=new Date((v.birth||"1990-01-01")+"T00:00:00");
+    var t=v.base ? new Date(v.base+"T00:00:00") : new Date(new Date().toDateString());
+    if(isNaN(b)||isNaN(t)) return {hero:{k:"오류",v:"날짜를 확인해 주세요"}};
+    if(t<b) return {hero:{k:"오류",v:"기준일이 생년월일보다 빨라야 합니다"}};
+
+    /* 만 나이: 생일이 지났으면 연도 차, 아니면 하나 뺀다 */
+    var man=t.getFullYear()-b.getFullYear();
+    var passed = (t.getMonth()>b.getMonth()) ||
+                 (t.getMonth()===b.getMonth() && t.getDate()>=b.getDate());
+    if(!passed) man--;
+
+    var yeon=t.getFullYear()-b.getFullYear();      /* 연 나이 */
+    var sen=yeon+1;                                 /* 옛 세는 나이 */
+
+    /* 다음 생일 */
+    var nb=new Date(t.getFullYear(), b.getMonth(), b.getDate());
+    if(nb<t) nb=new Date(t.getFullYear()+1, b.getMonth(), b.getDate());
+    var left=Math.round((nb-t)/D);
+    var lived=Math.round((t-b)/D);
+
+    var zodiac=["쥐","소","호랑이","토끼","용","뱀","말","양","원숭이","닭","개","돼지"];
+    var z=zodiac[(b.getFullYear()-4)%12];
+    var wd=["일","월","화","수","목","금","토"];
+
+    return {
+      hero:{k:"만 나이", v:F.num(man)+"세", cls:"up",
+            sub:b.getFullYear()+"년 "+(b.getMonth()+1)+"월 "+b.getDate()+"일생 · "+z+"띠"},
+      stats:[
+        {k:"연 나이", v:F.num(yeon)+"세", sub:"현재연도 − 출생연도"},
+        {k:"다음 생일", v: left===0 ? "오늘!" : "D-"+F.num(left),
+         sub:nb.getFullYear()+"."+(nb.getMonth()+1)+"."+nb.getDate()+" ("+wd[nb.getDay()]+")"},
+        {k:"태어난 지", v:F.num(lived)+"일", sub:"약 "+F.num(lived/365.25,1)+"년"}
+      ],
+      hint:(v.base? v.base : "오늘")+" 기준",
+      cols:["구분","나이","쓰이는 곳"],
+      rows:[
+        ["만 나이", man+"세", "법령·계약·공식 문서 (기본)"],
+        ["연 나이", yeon+"세", "병역법·청소년보호법·초등 취학"],
+        ["세는 나이", sen+"세", "일상 대화 (공식 기준 아님)"]
+      ],
+      extra:"<div class='note'>2023년 6월부터 법령상 나이는 <b>만 나이로 통일</b>됐습니다. "+
+        "별도 규정이 없으면 문서에 적힌 나이는 만 나이입니다. "+
+        "다만 <b>병역법과 청소년보호법 등 일부는 여전히 연 나이</b>를 씁니다. "+
+        (passed ? "" : "올해 생일이 아직 지나지 않아 만 나이가 연 나이보다 한 살 적습니다.")+"</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>2023년부터 만 나이로 통일됐습니다</h3>
+<p>2023년 6월 28일부터 <strong>행정·민사상 나이는 만 나이가 기본</strong>입니다.
+법령이나 계약서에 그냥 "나이"라고 적혀 있으면 만 나이로 봅니다.
+이전에는 세는 나이, 연 나이, 만 나이가 뒤섞여 혼선이 많았습니다.</p>
+
+<h3>세 가지 나이의 차이</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>구분</th><th>계산법</th><th>1990년 5월 15일생 기준</th></tr></thead>
+<tbody>
+<tr><td><strong>만 나이</strong></td><td>생일이 지나면 +1</td><td class="n">생일 전 35세, 후 36세</td></tr>
+<tr><td>연 나이</td><td>현재연도 − 출생연도</td><td class="n">36세 (생일 무관)</td></tr>
+<tr><td>세는 나이</td><td>연 나이 + 1</td><td class="n">37세</td></tr>
+</tbody></table></div>
+<p>같은 사람인데 최대 두 살까지 차이가 납니다.
+1월 1일에 태어난 사람과 12월 31일에 태어난 사람의 세는 나이가 같았던 것이 혼란의 원인이었습니다.</p>
+
+<h3>아직 연 나이를 쓰는 곳</h3>
+<p>만 나이로 통일됐지만 예외가 있습니다.</p>
+<ul>
+<li><strong>병역법</strong> — 병역 판정검사, 입영 등</li>
+<li><strong>청소년보호법</strong> — 주류·담배 구입 제한. 연도 기준이라 생일 전에도 해당 연도에 만 19세가 되면 구매 가능</li>
+<li><strong>초·중등교육법</strong> — 취학 연령</li>
+<li><strong>공무원임용시험령</strong> 등 일부 응시 연령</li>
+</ul>
+<p>이런 법에서는 "만 나이"가 아니라 태어난 해를 기준으로 셉니다.</p>
+
+<h3>보험·연금에서의 나이</h3>
+<p>보험은 <strong>보험나이</strong>라는 별도 기준을 쓰기도 합니다.
+계약일 기준 만 나이에서 6개월이 지났으면 한 살을 더하는 방식입니다.
+가입 시점에 따라 보험료가 달라질 수 있으니 약관을 확인하세요.</p>
+
+<h3>왜 헷갈렸나</h3>
+<p>만 나이는 <strong>태어난 날부터 1년이 지나야 한 살</strong>입니다.
+태어난 순간은 0세이고 첫 생일에 1세가 됩니다.
+반면 세는 나이는 태어나자마자 1세이고 해가 바뀌면 한 살을 더합니다.
+12월 31일에 태어난 아기는 다음 날 두 살이 됐습니다. 이 방식이 공식 기준에서 사라진 것입니다.</p>
+""",
+    faq=[
+        (u"만 나이와 연 나이가 왜 다른가요?",
+         u"만 나이는 생일이 지나야 한 살이 오르고, 연 나이는 생일과 무관하게 "
+         u"현재 연도에서 출생 연도를 뺍니다. 생일 전이면 만 나이가 한 살 적습니다."),
+        (u"술·담배는 어느 나이 기준인가요?",
+         u"청소년보호법은 연 나이를 씁니다. 해당 연도에 만 19세가 되는 사람은 "
+         u"생일이 지나지 않았어도 구매할 수 있습니다."),
+        (u"이제 세는 나이는 안 쓰나요?",
+         u"법령상 공식 기준에서는 쓰지 않습니다. 다만 일상 대화에서는 여전히 쓰이므로 "
+         u"참고용으로 함께 표시합니다."),
+        (u"계약서의 나이는 어느 기준인가요?",
+         u"별도 규정이 없으면 만 나이입니다. 2023년 6월부터 그렇게 정해졌습니다."),
+    ],
+)
+
+# ───────────────────────── 주택담보대출 한도 ─────────────────────────
+add(
+    slug="ltv", name=u"주택담보대출 한도 계산기", group=u"대출·예금",
+    title=u"주택담보대출 한도 계산기 | LTV·DSR 기준 대출 가능 금액",
+    desc=u"주택가격과 연소득으로 LTV와 DSR 기준 대출 한도를 각각 계산하고, 실제 받을 수 있는 금액을 알려줍니다.",
+    kw=u"LTV·DSR 기준 대출 가능 금액과 월 상환액",
+    spec=u"""
+Calc.mount({
+  id:"ltv",
+  formTitle:"대출 조건",
+  sideNote:"LTV와 DSR 규제 비율은 지역·주택수·정책에 따라 수시로 바뀝니다. 금융기관에서 본인 적용 기준을 확인하세요.",
+  fields:[
+    {k:"price", label:"주택가격", suffix:"원", value:600000000, step:10000000, min:0},
+    {k:"ltv", label:"LTV 비율", sub:"규제지역·주택수에 따라 다름", suffix:"%", value:70, step:5, min:0},
+    {k:"income", label:"연소득", sub:"세전", suffix:"원", value:60000000, step:1000000, min:0},
+    {k:"dsr", label:"DSR 한도", sub:"은행권 통상 40%", suffix:"%", value:40, step:5, min:0},
+    {k:"other", label:"기존 대출 연간 원리금", sub:"신용대출·기존 주담대 등", suffix:"원", value:0, step:1000000, min:0},
+    {k:"rate", label:"연이자율", suffix:"%", value:4.5, step:0.01, min:0},
+    {k:"years", label:"대출기간", suffix:"년", value:30, step:1, min:1}
+  ],
+  compute:function(v,F){
+    var price=v.price||0, income=v.income||0;
+    var i=(v.rate||0)/100/12, n=Math.max(1,Math.round((v.years||1)*12));
+
+    var ltvCap = price*(v.ltv||0)/100;
+
+    /* DSR: 연간 원리금상환액이 연소득의 일정 비율을 넘지 못한다 */
+    var allowed = income*(v.dsr||0)/100 - (v.other||0);
+    var factor = i>0 ? i*Math.pow(1+i,n)/(Math.pow(1+i,n)-1) : 1/n;   /* 월상환/원금 */
+    var dsrCap = allowed>0 ? allowed/(12*factor) : 0;
+
+    var limit=Math.min(ltvCap, dsrCap);
+    var binding = dsrCap<ltvCap ? "DSR" : "LTV";
+    var monthly=limit*factor;
+    var need=price-limit;
+
+    return {
+      hero:{k:"대출 가능 금액", v:F.kor(limit), sub:F.won(limit), cls:"up"},
+      stats:[
+        {k:"LTV 기준", v:F.kor(ltvCap), sub:"주택가 × "+F.num(v.ltv,0)+"%",
+         cls: binding==="LTV" ? "down":""},
+        {k:"DSR 기준", v:F.kor(Math.max(dsrCap,0)), sub:"연소득 × "+F.num(v.dsr,0)+"%",
+         cls: binding==="DSR" ? "down":""},
+        {k:"월 상환액", v:F.won(monthly), sub:F.num(v.years,0)+"년 원리금균등"}
+      ],
+      hint:binding+" 가 한도를 결정",
+      extra:"<div class='note'>"+
+        "<b>"+binding+"</b> 기준이 더 낮아 실제 한도를 결정합니다. "+
+        "자기자금은 <b>"+F.kor(need)+"</b> 가 필요합니다"+
+        (need>0 ? " (취득세·중개보수 별도)" : "")+".<br><br>"+
+        (dsrCap<ltvCap
+          ? "소득이 한도를 묶고 있습니다. 기간을 늘리면 연간 상환액이 줄어 DSR 한도가 올라갑니다."
+          : "담보가 한도를 묶고 있습니다. 소득이 늘어도 LTV 이상은 받을 수 없습니다.")+
+        "</div>",
+      cols:["대출기간","월 상환액","DSR 기준 한도"],
+      rows:[10,15,20,25,30,35,40].map(function(y){
+        var m=y*12;
+        var f = i>0 ? i*Math.pow(1+i,m)/(Math.pow(1+i,m)-1) : 1/m;
+        var cap = allowed>0 ? allowed/(12*f) : 0;
+        var lim = Math.min(ltvCap, cap);
+        return [y+"년", F.won(lim*f), F.kor(Math.max(cap,0))];
+      }),
+      tableHint:"기간별 비교"
+    };
+  }
+});""",
+    guide=u"""
+<h3>한도는 두 가지 중 낮은 쪽으로 정해집니다</h3>
+<p><strong>LTV</strong>는 집값 대비, <strong>DSR</strong>은 소득 대비 한도입니다.
+둘 다 통과해야 하므로 <strong>더 낮은 쪽이 실제 한도</strong>가 됩니다.</p>
+<ul>
+<li><strong>LTV (주택담보인정비율)</strong> = 대출금 ÷ 주택가격.
+70%면 6억 집에 4.2억까지입니다.</li>
+<li><strong>DSR (총부채원리금상환비율)</strong> = 연간 원리금상환액 ÷ 연소득.
+40%면 연소득 6천만원인 사람은 연 2,400만원, 월 200만원까지만 갚을 수 있습니다.</li>
+</ul>
+
+<h3>DSR이 막히는 경우가 많습니다</h3>
+<p>집값이 올라도 소득이 그대로면 DSR에서 걸립니다.
+연소득 6천만원에 DSR 40%면 월 상환액 200만원이 상한인데,
+금리 4.5%에 30년이면 대출 약 3.9억이 한계입니다.
+집이 10억이어도 LTV와 무관하게 여기서 막힙니다.</p>
+
+<h3>기간을 늘리면 DSR 한도가 올라갑니다</h3>
+<p>같은 금액이라도 30년으로 나누면 40년으로 나눌 때보다 월 상환액이 큽니다.
+기간을 늘리면 연간 상환액이 줄어 DSR 한도가 올라갑니다.
+다만 <strong>총 이자는 크게 늘어납니다.</strong> 계산기 아래 표에서 기간별 차이를 비교해 보세요.</p>
+
+<h3>기존 대출이 한도를 갉아먹습니다</h3>
+<p>DSR은 <strong>모든 대출</strong>의 원리금을 합산합니다.
+신용대출, 자동차 할부, 카드론, 학자금 대출이 전부 들어갑니다.
+마이너스 통장은 한도 금액 기준으로 잡히는 경우가 많습니다.
+주담대를 받기 전에 다른 대출을 정리하면 한도가 늘어납니다.</p>
+
+<h3>규제 비율은 계속 바뀝니다</h3>
+<p>LTV는 규제지역 여부, 주택 수, 생애최초 여부에 따라 달라집니다.
+DSR도 대출 규모와 금융권(은행·2금융)에 따라 다르게 적용되고,
+스트레스 DSR처럼 가산금리를 얹어 계산하는 제도가 도입되기도 합니다.</p>
+<p>이 계산기는 비율을 <strong>직접 입력</strong>하도록 열어두었습니다.
+본인에게 적용되는 수치를 금융기관에서 확인해 넣으세요.</p>
+
+<h3>집값 외에 필요한 돈</h3>
+<p>대출로 안 되는 금액이 자기자금인데, 여기에 <strong>취득세와 중개보수</strong>가 더 듭니다.
+6억 주택이면 취득세만 660만원 안팎입니다.
+<a href="../chwideukse/">취득세 계산기</a>와 <a href="../brokerage/">중개보수 계산기</a>로
+함께 계산해 보세요.</p>
+""",
+    faq=[
+        (u"LTV는 되는데 DSR에서 막힙니다.",
+         u"둘 다 통과해야 해서 낮은 쪽이 한도가 됩니다. 대출기간을 늘리거나 기존 대출을 "
+         u"줄이면 DSR 한도가 올라갑니다."),
+        (u"마이너스 통장도 DSR에 잡히나요?",
+         u"보통 약정 한도 기준으로 잡힙니다. 실제로 안 썼어도 한도가 있으면 부채로 계산되는 "
+         u"경우가 많으니 금융기관에 확인하세요."),
+        (u"LTV 비율을 얼마로 넣어야 하나요?",
+         u"규제지역 여부, 주택 수, 생애최초 여부에 따라 다릅니다. 정책이 자주 바뀌므로 "
+         u"금융기관에서 본인 적용 비율을 확인해 넣으세요."),
+        (u"전세대출도 DSR에 들어가나요?",
+         u"전세자금대출은 이자만 반영되거나 제외되는 등 취급이 달라져 왔습니다. "
+         u"시점과 상품에 따라 다르므로 확인이 필요합니다."),
+    ],
+)
+
+# ───────────────────────── 증여세 ─────────────────────────
+add(
+    slug="jeungyeo", name=u"증여세 계산기", group=u"사업·세금",
+    title=u"증여세 계산기 | 증여재산공제와 세율 적용",
+    desc=u"증여재산가액과 증여자와의 관계로 증여세를 계산합니다. 증여재산공제와 신고세액공제를 반영합니다.",
+    kw=u"관계별 증여재산공제 반영한 증여세",
+    spec=u"""
+Calc.mount({
+  id:"jeungyeo",
+  formTitle:"증여 정보",
+  sideNote:"10년 이내 같은 관계에서 받은 증여는 합산해 계산합니다. 공제 한도도 10년 기준입니다.",
+  fields:[
+    {k:"amount", label:"증여재산가액", suffix:"원", value:200000000, step:10000000, min:0},
+    {k:"prior", label:"10년 내 사전증여", sub:"같은 증여자에게 받은 금액", suffix:"원", value:0, step:10000000, min:0},
+    {k:"rel", label:"증여자와의 관계", type:"select", value:"lineal", options:[
+      {value:"spouse", label:"배우자 (6억 공제)"},
+      {value:"lineal", label:"직계존속 → 성년 자녀 (5천만)"},
+      {value:"minor", label:"직계존속 → 미성년 자녀 (2천만)"},
+      {value:"down", label:"직계비속 → 부모 (5천만)"},
+      {value:"rel6", label:"기타 친족 (1천만)"},
+      {value:"none", label:"타인 (공제 없음)"}]},
+    {k:"wedding", label:"혼인·출산 공제", sub:"직계존속에게 받을 때, 1억 한도", suffix:"원", value:0, step:10000000, min:0},
+    {k:"report", label:"기한 내 신고", type:"seg", options:[
+      {value:"1", label:"신고 (3% 공제)"}, {value:"0", label:"미신고"}]}
+  ],
+  compute:function(v,F){
+    var gift=(v.amount||0)+(v.prior||0);
+    var BASE={spouse:600000000, lineal:50000000, minor:20000000,
+              down:50000000, rel6:10000000, none:0};
+    var ded=BASE[v.rel]||0;
+    var wed = (v.rel==="lineal"||v.rel==="minor") ? Math.min(v.wedding||0, 100000000) : 0;
+    var totalDed=ded+wed;
+
+    var base=Math.max(0, gift-totalDed);
+    var t=[[100000000,.10,0],[500000000,.20,10000000],[1000000000,.30,60000000],
+           [3000000000,.40,160000000],[Infinity,.50,460000000]];
+    var tax=0, rateNote="";
+    for(var i=0;i<t.length;i++) if(base<=t[i][0]){ tax=base*t[i][1]-t[i][2]; rateNote=(t[i][1]*100)+"%"; break; }
+    tax=Math.max(0,tax);
+
+    var credit = v.report==1 ? tax*0.03 : 0;
+    var pay=tax-credit;
+
+    return {
+      hero:{k:"납부할 증여세", v:F.kor(pay), sub:F.won(pay), cls: pay>0?"down":"up"},
+      stats:[
+        {k:"증여재산공제", v:F.won(totalDed), sub: wed? "기본 "+F.kor(ded)+" + 혼인·출산 "+F.kor(wed) : "10년 합산 한도"},
+        {k:"과세표준", v:F.won(base), sub:"세율 "+rateNote},
+        {k:"실수령", v:F.won((v.amount||0)-pay), cls:"up"}
+      ],
+      hint: base<=0 ? "공제 범위 내 — 세금 없음" : "세율 "+rateNote,
+      cols:["단계","금액"],
+      rows:[
+        ["증여재산가액", F.won(v.amount||0)],
+        ["10년 내 사전증여", "+ "+F.won(v.prior||0)],
+        ["합산 증여재산", F.won(gift)],
+        ["증여재산공제", "− "+F.won(totalDed)],
+        ["과세표준", F.won(base)],
+        ["산출세액 ("+rateNote+")", F.won(tax)],
+        ["신고세액공제 3%", "− "+F.won(credit)],
+        ["납부세액", F.won(pay)]
+      ],
+      extra:"<div class='note'>"+
+        (base<=0 ? "공제 한도 안이라 낼 세금이 없습니다. 다만 <b>신고는 하는 편이 안전합니다.</b> "+
+                   "나중에 자금출처를 소명해야 할 때 근거가 됩니다.<br><br>" : "")+
+        "증여세는 <b>받는 사람(수증자)</b>이 냅니다. 신고·납부 기한은 증여받은 날이 속한 달의 "+
+        "말일부터 <b>3개월 이내</b>입니다. 기한을 넘기면 신고세액공제 3%를 못 받고 가산세가 붙습니다.<br><br>"+
+        "공제 한도는 <b>10년 단위로 합산</b>합니다. 5년 전에 부모에게 3천만원을 받았다면 "+
+        "이번에 쓸 수 있는 공제는 2천만원뿐입니다.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>증여세는 받는 사람이 냅니다</h3>
+<p>주는 사람이 아니라 <strong>받는 사람(수증자)</strong>이 신고하고 납부합니다.
+신고·납부 기한은 증여받은 날이 속한 달의 말일부터 <strong>3개월 이내</strong>입니다.</p>
+
+<h3>관계에 따라 공제액이 다릅니다</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>증여자</th><th>공제 한도 (10년)</th></tr></thead>
+<tbody>
+<tr><td>배우자</td><td class="n">6억원</td></tr>
+<tr><td>직계존속 → 성년 자녀</td><td class="n">5,000만원</td></tr>
+<tr><td>직계존속 → 미성년 자녀</td><td class="n">2,000만원</td></tr>
+<tr><td>직계비속 → 부모</td><td class="n">5,000만원</td></tr>
+<tr><td>기타 친족 (6촌 이내 혈족 등)</td><td class="n">1,000만원</td></tr>
+<tr><td>타인</td><td class="n">없음</td></tr>
+</tbody></table></div>
+
+<h3>10년 합산이 핵심입니다</h3>
+<p>공제 한도는 <strong>10년 동안 합쳐서</strong> 적용됩니다.
+부모에게 5년 전에 3,000만원을 받았다면, 지금 쓸 수 있는 공제는 2,000만원뿐입니다.
+10년이 지나면 한도가 다시 채워집니다.</p>
+<p>이 때문에 자녀가 어릴 때부터 10년 단위로 나눠 증여하는 방식이 많이 쓰입니다.
+미성년일 때 2,000만원, 성년이 된 뒤 5,000만원 식입니다.</p>
+
+<h3>혼인·출산 증여재산공제</h3>
+<p>직계존속에게 증여받는 경우, 혼인신고 전후 2년 이내 또는 출산·입양 후 2년 이내라면
+<strong>1억원까지 추가 공제</strong>를 받을 수 있습니다.
+기본 공제 5,000만원과 합치면 1억 5,000만원까지 세금 없이 받을 수 있습니다.
+요건과 적용 시점이 정해져 있으니 국세청이나 세무 전문가에게 확인하세요.</p>
+
+<h3>세율</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>과세표준</th><th>세율</th><th>누진공제</th></tr></thead>
+<tbody>
+<tr><td>1억원 이하</td><td class="n">10%</td><td class="n">—</td></tr>
+<tr><td>5억원 이하</td><td class="n">20%</td><td class="n">1,000만원</td></tr>
+<tr><td>10억원 이하</td><td class="n">30%</td><td class="n">6,000만원</td></tr>
+<tr><td>30억원 이하</td><td class="n">40%</td><td class="n">1억 6,000만원</td></tr>
+<tr><td>30억원 초과</td><td class="n">50%</td><td class="n">4억 6,000만원</td></tr>
+</tbody></table></div>
+
+<h3>기한 내 신고하면 3%를 깎아줍니다</h3>
+<p>기한 안에 신고하면 산출세액의 <strong>3%를 신고세액공제</strong>로 빼줍니다.
+반대로 기한을 넘기면 이 공제를 못 받고 무신고가산세(20%)와 납부지연가산세가 붙습니다.</p>
+
+<h3>세금이 없어도 신고하는 편이 낫습니다</h3>
+<p>공제 범위 안이라 낼 세금이 없더라도 신고해 두면 <strong>자금 출처 근거</strong>가 됩니다.
+나중에 부동산을 사거나 큰돈이 오갈 때 자금출처조사를 받게 되면
+"증여받은 돈"이라는 것을 입증해야 하는데, 신고 내역이 그 근거가 됩니다.</p>
+
+<h3>이 계산기가 다루지 않는 것</h3>
+<p>부담부증여(채무를 함께 넘기는 경우), 창업자금·가업승계 특례, 비상장주식 평가,
+부동산의 시가 산정, 재차증여 합산의 세부 규정은 반영하지 않았습니다.
+금액이 크거나 부동산·주식이 포함되면 반드시 세무 전문가와 상담하세요.</p>
+""",
+    faq=[
+        (u"부모에게 1억을 받으면 세금이 얼마인가요?",
+         u"성년 자녀 기준 공제 5,000만원을 빼면 과세표준 5,000만원, 세율 10%로 산출세액 500만원입니다. "
+         u"기한 내 신고하면 3% 공제로 485만원입니다."),
+        (u"세금이 없으면 신고 안 해도 되나요?",
+         u"의무는 아니지만 하는 편이 안전합니다. 나중에 자금출처를 소명해야 할 때 근거가 됩니다."),
+        (u"10년이 지나면 공제가 다시 생기나요?",
+         u"네. 공제 한도는 10년 단위로 합산하므로 마지막 증여로부터 10년이 지나면 다시 채워집니다."),
+        (u"혼인 공제 1억은 누구나 받나요?",
+         u"직계존속에게 받는 경우로, 혼인신고 전후 2년 또는 출산·입양 후 2년 이내라는 요건이 있습니다. "
+         u"국세청 기준을 확인하세요."),
+        (u"부동산을 증여받으면 어떻게 계산하나요?",
+         u"시가 평가가 필요하고 취득세도 별도로 발생합니다. 이 계산기는 현금 기준의 개략 계산이므로 "
+         u"부동산은 세무 전문가 상담을 권합니다."),
+    ],
+)
+
+# ───────────────────────── 종합소득세 ─────────────────────────
+add(
+    slug="jonghap", name=u"종합소득세 계산기", group=u"사업·세금",
+    title=u"종합소득세 계산기 | 프리랜서·사업자 5월 신고 세액",
+    desc=u"총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.",
+    kw=u"프리랜서·사업자 종합소득세 개략 계산",
+    spec=u"""
+Calc.mount({
+  id:"jonghap",
+  formTitle:"소득 정보",
+  sideNote:"단순경비율·기준경비율 적용 대상은 업종과 수입 규모에 따라 다릅니다. 홈택스에서 본인 기준을 확인하세요.",
+  fields:[
+    {k:"revenue", label:"총수입금액", sub:"1년 매출", suffix:"원", value:60000000, step:1000000, min:0},
+    {k:"mode", label:"필요경비", type:"seg", options:[
+      {value:"rate", label:"경비율 적용"}, {value:"direct", label:"직접 입력"}]},
+    {k:"expRate", label:"경비율", sub:"업종별 단순경비율", suffix:"%", value:64.1, step:0.1, min:0},
+    {k:"expense", label:"필요경비 금액", sub:"직접 입력 시", suffix:"원", value:0, step:1000000, min:0},
+    {k:"family", label:"부양가족", sub:"본인 포함", suffix:"명", value:1, step:1, min:1},
+    {k:"pension", label:"연금보험료 공제", sub:"국민연금 등 납부액", suffix:"원", value:0, step:100000, min:0},
+    {k:"prepaid", label:"기납부세액", sub:"원천징수 3.3% 등", suffix:"원", value:0, step:100000, min:0}
+  ],
+  compute:function(v,F){
+    var rev=v.revenue||0;
+    var exp = v.mode==="direct" ? (v.expense||0) : rev*(v.expRate||0)/100;
+    exp=Math.min(exp,rev);
+    var income=rev-exp;
+
+    var personal=1500000*Math.max(1,v.family||1);
+    var ded=personal+(v.pension||0);
+    var base=Math.max(0, income-ded);
+
+    var t=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+           [150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],
+           [1000000000,.42,35940000],[Infinity,.45,65940000]];
+    var tax=0, rateNote="";
+    for(var i=0;i<t.length;i++) if(base<=t[i][0]){ tax=base*t[i][1]-t[i][2]; rateNote=(t[i][1]*100)+"%"; break; }
+    tax=Math.max(0,tax);
+
+    var standard=70000;                       /* 표준세액공제 */
+    var income_tax=Math.max(0, tax-standard);
+    var local=income_tax*0.1;
+    var total=income_tax+local;
+    var due=total-(v.prepaid||0);
+
+    return {
+      hero:{k: due>=0 ? "추가 납부액" : "환급 예상액",
+            v:F.kor(Math.abs(due)), sub:F.won(Math.abs(due)),
+            cls: due>=0 ? "down":"up"},
+      stats:[
+        {k:"소득금액", v:F.won(income), sub:"수입 − 경비"},
+        {k:"결정세액", v:F.won(total), sub:"지방소득세 포함"},
+        {k:"기납부세액", v:F.won(v.prepaid||0), sub:"원천징수 등"}
+      ],
+      hint:"과세표준 "+F.kor(base)+" · 세율 "+rateNote,
+      cols:["단계","금액"],
+      rows:[
+        ["총수입금액", F.won(rev)],
+        ["필요경비", "− "+F.won(exp)],
+        ["소득금액", F.won(income)],
+        ["인적공제 ("+F.num(v.family)+"명)", "− "+F.won(personal)],
+        ["연금보험료공제", "− "+F.won(v.pension||0)],
+        ["과세표준", F.won(base)],
+        ["산출세액 ("+rateNote+")", F.won(tax)],
+        ["표준세액공제", "− "+F.won(Math.min(standard,tax))],
+        ["소득세", F.won(income_tax)],
+        ["지방소득세 10%", F.won(local)],
+        ["결정세액", F.won(total)],
+        ["기납부세액", "− "+F.won(v.prepaid||0)],
+        [due>=0?"추가 납부":"환급", F.won(Math.abs(due))]
+      ],
+      extra:"<div class='note'>종합소득세 신고 기한은 <b>매년 5월 1일~31일</b>입니다 "+
+        "(성실신고확인 대상은 6월 말). 프리랜서는 보통 3.3%가 원천징수되어 있으니 "+
+        "<b>기납부세액</b> 칸에 넣으면 환급인지 추가 납부인지 나옵니다.<br><br>"+
+        "의료비·교육비·기부금·연금저축·노란우산공제 등 개인별 공제는 반영하지 않았습니다. "+
+        "이런 공제가 있으면 실제 세액은 이보다 줄어듭니다.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>누가 신고하나</h3>
+<p>근로소득만 있고 연말정산을 마쳤다면 따로 신고하지 않아도 됩니다.
+다음에 해당하면 <strong>5월에 종합소득세를 신고</strong>해야 합니다.</p>
+<ul>
+<li>프리랜서 (3.3% 원천징수를 받는 인적용역 소득자)</li>
+<li>개인사업자</li>
+<li>근로소득 외에 사업·임대·기타소득이 있는 경우</li>
+<li>두 곳 이상에서 근로소득이 있는데 합산 연말정산을 하지 않은 경우</li>
+</ul>
+
+<h3>필요경비를 어떻게 잡느냐가 세금을 좌우합니다</h3>
+<p>수입에서 경비를 빼야 소득금액이 나옵니다. 방법은 두 가지입니다.</p>
+<p><strong>장부 작성 (직접 입력)</strong> — 실제 쓴 비용을 증빙과 함께 경비로 인정받습니다.
+경비가 많은 업종이면 유리하고, 적자면 결손금으로 이월할 수도 있습니다.</p>
+<p><strong>경비율 적용 (추계신고)</strong> — 장부가 없을 때 업종별로 정해진 비율만큼 경비로 인정합니다.
+<strong>단순경비율</strong>은 수입이 적은 사업자에게 적용되고 비율이 높아 유리합니다.
+수입이 일정 규모를 넘으면 비율이 낮은 <strong>기준경비율</strong> 대상이 되어 세금이 크게 늘 수 있습니다.</p>
+<p>업종별 경비율과 적용 대상 기준은 국세청이 고시합니다. 홈택스에서 본인 업종 코드로 확인하세요.</p>
+
+<h3>프리랜서 3.3%는 미리 낸 세금입니다</h3>
+<p>용역비에서 3.3%(소득세 3% + 지방소득세 0.3%)가 원천징수됩니다.
+이것은 <strong>세금을 다 낸 것이 아니라 미리 낸 것</strong>입니다.
+5월에 실제 세액을 계산해 더 냈으면 돌려받고, 덜 냈으면 더 냅니다.</p>
+<p>수입이 적으면 대부분 환급을 받습니다. 반대로 수입이 커서 높은 세율 구간에 들어가면
+추가 납부가 나옵니다. 기납부세액 칸에 원천징수된 금액을 넣어 확인해 보세요.</p>
+
+<h3>세율 구간</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>과세표준</th><th>세율</th><th>누진공제</th></tr></thead>
+<tbody>
+<tr><td>1,400만원 이하</td><td class="n">6%</td><td class="n">—</td></tr>
+<tr><td>5,000만원 이하</td><td class="n">15%</td><td class="n">126만원</td></tr>
+<tr><td>8,800만원 이하</td><td class="n">24%</td><td class="n">576만원</td></tr>
+<tr><td>1억 5,000만원 이하</td><td class="n">35%</td><td class="n">1,544만원</td></tr>
+<tr><td>3억원 이하</td><td class="n">38%</td><td class="n">1,994만원</td></tr>
+<tr><td>5억원 이하</td><td class="n">40%</td><td class="n">2,594만원</td></tr>
+<tr><td>10억원 이하</td><td class="n">42%</td><td class="n">3,594만원</td></tr>
+<tr><td>10억원 초과</td><td class="n">45%</td><td class="n">6,594만원</td></tr>
+</tbody></table></div>
+<p>여기에 지방소득세가 소득세의 10%만큼 더 붙습니다.</p>
+
+<h3>세금을 줄이는 합법적인 방법</h3>
+<ul>
+<li><strong>노란우산공제</strong> — 소기업·소상공인 공제부금. 연 최대 500만원 소득공제</li>
+<li><strong>연금저축·IRP</strong> — 세액공제</li>
+<li><strong>국민연금 보험료</strong> — 전액 소득공제</li>
+<li><strong>장부 작성</strong> — 경비를 제대로 반영하고 기장세액공제도 받을 수 있습니다</li>
+</ul>
+<p>이 계산기는 인적공제와 연금보험료만 반영합니다. 위 항목이 있으면 실제 세금은 더 줄어듭니다.</p>
+
+<h3>부가세와는 다른 세금입니다</h3>
+<p>부가가치세는 1월·7월에 신고하고, 종합소득세는 5월에 신고합니다.
+별개의 세금이니 둘 다 챙기셔야 합니다.
+부가세는 <a href="../bugagse/">부가세 계산기</a>에서 확인하실 수 있습니다.</p>
+""",
+    faq=[
+        (u"프리랜서인데 3.3% 떼고 받았습니다. 또 내야 하나요?",
+         u"3.3%는 미리 낸 세금입니다. 5월에 실제 세액을 계산해 정산합니다. "
+         u"수입이 적으면 보통 환급받고, 많으면 추가 납부가 나옵니다."),
+        (u"경비율을 얼마로 넣어야 하나요?",
+         u"업종별로 국세청이 고시합니다. 홈택스에서 본인 업종 코드의 단순경비율·기준경비율을 "
+         u"확인해 넣으세요. 기본값은 예시입니다."),
+        (u"장부를 쓰는 게 유리한가요?",
+         u"실제 경비가 경비율보다 많으면 장부가 유리합니다. 수입이 커지면 기준경비율 대상이 되어 "
+         u"인정 경비가 줄기 때문에 장부 작성이 사실상 필요해집니다."),
+        (u"근로소득도 있는데 어떻게 하나요?",
+         u"근로소득과 사업소득을 합산해 신고해야 합니다. 이 계산기는 사업·기타소득 단독 기준의 "
+         u"개략 계산이므로 합산 신고는 홈택스나 세무 전문가를 이용하세요."),
+        (u"신고 기한을 놓치면 어떻게 되나요?",
+         u"무신고가산세와 납부지연가산세가 붙습니다. 기한 후 신고를 빨리 할수록 가산세가 줄어듭니다."),
+    ],
+)
+
+# ───────────────────────── 연말정산 환급금 ─────────────────────────
+add(
+    slug="yeonmal", name=u"연말정산 환급금 계산기", group=u"급여·노무",
+    title=u"연말정산 계산기 | 환급금·추가납부액 미리 계산",
+    desc=u"총급여와 공제 항목으로 연말정산 결정세액을 계산하고, 이미 낸 세금과 비교해 환급 또는 추가 납부액을 알려줍니다.",
+    kw=u"신용카드·의료비·연금저축 반영한 환급 예상액",
+    spec=u"""
+Calc.mount({
+  id:"yeonmal",
+  formTitle:"급여와 공제",
+  sideNote:"주요 공제만 반영한 개략 계산입니다. 정확한 금액은 홈택스 연말정산 미리보기를 이용하세요.",
+  fields:[
+    {k:"pay", label:"총급여", sub:"연간, 비과세 제외", suffix:"원", value:50000000, step:1000000, min:0},
+    {k:"prepaid", label:"기납부세액", sub:"올해 원천징수된 소득세 합계", suffix:"원", value:2000000, step:100000, min:0},
+    {k:"family", label:"부양가족", sub:"본인 포함", suffix:"명", value:1, step:1, min:1},
+    {k:"child", label:"20세 이하 자녀", suffix:"명", value:0, step:1, min:0},
+    {k:"card", label:"신용·체크카드 사용액", suffix:"원", value:15000000, step:1000000, min:0},
+    {k:"medical", label:"의료비", suffix:"원", value:0, step:100000, min:0},
+    {k:"edu", label:"교육비", suffix:"원", value:0, step:100000, min:0},
+    {k:"insur", label:"보장성 보험료", sub:"연 100만 한도", suffix:"원", value:0, step:100000, min:0},
+    {k:"pension", label:"연금저축·IRP 납입액", sub:"연 900만 한도", suffix:"원", value:0, step:100000, min:0},
+    {k:"donate", label:"기부금", suffix:"원", value:0, step:100000, min:0}
+  ],
+  compute:function(v,F){
+    var g=v.pay||0;
+
+    /* 근로소득공제 */
+    var wd;
+    if(g<=5000000) wd=g*0.7;
+    else if(g<=15000000) wd=3500000+(g-5000000)*0.4;
+    else if(g<=45000000) wd=7500000+(g-15000000)*0.15;
+    else if(g<=100000000) wd=12000000+(g-45000000)*0.05;
+    else wd=14750000+(g-100000000)*0.02;
+    wd=Math.min(wd,20000000);
+
+    /* 4대보험 근로자 부담 (개략) */
+    var ins = Math.min(g,74040000)*0.045 + g*0.03545*1.1295 + g*0.009;
+
+    var personal=1500000*Math.max(1,v.family||1);
+
+    /* 신용카드 소득공제: 총급여 25% 초과분 × 15%, 한도 300만 */
+    var threshold=g*0.25;
+    var cardDed=Math.max(0, (v.card||0)-threshold)*0.15;
+    var cardCap = g<=70000000 ? 3000000 : 2500000;
+    cardDed=Math.min(cardDed, cardCap);
+
+    var base=Math.max(0, g-wd-personal-ins-cardDed);
+
+    function calcTax(b){
+      var t=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+             [150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],
+             [1000000000,.42,35940000],[Infinity,.45,65940000]];
+      for(var i=0;i<t.length;i++) if(b<=t[i][0]) return b*t[i][1]-t[i][2];
+      return 0;
+    }
+    var gross=Math.max(0,calcTax(base));
+
+    /* 근로소득세액공제 */
+    var wc = gross<=1300000 ? gross*0.55 : 715000+(gross-1300000)*0.30;
+    var wcCap = g<=33000000 ? 740000
+              : g<=70000000 ? Math.max(660000, 740000-(g-33000000)*0.008)
+              : Math.max(500000, 660000-(g-70000000)*0.005);
+    wc=Math.min(wc,wcCap);
+
+    var childC=(v.child||0)>0 ? ((v.child==1)?150000:(v.child==2)?350000:350000+(v.child-2)*300000) : 0;
+    var insurC=Math.min(v.insur||0,1000000)*0.12;
+    var medC=Math.max(0,(v.medical||0)-g*0.03)*0.15;
+    var eduC=(v.edu||0)*0.15;
+    var donC=(v.donate||0)*0.15;
+    var penRate = g<=55000000 ? 0.15 : 0.12;
+    var penC=Math.min(v.pension||0,9000000)*penRate;
+
+    var credits=wc+childC+insurC+medC+eduC+donC+penC;
+    var income=Math.max(0, gross-credits);
+    var local=income*0.1;
+    var decided=income+local;
+    var refund=(v.prepaid||0)-decided;
+
+    return {
+      hero:{k: refund>=0 ? "환급 예상액" : "추가 납부액",
+            v:F.kor(Math.abs(refund)), sub:F.won(Math.abs(refund)),
+            cls: refund>=0 ? "up":"down"},
+      stats:[
+        {k:"결정세액", v:F.won(decided), sub:"지방소득세 포함"},
+        {k:"기납부세액", v:F.won(v.prepaid||0)},
+        {k:"세액공제 합계", v:F.won(credits), cls:"up"}
+      ],
+      hint: refund>=0 ? "돌려받습니다" : "더 내야 합니다",
+      cols:["단계","금액"],
+      rows:[
+        ["총급여", F.won(g)],
+        ["근로소득공제", "− "+F.won(wd)],
+        ["인적공제 ("+F.num(v.family)+"명)", "− "+F.won(personal)],
+        ["4대보험료", "− "+F.won(ins)],
+        ["신용카드 소득공제", "− "+F.won(cardDed)],
+        ["과세표준", F.won(base)],
+        ["산출세액", F.won(gross)],
+        ["근로소득세액공제", "− "+F.won(wc)],
+        ["자녀세액공제", "− "+F.won(childC)],
+        ["보험료·의료비·교육비·기부금", "− "+F.won(insurC+medC+eduC+donC)],
+        ["연금저축 ("+(penRate*100)+"%)", "− "+F.won(penC)],
+        ["소득세", F.won(income)],
+        ["지방소득세 10%", F.won(local)],
+        ["결정세액", F.won(decided)],
+        [refund>=0?"환급":"추가 납부", F.won(Math.abs(refund))]
+      ],
+      extra:"<div class='note'>"+
+        "신용카드는 <b>총급여의 25%를 넘게 쓴 부분</b>만 공제됩니다. "+
+        "여기서는 "+F.won(threshold)+" 를 넘는 금액이 대상입니다."+
+        ((v.card||0)<threshold ? " <b>지금 사용액은 기준에 못 미쳐 공제가 없습니다.</b>" : "")+
+        "<br><br>의료비는 <b>총급여의 3%를 넘는 부분</b>만 공제됩니다 ("+F.won(g*0.03)+" 초과분).<br><br>"+
+        "체크카드·현금영수증은 공제율이 더 높고(30%), 전통시장·대중교통은 별도 추가 공제가 있습니다. "+
+        "여기서는 신용카드 기준 15%로 단순화했습니다. 월세액·주택자금·기부금 유형별 차등 등은 "+
+        "반영하지 않았으니 실제 금액은 홈택스 미리보기로 확인하세요.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>연말정산은 정산입니다</h3>
+<p>회사는 매달 <strong>간이세액표</strong>에 따라 대략적인 소득세를 떼어 갑니다.
+이건 어림잡아 미리 낸 금액입니다. 한 해가 끝나면 실제로 내야 할 세금(결정세액)을 계산해서,
+더 냈으면 <strong>돌려받고(환급)</strong> 덜 냈으면 <strong>더 냅니다(추가 납부)</strong>.</p>
+<p>그래서 "13월의 월급"이라는 말이 나오지만, 반대로 토해내는 경우도 있습니다.
+환급이 많다고 좋은 것도 아닙니다. 그만큼 1년 동안 세금을 과하게 내고 있었다는 뜻이기도 합니다.</p>
+
+<h3>소득공제와 세액공제는 다릅니다</h3>
+<p><strong>소득공제</strong>는 세금을 매기는 <em>대상 금액</em>을 줄입니다.
+신용카드, 인적공제, 4대보험료가 여기 해당합니다.
+같은 100만원 공제라도 세율이 높은 사람이 더 많이 아낍니다.</p>
+<p><strong>세액공제</strong>는 계산된 <em>세금 자체</em>를 깎습니다.
+의료비, 교육비, 연금저축, 기부금이 여기 해당합니다.
+소득에 관계없이 깎이는 금액이 같습니다.</p>
+
+<h3>신용카드는 총급여의 25%를 넘겨야 시작됩니다</h3>
+<p>가장 오해가 많은 부분입니다. 카드를 아무리 써도 <strong>총급여의 25%까지는 공제가 0원</strong>입니다.
+연봉 5,000만원이면 1,250만원을 넘게 쓴 부분부터 공제 대상입니다.</p>
+<p>공제율도 결제 수단에 따라 다릅니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>수단</th><th>공제율</th></tr></thead>
+<tbody>
+<tr><td>신용카드</td><td class="n">15%</td></tr>
+<tr><td>체크카드·현금영수증</td><td class="n">30%</td></tr>
+<tr><td>전통시장·대중교통</td><td class="n">40% (추가 한도 별도)</td></tr>
+</tbody></table></div>
+<p>따라서 <strong>25%까지는 혜택 좋은 신용카드로 쓰고, 그 위로는 체크카드를 쓰는 것</strong>이
+공제 측면에서 유리합니다. 이 계산기는 신용카드 기준 15%로 단순화했습니다.</p>
+
+<h3>의료비도 문턱이 있습니다</h3>
+<p>의료비는 <strong>총급여의 3%를 넘는 부분</strong>만 공제됩니다.
+연봉 5,000만원이면 150만원을 넘게 쓴 금액부터입니다.
+안경·콘택트렌즈(1인 50만원 한도), 산후조리원(200만원 한도)도 포함됩니다.
+다만 미용·성형 목적이나 건강기능식품은 제외됩니다.</p>
+
+<h3>연금저축·IRP가 가장 확실한 절세 수단입니다</h3>
+<p>연금저축과 IRP를 합쳐 <strong>연 900만원까지</strong> 세액공제를 받습니다.
+총급여 5,500만원 이하면 15%, 초과하면 12%입니다.
+900만원을 채우면 총급여 5,500만원 이하인 사람은 <strong>135만원</strong>을 돌려받습니다.</p>
+<p>다른 공제와 달리 <strong>내가 결정해서 늘릴 수 있는 항목</strong>이라는 점이 중요합니다.
+다만 55세 이후 연금으로 받아야 하고 중도 인출하면 세금을 토해내니 여유자금으로 하셔야 합니다.</p>
+
+<h3>맞벌이라면 누구에게 몰아줄지 계산해 보세요</h3>
+<p>부양가족 공제는 한 사람만 받을 수 있습니다.
+일반적으로 <strong>소득이 높은 쪽</strong>에 몰아주는 것이 유리하지만,
+의료비처럼 <em>총급여의 3% 초과분</em>만 인정되는 항목은
+<strong>소득이 낮은 쪽</strong>이 문턱이 낮아 유리할 수 있습니다.
+두 경우를 각각 계산해 비교해 보세요.</p>
+
+<h3>이 계산기의 한계</h3>
+<p>월세액 세액공제, 주택자금·주택청약 공제, 기부금 유형별 차등,
+중소기업 취업자 감면, 출산·입양 공제, 장애인·경로우대 추가공제는 반영하지 않았습니다.
+결과는 개략적인 추정이며, 정확한 금액은
+<strong>국세청 홈택스의 연말정산 미리보기</strong>에서 확인하세요.</p>
+""",
+    faq=[
+        (u"카드를 많이 썼는데 공제가 0원으로 나옵니다.",
+         u"신용카드 공제는 총급여의 25%를 넘게 쓴 부분부터 시작됩니다. "
+         u"연봉 5,000만원이면 1,250만원을 넘겨야 공제가 생깁니다."),
+        (u"환급을 많이 받으려면 어떻게 해야 하나요?",
+         u"내가 조절할 수 있는 항목은 연금저축·IRP 납입액입니다. 연 900만원까지 12~15% "
+         u"세액공제를 받습니다. 다만 55세 이후 연금 수령이 전제입니다."),
+        (u"기납부세액은 어디서 확인하나요?",
+         u"급여명세서의 소득세를 1년치 합하거나, 원천징수영수증의 기납부세액 항목을 보시면 됩니다."),
+        (u"맞벌이인데 누구에게 몰아야 하나요?",
+         u"보통 소득이 높은 쪽이 유리하지만, 의료비처럼 총급여 대비 문턱이 있는 항목은 "
+         u"소득이 낮은 쪽이 유리할 수 있습니다. 두 경우를 계산해 비교해 보세요."),
+        (u"계산 결과가 실제와 다릅니다.",
+         u"주요 공제만 반영한 개략 계산입니다. 월세·주택자금·중소기업 감면 등은 빠져 있어 "
+         u"실제 환급액은 더 클 수 있습니다. 홈택스 미리보기로 확인하세요."),
+    ],
+)
