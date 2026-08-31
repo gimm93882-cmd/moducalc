@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>대출 이자 계산기 | 원리금균등·원금균등·만기일시 상환 비교</title>
+<meta name="description" content="주택담보대출·신용대출의 월 상환액과 총이자를 계산합니다. 원리금균등·원금균등·만기일시 세 방식을 비교하고 상환 스케줄을 확인할 수 있습니다.">
+<link rel="canonical" href="https://moducalc.kr/loan/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="대출 이자 계산기 | 원리금균등·원금균등·만기일시 상환 비교">
+<meta property="og:description" content="주택담보대출·신용대출의 월 상환액과 총이자를 계산합니다. 원리금균등·원금균등·만기일시 세 방식을 비교하고 상환 스케줄을 확인할 수 있습니다.">
+<meta property="og:url" content="https://moducalc.kr/loan/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "대출 이자 계산기", "url": "https://moducalc.kr/loan/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "주택담보대출·신용대출의 월 상환액과 총이자를 계산합니다. 원리금균등·원금균등·만기일시 세 방식을 비교하고 상환 스케줄을 확인할 수 있습니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "원리금균등과 원금균등 중 어느 것이 유리한가요?", "acceptedAnswer": {"@type": "Answer", "text": "총이자만 보면 원금균등이 적습니다. 다만 초반 상환 부담이 크므로 현금 흐름을 함께 봐야 합니다. 두 방식을 각각 계산해 첫 달 금액과 총이자를 비교해 보세요."}}, {"@type": "Question", "name": "중도상환수수료도 계산되나요?", "acceptedAnswer": {"@type": "Answer", "text": "반영하지 않습니다. 상품마다 요율과 면제 조건이 달라 약정서를 확인하셔야 합니다."}}, {"@type": "Question", "name": "변동금리는 어떻게 확인하나요?", "acceptedAnswer": {"@type": "Answer", "text": "현재 금리로 한 번, 1~2%p 높인 금리로 한 번 계산해 상환액이 얼마나 늘어나는지 비교해 보시는 방법을 권합니다."}}, {"@type": "Question", "name": "거치기간을 두면 왜 총이자가 늘어나나요?", "acceptedAnswer": {"@type": "Answer", "text": "거치기간에는 원금이 줄지 않아 그만큼 이자가 붙는 기간이 길어지기 때문입니다."}}]}]</script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow">대출·예금</p><h1>대출 이자 계산기</h1><p>주택담보대출·신용대출의 월 상환액과 총이자를 계산합니다. 원리금균등·원금균등·만기일시 세 방식을 비교하고 상환 스케줄을 확인할 수 있습니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>상환방식에 따라 총이자가 크게 달라집니다</h3>
+<p>3억원을 연 4.5%로 30년 빌린다고 할 때 방식별 차이입니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>방식</th><th>첫 달</th><th>총이자</th><th>특징</th></tr></thead>
+<tbody>
+<tr><td>원리금균등</td><td class="n">약 152만원</td><td class="n">약 2억 4,722만원</td><td>매달 같은 금액</td></tr>
+<tr><td>원금균등</td><td class="n">약 195만원</td><td class="n">약 2억 306만원</td><td>초반 부담 크고 점점 감소</td></tr>
+<tr><td>만기일시</td><td class="n">약 112만원</td><td class="n">약 4억 500만원</td><td>월 부담 최소, 총이자 최대</td></tr>
+</tbody></table></div>
+<p>월 부담이 작을수록 총이자는 커집니다. 원금을 늦게 갚을수록 이자가 붙는 기간이 길어지기 때문입니다.</p>
+
+<h3>원리금균등 — 가장 흔한 방식</h3>
+<p>매달 내는 금액이 똑같아 자금 계획을 세우기 쉽습니다. 다만 <strong>초반에는 낸 돈의 대부분이 이자</strong>입니다.
+위 조건에서 첫 달 152만원 중 이자가 112.5만원, 원금은 40만원이 채 안 됩니다.
+5년을 갚아도 원금은 10% 남짓 줄어듭니다. 중도상환을 생각한다면 이 점을 알고 계셔야 합니다.</p>
+
+<h3>거치기간의 함정</h3>
+<p>거치기간에는 이자만 냅니다. 당장 부담은 줄지만 원금이 그대로 남아 있어
+거치가 끝난 뒤 월 상환액이 올라가고 총이자도 늘어납니다.
+거치기간 칸에 숫자를 넣어 총이자가 얼마나 늘어나는지 비교해 보세요.</p>
+
+<h3>중도상환수수료</h3>
+<p>대출을 일찍 갚으면 수수료가 붙는 경우가 있습니다. 보통 3년이 지나면 면제되고,
+남은 기간에 비례해 줄어드는 구조(슬라이딩)가 일반적입니다.
+이 계산기는 중도상환수수료를 반영하지 않으니 약정서를 확인하세요.</p>
+
+<h3>변동금리라면</h3>
+<p>이 계산기는 금리가 끝까지 그대로라고 가정합니다. 변동금리 대출은 기준금리 변동에 따라
+상환액이 바뀝니다. 금리를 1%p 올려서 다시 계산해 보면 감당 가능한 수준인지 가늠할 수 있습니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>원리금균등과 원금균등 중 어느 것이 유리한가요?</summary><div class="a">총이자만 보면 원금균등이 적습니다. 다만 초반 상환 부담이 크므로 현금 흐름을 함께 봐야 합니다. 두 방식을 각각 계산해 첫 달 금액과 총이자를 비교해 보세요.</div></details>
+<details><summary>중도상환수수료도 계산되나요?</summary><div class="a">반영하지 않습니다. 상품마다 요율과 면제 조건이 달라 약정서를 확인하셔야 합니다.</div></details>
+<details><summary>변동금리는 어떻게 확인하나요?</summary><div class="a">현재 금리로 한 번, 1~2%p 높인 금리로 한 번 계산해 상환액이 얼마나 늘어나는지 비교해 보시는 방법을 권합니다.</div></details>
+<details><summary>거치기간을 두면 왜 총이자가 늘어나나요?</summary><div class="a">거치기간에는 원금이 줄지 않아 그만큼 이자가 붙는 기간이 길어지기 때문입니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"loan",
+  formTitle:"대출 조건",
+  fields:[
+    {k:"principal", label:"대출금액", suffix:"원", value:300000000, step:1000000, min:0},
+    {k:"rate", label:"연이자율", suffix:"%", value:4.5, step:0.01, min:0},
+    {k:"months", label:"대출기간", suffix:"개월", value:360, step:1, min:1,
+     note:"360개월 = 30년"},
+    {k:"method", label:"상환방식", type:"select", value:"equal", options:[
+      {value:"equal", label:"원리금균등"},
+      {value:"principal", label:"원금균등"},
+      {value:"bullet", label:"만기일시"}]},
+    {k:"grace", label:"거치기간", sub:"이자만 내는 기간", suffix:"개월", value:0, step:1, min:0}
+  ],
+  compute:function(v,F){
+    var P=v.principal||0, i=(v.rate||0)/100/12, n=Math.max(1,Math.round(v.months||1));
+    var g=Math.min(Math.max(0,Math.round(v.grace||0)), n-1);
+    var pay=n-g, bal=P, rows=[], totalInt=0, first=0;
+
+    for(var m=1;m<=n;m++){
+      var interest=bal*i, princ=0;
+      if(m<=g){ princ=0; }
+      else if(v.method==="bullet"){ princ = (m===n)?bal:0; }
+      else if(v.method==="principal"){ princ = P/pay; }
+      else {
+        var A = i>0 ? P*i*Math.pow(1+i,pay)/(Math.pow(1+i,pay)-1) : P/pay;
+        princ = A-interest;
+        if(m===n) princ=bal;
+      }
+      if(princ>bal) princ=bal;
+      var total=princ+interest;
+      bal-=princ; totalInt+=interest;
+      if(m===g+1) first=total;
+      if(rows.length<600)
+        rows.push([m+"회", F.won(princ), F.won(interest), F.won(total), F.won(Math.max(bal,0))]);
+    }
+
+    var label={equal:"원리금균등",principal:"원금균등",bullet:"만기일시"}[v.method];
+    return {
+      hero:{k: v.method==="principal" ? "첫 달 상환액" : "월 상환액",
+            v:F.kor(first), sub:F.won(first)},
+      stats:[
+        {k:"총 이자", v:F.won(totalInt), cls:"down"},
+        {k:"총 상환액", v:F.won(P+totalInt)},
+        {k:"이자 비중", v:F.pct(P>0?totalInt/P*100:0,1), sub:"원금 대비"}
+      ],
+      hint:label+" · "+F.num(n)+"개월"+(g?" · 거치 "+F.num(g)+"개월":""),
+      extra:"<div class='note'>"+
+        (v.method==="principal"
+          ? "원금균등은 첫 달이 가장 많고 매달 줄어듭니다. 마지막 달 상환액은 <b>"+F.won(P/pay*(1+0)+0)+"</b> 수준까지 내려갑니다."
+          : v.method==="bullet"
+            ? "만기일시는 매달 이자만 내다가 만기에 원금 <b>"+F.won(P)+"</b> 를 한 번에 갚습니다. 월 부담은 가장 작지만 총이자는 가장 큽니다."
+            : "원리금균등은 매달 같은 금액을 냅니다. 초반에는 이자 비중이 크고 후반으로 갈수록 원금 비중이 커집니다.")
+        +"</div>",
+      cols:["회차","원금","이자","상환액","잔액"],
+      rows:rows,
+      tableHint: n>600 ? "앞 600회차만 표시" : F.num(n)+"회차"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>

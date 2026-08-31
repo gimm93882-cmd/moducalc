@@ -3,53 +3,262 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>소개 | 복리 계산기</title>
-<meta name="description" content="복리 계산기를 만든 이유와 다른 계산기와의 차이, 문의처 안내.">
-<link rel="canonical" href="https://gimm93882-cmd.github.io/compound-calculator/about.html">
+<title>소개 | 모두계산기</title>
+<meta name="description" content="모두계산기를 만든 이유와 계산 방식, 문의처 안내.">
+<link rel="canonical" href="https://moducalc.kr/about.html">
 <meta name="theme-color" content="#FF6B00">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:site_name" content="복리 계산기">
-<meta property="og:title" content="소개 | 복리 계산기">
-<meta property="og:description" content="복리 계산기를 만든 이유와 다른 계산기와의 차이, 문의처 안내.">
-<meta property="og:url" content="https://gimm93882-cmd.github.io/compound-calculator/about.html">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="소개 | 모두계산기">
+<meta property="og:description" content="모두계산기를 만든 이유와 계산 방식, 문의처 안내.">
+<meta property="og:url" content="https://moducalc.kr/about.html">
 <meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
-<style>*,*::before,*::after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0}</style>
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
 
-<style>
-/* 사이트 공통 껍데기. 계산기 자체 스타일은 src/calculator.html 안에 있다. */
-.sitenav{border-bottom:1px solid var(--line);background:var(--surface)}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
 .sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
-  align-items:center;gap:6px;flex-wrap:wrap;min-height:56px}
-.sitenav a{color:var(--ink-2);text-decoration:none;font-size:13.5px;font-weight:500;
-  padding:9px 11px;border-radius:7px;white-space:nowrap}
-.sitenav a:hover{background:var(--surface-2);color:var(--ink)}
-.sitenav a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
-.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:17px;
-  color:var(--ink);margin-right:8px;padding-left:0}
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
 .sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
 
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
 .prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
 .prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  padding:30px 28px;margin-top:22px;box-shadow:var(--shadow)}
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
 @media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
 .prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
-  font-size:clamp(22px,4.6vw,30px);margin:0 0 18px;letter-spacing:-.01em}
-.prose h3{font-size:clamp(16px,3.4vw,19px);font-weight:700;margin:30px 0 10px;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
   letter-spacing:-.01em;color:var(--ink)}
-.prose h3:first-of-type{margin-top:22px}
-.prose p{margin:0 0 14px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
 .prose strong{color:var(--ink);font-weight:700}
-.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:7px}
-.prose .tablewrap{margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
-.prose table{min-width:420px}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
 .prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
 
-.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
   background:var(--surface-3);overflow:hidden}
 .faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
   list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
@@ -59,59 +268,60 @@
 .faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
 .faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
 
-.sitefoot{border-top:1px solid var(--line);margin-top:40px;background:var(--surface)}
-.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 40px;
-  display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between}
-.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
-.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
-.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap}
-.sitefoot .small{font-size:12px;color:var(--muted);max-width:60ch;line-height:1.7}
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
 </style>
-
 </head>
 <body>
 <nav class="sitenav"><div class="in">
-<a class="brand" href="./">복리 <em>계산기</em></a>
-<a href="./">계산기</a>
+<a class="brand" href="./">모두<em>계산기</em></a>
+<div class="navlinks"><a href="">전체 계산기</a>
 <a href="about.html" aria-current="page">소개</a>
 <a href="privacy.html">개인정보처리방침</a>
-<a href="terms.html">이용약관</a>
+<a href="terms.html">이용약관</a></div>
 </div></nav>
 <div class="prose"><article><h2>소개</h2>
-<p><strong>복리 계산기</strong>는 원금과 회차당 수익률로 자산이 어떻게 불어나는지
-계산하는 무료 도구입니다. 설치나 가입 없이 브라우저에서 바로 쓸 수 있습니다.</p>
+<p><strong>모두계산기</strong>는 급여와 대출, 세금과 부동산처럼 일상과 사업에서 자주 마주치는
+계산을 한곳에 모은 무료 도구입니다. 현재 계산기 14가지를 제공하며, 설치나 가입 없이
+브라우저에서 바로 쓸 수 있습니다.</p>
 
-<h3>왜 만들었나</h3>
-<p>복리 계산기는 이미 많지만, 대부분 <strong>매 회차 반드시 이긴다</strong>고 가정합니다.
-그 가정은 예·적금에는 맞지만 매매에는 맞지 않습니다. 지는 회차가 섞이는 순간
-산술평균이 아니라 기하평균이 결과를 결정하는데, 이 차이를 보여주는 계산기가 드물었습니다.</p>
-<p>그래서 세 가지를 더했습니다.</p>
+<h3>어떤 계산기가 있나</h3>
 <ul>
-<li><strong>레버리지 환산</strong> — 가격 변동률을 증거금 대비 수익률로 바꾸고, 수수료를 배수만큼 반영하며, 청산선을 함께 보여줍니다.</li>
-<li><strong>목표 금액 역산</strong> — 목표까지 몇 회차인지, 정한 기간에 맞추려면 회차당 몇 %가 필요한지 계산합니다.</li>
-<li><strong>승률 보정</strong> — 승률과 손실 폭을 넣으면 기하평균 기준의 실제 기대값을 계산합니다.</li>
+<li><strong>급여·노무</strong> — 연봉 실수령액, 퇴직금, 4대보험, 주휴수당</li>
+<li><strong>대출·예금</strong> — 대출 이자(원리금균등·원금균등·만기일시), 예적금 만기 수령액</li>
+<li><strong>사업·세금</strong> — 부가세, 마진율, 카드 수수료</li>
+<li><strong>부동산·생활</strong> — 평수 변환, 전월세 전환, 중개보수, 날짜 계산</li>
+<li><strong>투자</strong> — 복리 계산 (레버리지·수수료·승률 반영)</li>
 </ul>
 
-<h3>개인정보</h3>
-<p>계산은 전부 브라우저 안에서 이루어집니다. 입력한 금액은 서버로 전송되지 않습니다.
+<h3>세 가지를 지키려 했습니다</h3>
+<p><strong>계산 근거를 밝힙니다.</strong> 각 계산기 아래에 어떤 식으로 계산했는지,
+어떤 기준을 썼는지 적었습니다. 숫자만 던지고 끝내지 않습니다.</p>
+<p><strong>바뀌는 값은 열어둡니다.</strong> 보험료율과 최저임금처럼 해마다 바뀌는 수치는
+상수로 박지 않고 입력 항목으로 두었습니다. 고시가 바뀌면 이용자가 직접 고쳐 쓸 수 있습니다.</p>
+<p><strong>입력값을 가져가지 않습니다.</strong> 급여나 대출금 같은 민감한 숫자를 다루는 만큼,
+모든 계산은 브라우저 안에서만 이루어지고 서버로 전송되지 않습니다.
 자세한 내용은 <a href="privacy.html">개인정보처리방침</a>을 참고해 주세요.</p>
 
-<h3>중요한 고지</h3>
-<p>이 사이트는 <strong>투자 자문을 제공하지 않습니다.</strong> 계산 결과는 입력한 가정에 대한
-산술 결과일 뿐이며 특정 투자의 수익을 예상하거나 보장하지 않습니다. 자세한 내용은
-<a href="terms.html">이용약관</a>에 정리해 두었습니다.</p>
+<h3>한계</h3>
+<p>이 사이트는 <strong>세무·법률·노무·투자 자문을 제공하지 않습니다.</strong>
+계산 결과는 입력한 값에 대한 산술 결과이며, 개인별 사정과 최신 법령에 따라 실제 금액은
+달라집니다. 중요한 판단은 홈택스·공단·전문가 확인을 거치시기 바랍니다.
+자세한 내용은 <a href="terms.html">이용약관</a>에 정리해 두었습니다.</p>
 
 <h3>문의</h3>
-<p>오류 제보나 기능 제안은 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a> 로 보내주시면 확인하겠습니다.</p>
+<p>계산 오류 제보, 필요한 계산기 제안은 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a> 로 보내주시면
+확인하겠습니다.</p>
 </article></div>
 <footer class="sitefoot"><div class="in">
 <div class="small">
-  <strong>복리 계산기</strong><br>
-  계산 결과는 입력한 가정에 대한 산술 결과일 뿐이며 특정 투자의 수익을 예상하거나 보장하지 않습니다.
-  투자 판단과 그 결과에 대한 책임은 이용자 본인에게 있습니다.<br>
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
   문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
 </div>
-<div class="links"><a href="./">계산기</a>
+<div class="links"><a href="">전체 계산기</a>
 <a href="about.html">소개</a>
 <a href="privacy.html">개인정보처리방침</a>
 <a href="terms.html">이용약관</a></div>

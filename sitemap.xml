@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://gimm93882-cmd.github.io/compound-calculator/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://gimm93882-cmd.github.io/compound-calculator/about.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://gimm93882-cmd.github.io/compound-calculator/privacy.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://gimm93882-cmd.github.io/compound-calculator/terms.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://moducalc.kr/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://moducalc.kr/bugagse/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/margin/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/card/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/pyeong/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/date/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/juhyu/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/loan/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/deposit/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/insurance/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/salary/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/severance/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/jeonwolse/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/brokerage/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/bokri/</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://moducalc.kr/about.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://moducalc.kr/privacy.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://moducalc.kr/terms.html</loc><lastmod>2026-08-31</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
 </urlset>

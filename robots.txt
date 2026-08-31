@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gimm93882-cmd.github.io/compound-calculator/sitemap.xml
+Sitemap: https://moducalc.kr/sitemap.xml

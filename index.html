@@ -3,84 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>복리 계산기 | 일복리·월복리·레버리지 수익률 계산</title>
-<meta name="description" content="원금과 회차당 수익률로 복리를 계산합니다. 레버리지와 수수료를 수익률로 환산하고, 목표 금액까지 걸리는 회차를 역산하며, 승률을 넣으면 실제 기대값으로 다시 계산합니다. 무료, 설치 없음.">
-<link rel="canonical" href="https://gimm93882-cmd.github.io/compound-calculator/">
+<title>모두계산기 | 급여·대출·세금·부동산 계산기 모음</title>
+<meta name="description" content="연봉 실수령액, 퇴직금, 대출 이자, 부가세, 마진율, 평수까지 자주 쓰는 계산기 14가지. 무료이고 가입이 필요 없습니다.">
+<link rel="canonical" href="https://moducalc.kr/">
 <meta name="theme-color" content="#FF6B00">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:site_name" content="복리 계산기">
-<meta property="og:title" content="복리 계산기 | 일복리·월복리·레버리지 수익률 계산">
-<meta property="og:description" content="원금과 회차당 수익률로 복리를 계산합니다. 레버리지와 수수료를 수익률로 환산하고, 목표 금액까지 걸리는 회차를 역산하며, 승률을 넣으면 실제 기대값으로 다시 계산합니다. 무료, 설치 없음.">
-<meta property="og:url" content="https://gimm93882-cmd.github.io/compound-calculator/">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="모두계산기 | 급여·대출·세금·부동산 계산기 모음">
+<meta property="og:description" content="연봉 실수령액, 퇴직금, 대출 이자, 부가세, 마진율, 평수까지 자주 쓰는 계산기 14가지. 무료이고 가입이 필요 없습니다.">
+<meta property="og:url" content="https://moducalc.kr/">
 <meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
-<style>*,*::before,*::after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0}</style>
-
-<style>
-/* 사이트 공통 껍데기. 계산기 자체 스타일은 src/calculator.html 안에 있다. */
-.sitenav{border-bottom:1px solid var(--line);background:var(--surface)}
-.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
-  align-items:center;gap:6px;flex-wrap:wrap;min-height:56px}
-.sitenav a{color:var(--ink-2);text-decoration:none;font-size:13.5px;font-weight:500;
-  padding:9px 11px;border-radius:7px;white-space:nowrap}
-.sitenav a:hover{background:var(--surface-2);color:var(--ink)}
-.sitenav a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
-.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:17px;
-  color:var(--ink);margin-right:8px;padding-left:0}
-.sitenav .brand em{font-style:normal;color:var(--accent)}
-
-.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
-.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  padding:30px 28px;margin-top:22px;box-shadow:var(--shadow)}
-@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
-.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
-  font-size:clamp(22px,4.6vw,30px);margin:0 0 18px;letter-spacing:-.01em}
-.prose h3{font-size:clamp(16px,3.4vw,19px);font-weight:700;margin:30px 0 10px;
-  letter-spacing:-.01em;color:var(--ink)}
-.prose h3:first-of-type{margin-top:22px}
-.prose p{margin:0 0 14px;color:var(--ink-2);line-height:1.85;max-width:68ch}
-.prose strong{color:var(--ink);font-weight:700}
-.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:7px}
-.prose .tablewrap{margin:16px 0 20px;border:1px solid var(--line);border-radius:10px}
-.prose table{min-width:420px}
-.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
-
-.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;
-  background:var(--surface-3);overflow:hidden}
-.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
-  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
-  font-weight:700;flex-shrink:0}
-.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
-.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
-
-.sitefoot{border-top:1px solid var(--line);margin-top:40px;background:var(--surface)}
-.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 40px;
-  display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between}
-.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
-.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
-.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap}
-.sitefoot .small{font-size:12px;color:var(--muted);max-width:60ch;line-height:1.7}
-</style>
-
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "복리 계산기", "url": "https://gimm93882-cmd.github.io/compound-calculator/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}, "description": "원금과 회차당 수익률로 복리를 계산하고, 레버리지·수수료 환산과 목표 금액 역산, 승률을 반영한 기대값을 함께 보여주는 계산기."},
-{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "추가 납입을 넣어 적립식 복리 계산기로 쓸 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "됩니다. ‘회차당 추가 납입’에 금액을 넣으면 매 회차 끝에 그만큼 더해 계산합니다. 총 투자 원금에도 납입액이 누적돼 표시되므로, 실제 수익률이 얼마인지 구분해서 볼 수 있습니다."}}, {"@type": "Question", "name": "일복리와 월복리는 어떻게 구분해서 쓰나요?", "acceptedAnswer": {"@type": "Answer", "text": "기간 단위를 바꾸면 됩니다. 단위는 표시용 라벨이고 계산은 동일하게 ‘회차당 수익률’로 돌아갑니다. 하루 1%씩 30일이면 단위를 ‘일’, 기간을 30, 수익률을 1로 넣으시면 됩니다."}}, {"@type": "Question", "name": "레버리지를 쓰면 수익률을 어떻게 넣어야 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "레버리지 환산 패널에 가격 변동률·배수·수수료를 넣으면 회차당 순수익률이 자동으로 계산됩니다. ‘이 값을 수익률로 넣기’를 누르면 위 계산에 그대로 반영됩니다."}}, {"@type": "Question", "name": "승률 보정은 왜 필요한가요?", "acceptedAnswer": {"@type": "Answer", "text": "일반 복리 계산은 매 회차 이긴다고 가정합니다. 실제로는 지는 회차가 섞이는데, 복리에서는 산술평균이 아니라 기하평균이 실제 성장률을 결정합니다. 승률과 손실 폭을 넣으면 그 값을 계산해 보여줍니다."}}, {"@type": "Question", "name": "청산선은 어떻게 계산된 값인가요?", "acceptedAnswer": {"@type": "Answer", "text": "유지증거금률 0.4%를 가정한 근사치입니다. 실제 청산가는 거래소·포지션 규모·마진 방식(격리/교차)에 따라 달라지고, 거래소는 체결가가 아니라 마크가격으로 청산을 판정합니다. 참고용으로만 쓰세요."}}, {"@type": "Question", "name": "입력한 값이 서버로 전송되나요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 모든 계산은 브라우저 안에서만 일어납니다. 입력값은 편의를 위해 브라우저의 로컬 저장소에 보관되며, 다른 곳으로 전송되지 않습니다. 브라우저 데이터를 지우면 함께 사라집니다."}}, {"@type": "Question", "name": "세금은 어떻게 적용되나요?", "acceptedAnswer": {"@type": "Answer", "text": "각 회차에서 발생한 수익에만 적용하고, 세후 금액이 다음 회차의 원금이 됩니다. 15.4%는 국내 이자소득세(소득세 14% + 지방소득세 1.4%) 기준입니다."}}, {"@type": "Question", "name": "회차별 상세표가 다 안 보입니다.", "acceptedAnswer": {"@type": "Answer", "text": "표는 성능을 위해 앞 2,000회차까지만 그립니다. 그보다 긴 기간도 최종 결과는 정확하게 계산됩니다."}}, {"@type": "Question", "name": "목표 금액까지 걸리는 기간이 이상하게 깁니다.", "acceptedAnswer": {"@type": "Answer", "text": "회차당 수익률이 낮거나 목표가 큰 경우입니다. 필요 배수와 ‘정한 기간에 맞추려면 회차당 몇 %’ 값을 함께 보시면 목표가 현실적인지 판단하는 데 도움이 됩니다."}}, {"@type": "Question", "name": "이 계산기로 수익을 보장받을 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 입력한 가정대로 숫자가 흘러갔을 때의 산술 결과일 뿐입니다. 실제 매매에는 슬리피지·펀딩비·청산·세금이 개입하며 이 계산기는 그것을 반영하지 않습니다."}}]}]</script>
-</head>
-<body>
-<nav class="sitenav"><div class="in">
-<a class="brand" href="./">복리 <em>계산기</em></a>
-<a href="./" aria-current="page">계산기</a>
-<a href="about.html">소개</a>
-<a href="privacy.html">개인정보처리방침</a>
-<a href="terms.html">이용약관</a>
-</div></nav>
-<style>
-:root{
+<style>:root{
   /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
   --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
   --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
@@ -262,532 +200,146 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
   footer{font-size:11.5px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
 </style>
-
-<div class="wrap">
-<header>
-  <p class="eyebrow">복리 시뮬레이터</p>
-  <h1>복리 <em>계산기</em></h1>
-  <p>회차당 수익률로 자산이 어떻게 불어나는지 계산합니다. 레버리지와 수수료를 수익률로 환산하고, 목표 금액까지 몇 회차가 걸리는지 역산하며, 승률을 넣으면 실제 기대값으로 다시 계산합니다.</p>
-</header>
-
-<div class="grid">
-  <!-- 입력 -->
-  <div class="side">
-  <div class="panel">
-    <div class="panel-head"><h2>투자 설정</h2></div>
-    <div class="panel-body">
-
-      <div class="field">
-        <label for="seed">초기 원금</label>
-        <div class="control">
-          <input class="has-suffix" type="number" id="seed" value="500000" min="0" step="10000">
-          <span class="suffix">원</span>
-        </div>
-        <div class="readout" id="seedRead"></div>
-      </div>
-
-      <div class="field">
-        <label for="add">회차당 추가 납입 <span class="sub">적립식</span></label>
-        <div class="control">
-          <input class="has-suffix" type="number" id="add" value="0" min="0" step="10000">
-          <span class="suffix">원</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>계산 기간</label>
-        <div class="row">
-          <input type="number" id="periods" value="100" min="1" max="100000" step="1">
-          <select id="unit">
-            <option value="일">일</option>
-            <option value="회" selected>회</option>
-            <option value="주">주</option>
-            <option value="개월">개월</option>
-            <option value="년">년</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="rate">회차당 수익률</label>
-        <div class="control">
-          <input class="has-suffix" type="number" id="rate" value="1" step="0.01">
-          <span class="suffix">%</span>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>세금</label>
-        <div class="seg" id="taxSeg">
-          <button type="button" data-tax="0" aria-pressed="true">비과세</button>
-          <button type="button" data-tax="15.4" aria-pressed="false">15.4%</button>
-          <button type="button" data-tax="22" aria-pressed="false">22%</button>
-        </div>
-      </div>
-
-      <button class="go" id="calc">계산하기</button>
-    </div>
-  </div>
-
-  <!-- 레버리지 환산 -->
-  <div class="panel" style="margin-top:16px">
-    <div class="panel-head"><h2>레버리지 환산</h2><span class="hint">→ 수익률에 반영</span></div>
-    <div class="panel-body">
-      <div class="field">
-        <label for="move">가격 변동률 <span class="sub">1회 매매</span></label>
-        <div class="control">
-          <input class="has-suffix" type="number" id="move" value="0.6" step="0.01">
-          <span class="suffix">%</span>
-        </div>
-      </div>
-      <div class="row" style="grid-template-columns:1fr 1fr;gap:10px">
-        <div class="field" style="margin:0">
-          <label for="lev">레버리지</label>
-          <div class="control">
-            <input class="has-suffix" type="number" id="lev" value="20" min="1" step="1">
-            <span class="suffix">배</span>
-          </div>
-        </div>
-        <div class="field" style="margin:0">
-          <label for="fee">수수료 <span class="sub">편도</span></label>
-          <div class="control">
-            <input class="has-suffix" type="number" id="fee" value="0.06" step="0.01">
-            <span class="suffix">%</span>
-          </div>
-        </div>
-      </div>
-      <div class="note" id="levNote" style="margin-top:14px"></div>
-      <button class="go" id="applyLev" style="margin-top:12px">이 값을 수익률로 넣기</button>
-    </div>
-  </div>
-  </div>
-
-  <!-- 결과 -->
-  <div class="stack">
-    <div class="panel">
-      <div class="panel-head"><h2 id="resTitle">결과</h2><span class="hint" id="resHint"></span></div>
-      <div class="hero" id="hero"></div>
-      <div class="stats" id="stats"></div>
-      <div class="panel-body" style="padding-top:14px">
-        <div class="note" id="targetNote"></div>
-
-        <details class="more">
-          <summary>목표 금액까지 역산</summary>
-          <div class="more-body">
-            <div class="field">
-              <label for="goal">목표 금액</label>
-              <div class="control">
-                <input class="has-suffix" type="number" id="goal" value="1000000000" min="1" step="10000000">
-                <span class="suffix">원</span>
-              </div>
-              <div class="readout" id="goalRead"></div>
-            </div>
-            <div id="goalOut"></div>
-          </div>
-        </details>
-
-        <details class="more">
-          <summary>승률을 반영한 현실 계산</summary>
-          <div class="more-body">
-            <p style="margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.65">
-              위 계산은 <b>매 회차 이긴다</b>고 가정합니다. 실제로는 지는 회차가 섞이므로, 승률과 손실 폭을 넣으면 기하평균 기준 기대값으로 다시 계산합니다.
-            </p>
-            <div class="row" style="grid-template-columns:1fr 1fr;gap:10px">
-              <div class="field" style="margin:0">
-                <label for="wr">승률</label>
-                <div class="control">
-                  <input class="has-suffix" type="number" id="wr" value="50" min="0" max="100" step="1">
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-              <div class="field" style="margin:0">
-                <label for="lossPct">질 때 손실 <span class="sub">증거금 대비</span></label>
-                <div class="control">
-                  <input class="has-suffix" type="number" id="lossPct" value="12" min="0" max="100" step="0.5">
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-            </div>
-            <div id="realOut" style="margin-top:16px"></div>
-          </div>
-        </details>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><h2>회차별 상세</h2><span class="hint" id="tblHint"></span></div>
-      <div class="tablewrap"><table>
-        <thead><tr>
-          <th>회차</th><th>해당 회차 수익</th><th>누적 순수익</th><th>총 자산</th><th>수익률</th>
-        </tr></thead>
-        <tbody id="tbody"></tbody>
-      </table></div>
-    </div>
-  </div>
-</div>
-
-<footer>
-  계산 결과는 입력값에 대한 산술 결과일 뿐이며 특정 투자의 수익을 예상하거나 보장하지 않습니다. 실제 매매에는 슬리피지·펀딩비·청산이 발생하고, 이 계산기는 그것을 반영하지 않습니다.
-</footer>
-</div>
-
-<script>
-(function(){
-  var $ = function(id){ return document.getElementById(id); };
-  var KEY = "compound-calc-v1";
-
-  function won(n){
-    if(!isFinite(n)) return "—";
-    return Math.round(n).toLocaleString("ko-KR") + "원";
-  }
-  // 1,234,567,890 -> "12억 3,456만"
-  function kor(n){
-    n = Math.floor(Math.abs(n));
-    if(n < 10000) return n.toLocaleString("ko-KR") + "원";
-    var eok = Math.floor(n / 100000000);
-    var man = Math.floor((n % 100000000) / 10000);
-    var out = [];
-    if(eok) out.push(eok.toLocaleString("ko-KR") + "억");
-    if(man) out.push(man.toLocaleString("ko-KR") + "만");
-    return out.join(" ") + "원";
-  }
-  function pct(x, d){ 
-    d = d === undefined ? 2 : d;
-    return (x>=0?"+":"") + x.toFixed(d) + "%"; 
-  }
-
-  function tax(){
-    var b = document.querySelector('#taxSeg button[aria-pressed="true"]');
-    return b ? parseFloat(b.dataset.tax)/100 : 0;
-  }
-
-  function inputs(){
-    return {
-      seed: +$("seed").value || 0,
-      add: +$("add").value || 0,
-      n: Math.max(1, Math.min(100000, Math.floor(+$("periods").value || 1))),
-      unit: $("unit").value,
-      r: (+$("rate").value || 0)/100,
-      t: tax()
-    };
-  }
-
-  // 회차별 진행. 수익에만 과세하고, 추가 납입은 회차 끝에 더한다.
-  function run(cfg, cap){
-    var bal = cfg.seed, principal = cfg.seed, rows = [], netSum = 0;
-    var lim = Math.min(cfg.n, cap || cfg.n);
-    for(var i=1;i<=lim;i++){
-      var gross = bal * cfg.r;
-      var net = gross * (1 - cfg.t);
-      bal += net; netSum += net;
-      if(cfg.add){ bal += cfg.add; principal += cfg.add; }
-      rows.push({i:i, gross:gross, net:net, cum:netSum, bal:bal, principal:principal});
-    }
-    return {rows:rows, bal:bal, principal:principal, net:netSum};
-  }
-
-  function render(){
-    var c = inputs();
-    var cap = 2000;                       // 표는 최대 2,000행까지만 그린다
-    var res = run(c, cap);
-    var full = c.n > cap ? run(c) : res;
-
-    var roi = full.principal>0 ? (full.bal - full.principal)/full.principal*100 : 0;
-    var mult = full.principal>0 ? full.bal/c.seed : 0;
-
-    $("resTitle").textContent = "결과";
-    $("resHint").textContent = c.n.toLocaleString("ko-KR") + c.unit + " · 회차당 " + pct(c.r*100) 
-      + (c.t ? " · 세금 " + (c.t*100).toFixed(1) + "%" : " · 비과세");
-
-    var gainCls = full.bal>=full.principal ? "up" : "down";
-    $("hero").innerHTML =
-      "<div class='k'>최종 자산</div>"
-      + "<div class='v display " + gainCls + "'>" + kor(full.bal) + "</div>"
-      + "<div class='exact'>" + won(full.bal) + "</div>";
-
-    $("stats").innerHTML =
-      tile("총 투자 원금", won(full.principal), c.add ? c.n.toLocaleString("ko-KR")+"회 납입 포함" : "추가 납입 없음", "") +
-      tile("누적 순수익", won(full.bal-full.principal), "세후 기준", gainCls) +
-      tile("수익률", pct(roi,2), mult>=1 ? "원금의 " + mult.toLocaleString("ko-KR",{maximumFractionDigits:1}) + "배" : "", gainCls);
-
-    var tb = res.rows.map(function(x){
-      return "<tr><td>"+x.i.toLocaleString("ko-KR")+c.unit+"</td>"+
-        "<td class='n "+(x.net>=0?"up":"down")+"'>"+won(x.gross)+"</td>"+
-        "<td class='n'>"+won(x.cum)+"</td>"+
-        "<td class='n'>"+won(x.bal)+"</td>"+
-        "<td class='n'>"+pct((x.bal-x.principal)/x.principal*100)+"</td></tr>";
-    }).join("");
-    $("tbody").innerHTML = tb;
-    $("tblHint").textContent = c.n>cap ? "앞 "+cap.toLocaleString("ko-KR")+"회차만 표시" : c.n.toLocaleString("ko-KR")+"회차";
-
-    $("targetNote").innerHTML = "<b>" + kor(c.seed) + "</b> 이 " + c.n.toLocaleString("ko-KR") + c.unit
-      + " 뒤 <b>" + kor(full.bal) + "</b> 이 됩니다. 매 회차 " + pct(c.r*100) + " 를 "
-      + "<b>한 번도 빠짐없이</b> 달성한다는 가정입니다.";
-
-    goal(c);
-    real(c);
-    save();
-  }
-
-  function tile(k,v,sub,cls){
-    return "<div class='stat'><div class='k'>"+k+"</div>"+
-      "<div class='v num "+(cls||"")+"'>"+v+"</div>"+
-      (sub?"<div class='sub'>"+sub+"</div>":"")+"</div>";
-  }
-
-  // 목표 금액까지 몇 회차인가
-  function goal(c){
-    var g = +$("goal").value || 0;
-    $("goalRead").textContent = g ? kor(g) : "";
-    if(!g || g<=0){ $("goalOut").innerHTML=""; return; }
-
-    var eff = c.r * (1 - c.t);
-    var out = "";
-
-    if(c.seed >= g){
-      out = "<p class='verdict'>이미 목표 금액 이상입니다.</p>";
-    } else if(eff<=0 && !c.add){
-      out = "<p class='verdict'>회차당 수익률이 0 이하라 목표에 도달하지 않습니다.</p>";
-    } else {
-      var bal=c.seed, k=0, LIM=2000000;
-      while(bal<g && k<LIM){ bal += bal*eff; if(c.add) bal+=c.add; k++; }
-      if(k>=LIM){
-        out = "<p class='verdict'>200만 회차 안에 도달하지 않습니다.</p>";
-      } else {
-        var perDay = {"일":1,"회":1,"주":7,"개월":30.44,"년":365.25}[c.unit];
-        var days = k*perDay, yrs = days/365.25;
-        out = "<p class='verdict'>목표까지 <strong>"+k.toLocaleString("ko-KR")+c.unit+"</strong></p>"
-          + "<div style='margin-top:12px'>"
-          + kv("환산", yrs>=1 ? yrs.toLocaleString("ko-KR",{maximumFractionDigits:1})+"년" : Math.round(days).toLocaleString("ko-KR")+"일")
-          + kv("필요 배수", (g/c.seed).toLocaleString("ko-KR",{maximumFractionDigits:1})+"배")
-          + kv("도달 시 자산", won(bal))
-          + "</div>";
-      }
-    }
-    // 역으로, 지금 기간 안에 목표를 맞추려면 회차당 몇 %가 필요한가
-    if(c.seed>0 && g>c.seed && !c.add){
-      var need = (Math.pow(g/c.seed, 1/c.n) - 1) / (1-c.t) * 100;
-      out += "<div style='margin-top:14px'>" 
-        + kv(c.n.toLocaleString("ko-KR")+c.unit+" 안에 맞추려면", "회차당 " + need.toLocaleString("ko-KR",{maximumFractionDigits: need<10?2:0}) + "%")
-        + "</div>";
-    }
-    $("goalOut").innerHTML = out;
-  }
-
-  function kv(k,v){ return "<div class='kv'><span class='k'>"+k+"</span><span class='v'>"+v+"</span></div>"; }
-
-  // 승률 반영: 기하평균 성장률로 다시 계산
-  function real(c){
-    var p = Math.max(0,Math.min(100,+$("wr").value||0))/100;
-    var l = Math.max(0,Math.min(100,+$("lossPct").value||0))/100;
-    var g = c.r * (1-c.t);
-
-    if(1-l <= 0 && p < 1){
-      $("realOut").innerHTML = "<p class='verdict'>질 때 손실이 100%면 한 번만 져도 계좌가 0이 됩니다. 승률이 100%가 아닌 한 결국 도달합니다.</p>";
-      return;
-    }
-    // 기하평균: exp(p·ln(1+g) + (1-p)·ln(1-l))
-    var lg = p*Math.log(1+g) + (1-p)*Math.log(1-l);
-    var geo = Math.exp(lg) - 1;
-    var bal = c.seed * Math.exp(lg*c.n) + (c.add ? 0 : 0);
-    var naive = c.seed * Math.pow(1+g, c.n);
-
-    $("realOut").innerHTML =
-      "<div>"
-      + kv("이길 때", pct(g*100) + " · " + (p*100).toFixed(0) + "% 확률")
-      + kv("질 때", pct(-l*100) + " · " + ((1-p)*100).toFixed(0) + "% 확률")
-      + kv("실질 회차당 (기하평균)", "<span class='"+(geo>=0?"up":"down")+"'>"+pct(geo*100,3)+"</span>")
-      + "</div>"
-      + "<div class='note' style='margin-top:14px'>"
-      + "매 회차 이긴다고 보면 <b>"+kor(naive)+"</b> 이지만, 승률 "+(p*100).toFixed(0)+"% 를 반영하면 "
-      + c.n.toLocaleString("ko-KR")+c.unit+" 뒤 <b class='"+(bal>=c.seed?"up":"down")+"'>"+kor(bal)+"</b> 입니다."
-      + (geo<0 ? " 실질 성장률이 마이너스라 회차가 늘수록 줄어듭니다." : "")
-      + "</div>";
-  }
-
-  // 레버리지 → 회차당 수익률
-  function lev(){
-    var m = +$("move").value||0, L = +$("lev").value||1, f = +$("fee").value||0;
-    var gross = m*L, cost = f*2*L, net = gross-cost;
-    var liq = -(100/L - 0.4);
-    $("levNote").innerHTML =
-      "가격 " + pct(m) + " × " + L + "배 = <b>" + pct(gross) + "</b><br>"
-      + "수수료 " + f + "% 왕복 × " + L + "배 = <b class='down'>" + pct(-cost) + "</b><br>"
-      + "→ 회차당 순수익 <b class='" + (net>=0?"up":"down") + "'>" + pct(net) + "</b>"
-      + "<br><span style='color:var(--muted)'>참고 · " + L + "배 청산선은 가격 " + liq.toFixed(2) + "%</span>";
-    return net;
-  }
-
-  function save(){
-    try{
-      var o={};
-      ["seed","add","periods","unit","rate","move","lev","fee","goal","wr","lossPct"].forEach(function(k){ o[k]=$(k).value; });
-      o.tax = tax()*100;
-      localStorage.setItem(KEY, JSON.stringify(o));
-    }catch(e){}
-  }
-  function load(){
-    try{
-      var o = JSON.parse(localStorage.getItem(KEY)||"null");
-      if(!o) return;
-      ["seed","add","periods","unit","rate","move","lev","fee","goal","wr","lossPct"].forEach(function(k){
-        if(o[k]!==undefined && $(k)) $(k).value=o[k];
-      });
-      if(o.tax!==undefined){
-        [].forEach.call(document.querySelectorAll("#taxSeg button"), function(b){
-          b.setAttribute("aria-pressed", String(parseFloat(b.dataset.tax)===o.tax));
-        });
-      }
-    }catch(e){}
-  }
-
-  // 이벤트
-  $("calc").addEventListener("click", render);
-  $("applyLev").addEventListener("click", function(){
-    $("rate").value = lev().toFixed(3); render();
-  });
-  document.querySelectorAll("#taxSeg button").forEach(function(b){
-    b.addEventListener("click", function(){
-      document.querySelectorAll("#taxSeg button").forEach(function(x){ x.setAttribute("aria-pressed","false"); });
-      b.setAttribute("aria-pressed","true"); render();
-    });
-  });
-  ["seed","add","periods","unit","rate"].forEach(function(k){
-    $(k).addEventListener("input", render);
-  });
-  ["move","lev","fee"].forEach(function(k){ $(k).addEventListener("input", lev); });
-  ["goal"].forEach(function(k){ $(k).addEventListener("input", function(){ goal(inputs()); save(); }); });
-  ["wr","lossPct"].forEach(function(k){ $(k).addEventListener("input", function(){ real(inputs()); save(); }); });
-  $("seed").addEventListener("input", function(){ $("seedRead").textContent = kor(+$("seed").value||0); });
-
-  load();
-  $("seedRead").textContent = kor(+$("seed").value||0);
-  lev();
-  render();
-})();
-</script>
-<div class="prose">
-<article>
-<h2 id="guide">복리 계산기 활용 가이드</h2>
-
-<p>복리는 이자에 다시 이자가 붙는 구조입니다. 원금만 굴리는 단리와 달리, 벌어들인
-수익이 다음 회차의 원금이 됩니다. 회차가 쌓일수록 두 방식의 격차는 걷잡을 수 없이 벌어집니다.</p>
-
-<h3>단리와 복리는 얼마나 차이가 나는가</h3>
-
-<p>1,000만원을 연 10%로 굴린다고 해보겠습니다.</p>
-
-<div class="tablewrap"><table>
-<thead><tr><th>기간</th><th>단리</th><th>복리</th><th>차이</th></tr></thead>
-<tbody>
-<tr><td>5년</td><td class="n">1,500만원</td><td class="n">1,610만원</td><td class="n">110만원</td></tr>
-<tr><td>10년</td><td class="n">2,000만원</td><td class="n">2,594만원</td><td class="n">594만원</td></tr>
-<tr><td>20년</td><td class="n">3,000만원</td><td class="n">6,727만원</td><td class="n">3,727만원</td></tr>
-<tr><td>30년</td><td class="n">4,000만원</td><td class="n">1억 7,449만원</td><td class="n">1억 3,449만원</td></tr>
-</tbody></table></div>
-
-<p>5년 차에는 110만원 차이지만 30년 차에는 1억 3,449만원으로 벌어집니다.
-복리에서 가장 큰 변수는 수익률이 아니라 <strong>회차 수</strong>입니다.</p>
-
-<h3>72의 법칙 — 원금이 두 배 되는 기간</h3>
-
-<p>72를 수익률로 나누면 원금이 두 배가 되는 기간이 대략 나옵니다. 연 6%면 72÷6=12년,
-연 12%면 6년입니다. 암산으로 감을 잡을 때 쓰고, 정확한 값은 계산기로 확인하시면 됩니다.</p>
-
-<h3>일복리·월복리·연복리는 무엇이 다른가</h3>
-
-<p>같은 수익률이라도 <strong>얼마나 자주 재투자하느냐</strong>에 따라 결과가 달라집니다.
-계산기의 기간 단위를 바꿔가며 비교해 보세요. 하루 0.5%는 작아 보이지만 100일이면
-원금의 1.64배, 200일이면 2.71배가 됩니다. 반대로 하루 0.5%씩 잃으면 200일 뒤
-원금의 37%만 남습니다.</p>
-
-<h3>적립식 복리 — 매달 넣는 돈의 힘</h3>
-
-<p>회차당 추가 납입을 넣으면 적립식으로 계산됩니다. 초기 원금이 적을수록
-납입액이 결과를 좌우합니다. 원금 100만원에 월 50만원씩 넣고 월 1%로 10년을 굴리면,
-납입 원금 6,100만원이 약 1억 1,600만원이 됩니다. 이 중 절반가량이 납입금 자체이고
-나머지가 복리 효과입니다.</p>
-
-<h3>레버리지는 수익률을 곱하지만 청산선을 당깁니다</h3>
-
-<p>레버리지 환산 기능은 가격 변동률을 증거금 대비 수익률로 바꿔줍니다.
-가격이 0.6% 오를 때 20배면 12%, 30배면 18%입니다. 수수료도 배수만큼 곱해집니다.
-편도 0.06%면 왕복 0.12%인데, 20배에서는 증거금의 2.4%가 매 회차 빠집니다.</p>
-
-<p>여기서 놓치기 쉬운 것이 <strong>청산선</strong>입니다. 배수가 올라갈수록
-버틸 수 있는 하락 폭이 좁아집니다.</p>
-
-<div class="tablewrap"><table>
-<thead><tr><th>레버리지</th><th>가격 +0.6% 시 수익</th><th>청산 가격 변동</th></tr></thead>
-<tbody>
-<tr><td>5배</td><td class="n">+3.0%</td><td class="n">-19.6%</td></tr>
-<tr><td>10배</td><td class="n">+6.0%</td><td class="n">-9.6%</td></tr>
-<tr><td>20배</td><td class="n">+12.0%</td><td class="n">-4.6%</td></tr>
-<tr><td>30배</td><td class="n">+18.0%</td><td class="n">-2.9%</td></tr>
-<tr><td>50배</td><td class="n">+30.0%</td><td class="n">-1.6%</td></tr>
-</tbody></table></div>
-
-<p>30배에서는 가격이 2.9%만 반대로 가도 증거금 전액을 잃습니다. 유지증거금률 0.4%를
-반영한 근사치이며 거래소와 포지션 규모에 따라 달라집니다.</p>
-
-<h3>승률을 넣지 않은 복리 계산은 절반만 맞습니다</h3>
-
-<p>이 계산기에서 가장 중요한 부분입니다. 일반적인 복리 계산기는 <strong>매 회차 이긴다</strong>고
-가정합니다. 실제 매매에는 지는 회차가 섞이는데, 이때 산술평균으로 생각하면 크게 틀립니다.</p>
-
-<p>승률 50%에 이기면 +12%, 지면 -12%인 매매를 생각해 보겠습니다. 산술평균은 0%라
-본전 같지만 실제로는 다릅니다. 1.12 × 0.88 = 0.9856이므로 두 번에 1.44%씩 잃습니다.
-100회를 돌리면 원금의 절반가량이 사라집니다.</p>
-
-<p>이것이 <strong>기하평균</strong>입니다. 복리에서는 산술평균이 아니라 기하평균이 실제
-성장률을 결정합니다. 승률 보정 기능은 이 값을 계산해 보여줍니다.</p>
-
-<p>같은 원리로, 지는 회차의 손실이 클수록 필요한 승률이 급격히 올라갑니다.
-이기면 +12%, 지면 청산으로 -100%인 구조라면 손익분기 승률은 89.3%입니다.
-승률이 86.8%라면 이겨도 계좌는 줄어듭니다.</p>
-
-<h3>수수료는 회차가 많을수록 무섭습니다</h3>
-
-<p>왕복 0.12%는 한 번이면 무시할 만하지만 100회면 단순 합산으로 12%,
-복리로는 그 이상입니다. 매매가 잦은 전략일수록 수익률보다 수수료 구조를 먼저 봐야 합니다.
-지정가(메이커) 주문은 시장가(테이커)보다 수수료가 낮은 경우가 많습니다.</p>
-
-<h3>세금</h3>
-
-<p>계산기의 세금 항목은 <strong>수익에만</strong> 적용됩니다. 국내 예금·적금 이자소득세는
-15.4%(소득세 14% + 지방소득세 1.4%)입니다. 금융투자소득 과세 여부와 세율은
-상품과 시행 시점에 따라 다르므로, 실제 신고는 세무 전문가나 국세청 안내를 확인하세요.</p>
-
-<h3>목표 금액 역산 — 현실성을 확인하는 법</h3>
-
-<p>목표 금액을 넣으면 몇 회차가 걸리는지, 정한 기간에 맞추려면 회차당 몇 %가 필요한지
-계산합니다. 목표가 비현실적이면 필요 수익률이 터무니없는 숫자로 나오는데,
-그것 자체가 답입니다.</p>
-
-<p>예를 들어 50만원을 1년 안에 10억으로 만들려면 2,000배가 필요합니다.
-연 193회 매매한다고 보면 <strong>매 회차 +4.02%를 193번 연속, 한 번도 지지 않고</strong>
-달성해야 합니다. 승률 86.8%로 193연승할 확률은 약 7,300억 번에 한 번입니다.</p>
-</article>
-<article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>추가 납입을 넣어 적립식 복리 계산기로 쓸 수 있나요?</summary><div class="a">됩니다. ‘회차당 추가 납입’에 금액을 넣으면 매 회차 끝에 그만큼 더해 계산합니다. 총 투자 원금에도 납입액이 누적돼 표시되므로, 실제 수익률이 얼마인지 구분해서 볼 수 있습니다.</div></details>
-<details><summary>일복리와 월복리는 어떻게 구분해서 쓰나요?</summary><div class="a">기간 단위를 바꾸면 됩니다. 단위는 표시용 라벨이고 계산은 동일하게 ‘회차당 수익률’로 돌아갑니다. 하루 1%씩 30일이면 단위를 ‘일’, 기간을 30, 수익률을 1로 넣으시면 됩니다.</div></details>
-<details><summary>레버리지를 쓰면 수익률을 어떻게 넣어야 하나요?</summary><div class="a">레버리지 환산 패널에 가격 변동률·배수·수수료를 넣으면 회차당 순수익률이 자동으로 계산됩니다. ‘이 값을 수익률로 넣기’를 누르면 위 계산에 그대로 반영됩니다.</div></details>
-<details><summary>승률 보정은 왜 필요한가요?</summary><div class="a">일반 복리 계산은 매 회차 이긴다고 가정합니다. 실제로는 지는 회차가 섞이는데, 복리에서는 산술평균이 아니라 기하평균이 실제 성장률을 결정합니다. 승률과 손실 폭을 넣으면 그 값을 계산해 보여줍니다.</div></details>
-<details><summary>청산선은 어떻게 계산된 값인가요?</summary><div class="a">유지증거금률 0.4%를 가정한 근사치입니다. 실제 청산가는 거래소·포지션 규모·마진 방식(격리/교차)에 따라 달라지고, 거래소는 체결가가 아니라 마크가격으로 청산을 판정합니다. 참고용으로만 쓰세요.</div></details>
-<details><summary>입력한 값이 서버로 전송되나요?</summary><div class="a">아닙니다. 모든 계산은 브라우저 안에서만 일어납니다. 입력값은 편의를 위해 브라우저의 로컬 저장소에 보관되며, 다른 곳으로 전송되지 않습니다. 브라우저 데이터를 지우면 함께 사라집니다.</div></details>
-<details><summary>세금은 어떻게 적용되나요?</summary><div class="a">각 회차에서 발생한 수익에만 적용하고, 세후 금액이 다음 회차의 원금이 됩니다. 15.4%는 국내 이자소득세(소득세 14% + 지방소득세 1.4%) 기준입니다.</div></details>
-<details><summary>회차별 상세표가 다 안 보입니다.</summary><div class="a">표는 성능을 위해 앞 2,000회차까지만 그립니다. 그보다 긴 기간도 최종 결과는 정확하게 계산됩니다.</div></details>
-<details><summary>목표 금액까지 걸리는 기간이 이상하게 깁니다.</summary><div class="a">회차당 수익률이 낮거나 목표가 큰 경우입니다. 필요 배수와 ‘정한 기간에 맞추려면 회차당 몇 %’ 값을 함께 보시면 목표가 현실적인지 판단하는 데 도움이 됩니다.</div></details>
-<details><summary>이 계산기로 수익을 보장받을 수 있나요?</summary><div class="a">아닙니다. 입력한 가정대로 숫자가 흘러갔을 때의 산술 결과일 뿐입니다. 실제 매매에는 슬리피지·펀딩비·청산·세금이 개입하며 이 계산기는 그것을 반영하지 않습니다.</div></details></article>
-</div>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "ItemList", "name": "모두계산기 계산기 목록", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "부가세 계산기", "url": "https://moducalc.kr/bugagse/"}, {"@type": "ListItem", "position": 2, "name": "마진율 계산기", "url": "https://moducalc.kr/margin/"}, {"@type": "ListItem", "position": 3, "name": "카드 수수료 계산기", "url": "https://moducalc.kr/card/"}, {"@type": "ListItem", "position": 4, "name": "평수 계산기", "url": "https://moducalc.kr/pyeong/"}, {"@type": "ListItem", "position": 5, "name": "날짜 계산기", "url": "https://moducalc.kr/date/"}, {"@type": "ListItem", "position": 6, "name": "주휴수당 계산기", "url": "https://moducalc.kr/juhyu/"}, {"@type": "ListItem", "position": 7, "name": "대출 이자 계산기", "url": "https://moducalc.kr/loan/"}, {"@type": "ListItem", "position": 8, "name": "예적금 계산기", "url": "https://moducalc.kr/deposit/"}, {"@type": "ListItem", "position": 9, "name": "4대보험 계산기", "url": "https://moducalc.kr/insurance/"}, {"@type": "ListItem", "position": 10, "name": "연봉 실수령액 계산기", "url": "https://moducalc.kr/salary/"}, {"@type": "ListItem", "position": 11, "name": "퇴직금 계산기", "url": "https://moducalc.kr/severance/"}, {"@type": "ListItem", "position": 12, "name": "전월세 전환 계산기", "url": "https://moducalc.kr/jeonwolse/"}, {"@type": "ListItem", "position": 13, "name": "부동산 중개보수 계산기", "url": "https://moducalc.kr/brokerage/"}, {"@type": "ListItem", "position": 14, "name": "복리 계산기", "url": "https://moducalc.kr/bokri/"}]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "회원가입이 필요한가요?", "acceptedAnswer": {"@type": "Answer", "text": "필요 없습니다. 모든 계산기는 가입이나 로그인 없이 바로 쓸 수 있고 무료입니다."}}, {"@type": "Question", "name": "입력한 금액이 서버로 전송되나요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 계산은 전부 이용자의 브라우저 안에서 이루어집니다. 입력값은 다음 방문 때 편의를 위해 브라우저 로컬 저장소에만 보관되며 어디로도 전송되지 않습니다."}}, {"@type": "Question", "name": "세율이나 요율이 실제와 다릅니다.", "acceptedAnswer": {"@type": "Answer", "text": "4대보험 요율, 최저임금, 국민연금 상한 등은 해마다 바뀝니다. 이런 값은 입력 항목으로 열어두었으니 관계 기관 고시 수치를 직접 넣어 계산하세요. 기본값은 참고용입니다."}}, {"@type": "Question", "name": "계산 결과를 그대로 신고나 계약에 써도 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "참고용으로만 쓰시기 바랍니다. 실제 세액과 급여, 법정 금액은 개별 사정과 최신 법령에 따라 달라집니다. 중요한 판단은 홈택스·공단·전문가 확인을 거치세요."}}, {"@type": "Question", "name": "모바일에서도 쓸 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "휴대폰과 태블릿에서도 화면에 맞춰 동작합니다. 설치할 앱은 없습니다."}}, {"@type": "Question", "name": "계산기를 추가해 주실 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "문의 메일로 필요한 계산기를 알려주시면 검토하겠습니다."}}]}]</script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="./">모두<em>계산기</em></a>
+<div class="navlinks"><a href="" aria-current="page">전체 계산기</a>
+<a href="about.html">소개</a>
+<a href="privacy.html">개인정보처리방침</a>
+<a href="terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header class="hubhead"><p class="eyebrow">무료 · 가입 없음</p><h1>필요한 계산, <em>여기서</em></h1><p>급여와 퇴직금, 대출 이자, 부가세와 마진율, 부동산 면적까지. 자주 쓰는 계산 14가지를 한곳에 모았습니다. 모든 계산은 브라우저 안에서 이루어지며 입력한 값은 서버로 전송되지 않습니다.</p></header><section class="group"><h2>급여·노무</h2><div class="cards"><a class="card" href="juhyu/"><span class="cname">주휴수당 계산기</span><span class="ckw">시급·주 근로시간으로 주휴수당과 월급 환산</span></a><a class="card" href="insurance/"><span class="cname">4대보험 계산기</span><span class="ckw">국민연금·건강보험·고용보험 근로자/사업주 부담</span></a><a class="card" href="salary/"><span class="cname">연봉 실수령액 계산기</span><span class="ckw">연봉에서 4대보험·소득세 빼고 월 실수령액</span></a><a class="card" href="severance/"><span class="cname">퇴직금 계산기</span><span class="ckw">재직기간과 평균임금으로 퇴직금 산정</span></a></div></section><section class="group"><h2>대출·예금</h2><div class="cards"><a class="card" href="loan/"><span class="cname">대출 이자 계산기</span><span class="ckw">주담대·신용대출 월 상환액과 총이자, 상환 스케줄</span></a><a class="card" href="deposit/"><span class="cname">예적금 계산기</span><span class="ckw">정기예금·정기적금 만기 수령액과 세후 이자</span></a></div></section><section class="group"><h2>사업·세금</h2><div class="cards"><a class="card" href="bugagse/"><span class="cname">부가세 계산기</span><span class="ckw">공급가액에서 더하거나 합계액에서 역산</span></a><a class="card" href="margin/"><span class="cname">마진율 계산기</span><span class="ckw">원가·판매가로 마진율, 목표 마진율로 판매가 역산</span></a><a class="card" href="card/"><span class="cname">카드 수수료 계산기</span><span class="ckw">결제금액에서 수수료 빼고 실입금액 확인</span></a></div></section><section class="group"><h2>부동산·생활</h2><div class="cards"><a class="card" href="pyeong/"><span class="cname">평수 계산기</span><span class="ckw">평 ↔ ㎡ 변환, 전용률 확인</span></a><a class="card" href="date/"><span class="cname">날짜 계산기</span><span class="ckw">디데이, 날짜 사이 일수, N일 후</span></a><a class="card" href="jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a></div></section><section class="group"><h2>투자</h2><div class="cards"><a class="card" href="bokri/"><span class="cname">복리 계산기</span><span class="ckw">레버리지·수수료 환산, 목표 금액 역산, 승률 보정</span></a></div></section></div><div class="prose"><article>
+<h2>계산이 어긋나는 흔한 지점들</h2>
+
+<p>계산기가 있어도 <strong>어떤 기준으로 넣어야 하는지</strong>를 모르면 답이 어긋납니다.
+실무에서 가장 자주 틀리는 곳을 모았습니다.</p>
+
+<h3>부가세 — 합계금액에 10%를 곱하면 틀립니다</h3>
+<p>110만원을 받았을 때 부가세는 11만원이 아니라 10만원입니다.
+110만원에는 이미 부가세가 들어 있어 <strong>1.1로 나눠야</strong> 합니다.
+받은 돈에서 세금을 뽑을 때와 청구서를 쓸 때 계산 방향이 반대입니다.</p>
+
+<h3>마진율 — 원가에 40%를 더하면 마진율 40%가 아닙니다</h3>
+<p>마진율은 <strong>판매가</strong> 기준이고 마크업은 <strong>원가</strong> 기준입니다.
+원가 6,000원에 40%를 더한 8,400원의 마진율은 28.6%입니다.
+마진율 40%를 남기려면 6,000 ÷ 0.6 = 10,000원에 팔아야 합니다.</p>
+
+<h3>적금 — 연 3.5%인데 이자가 절반뿐입니다</h3>
+<p>적금 이자는 돈을 넣은 시점부터 붙습니다. 마지막 달에 넣은 돈은 한 달치 이자만 받습니다.
+그래서 원금 대비 실질 수익률이 표시금리의 절반 남짓인 것이 정상입니다.
+같은 금리라도 목돈을 맡기는 예금과 결과가 다릅니다.</p>
+
+<h3>장기요양보험료 — 월급이 아니라 건강보험료에 곱합니다</h3>
+<p>월급 300만원에 12.95%를 곱하면 38만원이 나오지만 이건 틀린 계산입니다.
+장기요양보험료는 <strong>건강보험료에</strong> 요율을 곱합니다.
+건강보험료가 10만원이면 12,950원입니다.</p>
+
+<h3>평수 — 84㎡는 25.4평이지 34평이 아닙니다</h3>
+<p>84㎡는 <strong>전용면적</strong>이고 34평은 <strong>공급면적</strong> 기준입니다.
+84㎡ 자체를 평으로 바꾸면 25.4평입니다. 기준이 다른 두 숫자를 비교하면 안 됩니다.</p>
+
+<h3>중개보수 — 월세 계약은 보증금만으로 계산하지 않습니다</h3>
+<p>임대차 거래금액은 <strong>보증금 + (월세 × 100)</strong>입니다.
+그 값이 5,000만원 미만이면 <strong>보증금 + (월세 × 70)</strong>을 씁니다.
+보증금 1,000만원에 월세 50만원이면 거래금액은 6,000만원입니다.</p>
+
+<h3>퇴직금 — 3개월 급여를 근무일수로 나누지 않습니다</h3>
+<p>평균임금은 3개월 임금 총액을 그 기간의 <strong>달력상 총일수</strong>로 나눕니다.
+근무한 날만 세는 것이 아닙니다. 3개월이 92일이면 92로 나눕니다.</p>
+
+<h3>세율과 요율은 해마다 바뀝니다</h3>
+<p>4대보험 요율, 최저임금, 국민연금 상한은 매년 조정됩니다.
+이 사이트의 계산기는 이런 값을 <strong>입력 항목으로 열어두었습니다.</strong>
+기본값은 참고용이니 관계 기관이 고시한 당해 연도 수치를 확인해 넣으시면
+정확한 결과가 나옵니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>회원가입이 필요한가요?</summary><div class="a">필요 없습니다. 모든 계산기는 가입이나 로그인 없이 바로 쓸 수 있고 무료입니다.</div></details>
+<details><summary>입력한 금액이 서버로 전송되나요?</summary><div class="a">아닙니다. 계산은 전부 이용자의 브라우저 안에서 이루어집니다. 입력값은 다음 방문 때 편의를 위해 브라우저 로컬 저장소에만 보관되며 어디로도 전송되지 않습니다.</div></details>
+<details><summary>세율이나 요율이 실제와 다릅니다.</summary><div class="a">4대보험 요율, 최저임금, 국민연금 상한 등은 해마다 바뀝니다. 이런 값은 입력 항목으로 열어두었으니 관계 기관 고시 수치를 직접 넣어 계산하세요. 기본값은 참고용입니다.</div></details>
+<details><summary>계산 결과를 그대로 신고나 계약에 써도 되나요?</summary><div class="a">참고용으로만 쓰시기 바랍니다. 실제 세액과 급여, 법정 금액은 개별 사정과 최신 법령에 따라 달라집니다. 중요한 판단은 홈택스·공단·전문가 확인을 거치세요.</div></details>
+<details><summary>모바일에서도 쓸 수 있나요?</summary><div class="a">휴대폰과 태블릿에서도 화면에 맞춰 동작합니다. 설치할 앱은 없습니다.</div></details>
+<details><summary>계산기를 추가해 주실 수 있나요?</summary><div class="a">문의 메일로 필요한 계산기를 알려주시면 검토하겠습니다.</div></details></article></div>
 <footer class="sitefoot"><div class="in">
 <div class="small">
-  <strong>복리 계산기</strong><br>
-  계산 결과는 입력한 가정에 대한 산술 결과일 뿐이며 특정 투자의 수익을 예상하거나 보장하지 않습니다.
-  투자 판단과 그 결과에 대한 책임은 이용자 본인에게 있습니다.<br>
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
   문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
 </div>
-<div class="links"><a href="./">계산기</a>
+<div class="links"><a href="">전체 계산기</a>
 <a href="about.html">소개</a>
 <a href="privacy.html">개인정보처리방침</a>
 <a href="terms.html">이용약관</a></div>
