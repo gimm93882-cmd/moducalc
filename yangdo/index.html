@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>양도소득세 계산기 | 주택 양도세와 장기보유특별공제</title>
+<meta name="description" content="양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.">
+<link rel="canonical" href="https://moducalc.kr/yangdo/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="양도소득세 계산기 | 주택 양도세와 장기보유특별공제">
+<meta property="og:description" content="양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.">
+<meta property="og:url" content="https://moducalc.kr/yangdo/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "양도소득세 계산기", "url": "https://moducalc.kr/yangdo/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "1세대 1주택인데 15억에 팔면 세금이 얼마인가요?", "acceptedAnswer": {"@type": "Answer", "text": "12억 초과분에 해당하는 차익만 과세합니다. 전액이 과세되는 것이 아니라 차익 × (양도가액−12억) ÷ 양도가액 만큼만 대상이 됩니다."}}, {"@type": "Question", "name": "장기보유특별공제 80%는 누가 받나요?", "acceptedAnswer": {"@type": "Answer", "text": "1세대 1주택으로 2년 이상 거주한 경우, 보유 연 4%와 거주 연 4%를 합해 최대 80%입니다. 10년 보유 + 10년 거주가 상한입니다."}}, {"@type": "Question", "name": "필요경비에 인테리어 비용을 넣을 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "발코니 확장, 새시 교체처럼 자산 가치를 높이는 자본적 지출은 인정됩니다. 도배·장판 같은 원상복구성 지출은 인정되지 않습니다. 증빙이 필요합니다."}}, {"@type": "Question", "name": "다주택자인데 이 계산이 맞나요?", "acceptedAnswer": {"@type": "Answer", "text": "이 계산기는 주택 1건 양도를 전제로 합니다. 다주택 중과세율은 반영하지 않았으므로 실제 세액은 더 클 수 있습니다. 세무 전문가 상담을 권합니다."}}, {"@type": "Question", "name": "언제까지 신고해야 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "양도일이 속한 달의 말일부터 2개월 이내에 예정신고·납부합니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow">부동산·생활</p><h1>양도소득세 계산기</h1><p>양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>계산 순서</h3>
+<p>양도소득세는 단계를 밟아 내려갑니다.</p>
+<ol>
+<li><strong>양도차익</strong> = 양도가액 − 취득가액 − 필요경비</li>
+<li><strong>장기보유특별공제</strong>를 뺍니다</li>
+<li><strong>기본공제 250만원</strong>을 뺍니다 (연 1회)</li>
+<li>남은 <strong>과세표준</strong>에 세율을 곱합니다</li>
+<li><strong>지방소득세</strong>를 양도세의 10%만큼 더합니다</li>
+</ol>
+
+<h3>필요경비에 넣을 수 있는 것</h3>
+<p>취득할 때 낸 <strong>취득세·등록세</strong>, <strong>중개보수</strong>, <strong>법무사 비용</strong>,
+자본적 지출에 해당하는 <strong>수선비</strong>(발코니 확장, 새시 교체, 난방 교체 등)를 넣습니다.
+도배·장판 같은 원상복구성 지출은 인정되지 않습니다.
+증빙이 없으면 인정받기 어려우니 계약서와 영수증을 보관하셔야 합니다.</p>
+
+<h3>1세대 1주택 비과세는 12억까지</h3>
+<p>1세대가 1주택을 <strong>2년 이상 보유</strong>(취득 당시 조정대상지역이었다면 2년 이상 거주)하고
+양도가액이 <strong>12억원 이하</strong>면 비과세입니다.</p>
+<p>12억을 넘으면 <strong>초과분에 해당하는 차익만</strong> 과세합니다.
+15억에 팔아 차익이 5억이라면, 5억 × (15억−12억) ÷ 15억 = 1억에 대해서만 세금을 냅니다.
+전액이 과세되는 것이 아닙니다.</p>
+
+<h3>장기보유특별공제 — 1주택이면 최대 80%</h3>
+<p>오래 보유할수록 공제가 커집니다. 두 갈래로 나뉩니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>구분</th><th>공제율</th><th>상한</th></tr></thead>
+<tbody>
+<tr><td>일반 (3년 이상)</td><td class="n">보유 연 2%</td><td class="n">30% (15년)</td></tr>
+<tr><td>1세대1주택 (2년 이상 거주)</td><td class="n">보유 연 4% + 거주 연 4%</td><td class="n">80% (각 10년)</td></tr>
+</tbody></table></div>
+<p>1주택자가 10년 보유하고 10년 거주하면 40% + 40% = <strong>80% 공제</strong>입니다.
+차익의 80%가 빠지므로 세금이 크게 줄어듭니다. 거주 요건이 붙는 이유입니다.</p>
+<p><strong>3년 미만은 공제가 아예 없습니다.</strong></p>
+
+<h3>단기 보유는 세율이 크게 올라갑니다</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>보유기간</th><th>세율</th></tr></thead>
+<tbody>
+<tr><td>1년 미만</td><td class="n">70%</td></tr>
+<tr><td>1년 이상 2년 미만</td><td class="n">60%</td></tr>
+<tr><td>2년 이상</td><td class="n">6~45% 누진</td></tr>
+</tbody></table></div>
+<p>여기에 지방소득세 10%가 더 붙습니다. 1년 미만이면 실질 77%입니다.
+단기 매매 차익은 대부분 세금으로 나갑니다.</p>
+
+<h3>신고 기한</h3>
+<p>양도일이 속한 달의 말일부터 <strong>2개월 이내</strong>에 예정신고·납부해야 합니다.
+같은 해에 두 건 이상 양도했다면 다음 해 5월에 확정신고로 합산합니다.
+기한을 넘기면 가산세가 붙습니다.</p>
+
+<h3>이 계산기가 다루지 않는 것</h3>
+<p>다주택 중과세율, 조정대상지역 지정, 일시적 2주택 특례, 상속·증여로 취득한 경우,
+분양권·입주권, 재개발·재건축, 각종 감면 특례는 반영하지 않았습니다.
+양도세는 사안마다 결론이 크게 달라지므로 <strong>실제 신고 전 홈택스나 세무 전문가 확인이 필요합니다.</strong></p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>1세대 1주택인데 15억에 팔면 세금이 얼마인가요?</summary><div class="a">12억 초과분에 해당하는 차익만 과세합니다. 전액이 과세되는 것이 아니라 차익 × (양도가액−12억) ÷ 양도가액 만큼만 대상이 됩니다.</div></details>
+<details><summary>장기보유특별공제 80%는 누가 받나요?</summary><div class="a">1세대 1주택으로 2년 이상 거주한 경우, 보유 연 4%와 거주 연 4%를 합해 최대 80%입니다. 10년 보유 + 10년 거주가 상한입니다.</div></details>
+<details><summary>필요경비에 인테리어 비용을 넣을 수 있나요?</summary><div class="a">발코니 확장, 새시 교체처럼 자산 가치를 높이는 자본적 지출은 인정됩니다. 도배·장판 같은 원상복구성 지출은 인정되지 않습니다. 증빙이 필요합니다.</div></details>
+<details><summary>다주택자인데 이 계산이 맞나요?</summary><div class="a">이 계산기는 주택 1건 양도를 전제로 합니다. 다주택 중과세율은 반영하지 않았으므로 실제 세액은 더 클 수 있습니다. 세무 전문가 상담을 권합니다.</div></details>
+<details><summary>언제까지 신고해야 하나요?</summary><div class="a">양도일이 속한 달의 말일부터 2개월 이내에 예정신고·납부합니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"yangdo",
+  formTitle:"양도 정보",
+  sideNote:"주택 1건 양도를 전제로 한 개략 계산입니다. 다주택 중과, 조정대상지역, 감면 특례는 반영하지 않습니다.",
+  fields:[
+    {k:"sale", label:"양도가액", sub:"판 금액", suffix:"원", value:900000000, step:10000000, min:0},
+    {k:"buy", label:"취득가액", sub:"산 금액", suffix:"원", value:500000000, step:10000000, min:0},
+    {k:"cost", label:"필요경비", sub:"취득세·중개보수·수선비 등", suffix:"원", value:20000000, step:1000000, min:0},
+    {k:"hold", label:"보유기간", suffix:"년", value:10, step:0.5, min:0},
+    {k:"live", label:"거주기간", sub:"1세대1주택 공제용", suffix:"년", value:10, step:0.5, min:0},
+    {k:"one", label:"1세대 1주택", type:"seg", options:[
+      {value:"1", label:"해당"}, {value:"0", label:"해당 없음"}]}
+  ],
+  compute:function(v,F){
+    var sale=v.sale||0, buy=v.buy||0, cost=v.cost||0;
+    var hold=v.hold||0, live=v.live||0, isOne=v.one==1;
+    var gain=sale-buy-cost;
+
+    if(gain<=0){
+      return {hero:{k:"양도차익", v:"손실", cls:"down", sub:F.won(gain)},
+              extra:"<div class='note'>양도차익이 없으면 양도소득세도 없습니다. "+
+                "다만 같은 해 다른 양도소득과 통산할 수 있으니 신고는 확인해 보세요.</div>"};
+    }
+
+    /* 1세대1주택: 12억 초과분만 과세 */
+    var HIGH=1200000000;
+    var taxableGain=gain, exemptNote="";
+    if(isOne){
+      if(sale<=HIGH){
+        return {hero:{k:"양도소득세", v:"비과세", cls:"up", sub:"1세대 1주택 12억 이하"},
+                stats:[{k:"양도차익", v:F.won(gain)},{k:"양도가액", v:F.won(sale)},
+                       {k:"보유기간", v:F.num(hold,1)+"년"}],
+                extra:"<div class='note'>1세대 1주택이고 양도가액이 <b>12억원 이하</b>라 비과세입니다. "+
+                  "다만 <b>2년 이상 보유</b>(취득 당시 조정대상지역이면 2년 이상 거주) 요건을 "+
+                  "충족해야 합니다. 요건을 못 채우면 과세됩니다.</div>"};
+      }
+      taxableGain = gain*(sale-HIGH)/sale;
+      exemptNote = "12억 초과분만 과세";
+    }
+
+    /* 장기보유특별공제 */
+    var ltRate=0, ltNote="";
+    if(isOne && live>=2 && hold>=3){
+      var h=Math.min(Math.floor(hold),10)*4, l=Math.min(Math.floor(live),10)*4;
+      ltRate=Math.min(80, h+l);
+      ltNote="보유 "+h+"% + 거주 "+l+"%";
+    } else if(hold>=3){
+      ltRate=Math.min(30, Math.floor(hold)*2);
+      ltNote="보유 "+Math.floor(hold)+"년 × 2%";
+    } else {
+      ltNote="3년 미만은 공제 없음";
+    }
+    var ltDeduct=taxableGain*ltRate/100;
+    var income=taxableGain-ltDeduct;
+
+    var BASIC=2500000;
+    var base=Math.max(0, income-BASIC);
+
+    /* 세율: 단기보유 중과 */
+    var tax, rateNote;
+    if(hold<1){ tax=base*0.70; rateNote="1년 미만 70%"; }
+    else if(hold<2){ tax=base*0.60; rateNote="1~2년 60%"; }
+    else {
+      var t=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+             [150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],
+             [1000000000,.42,35940000],[Infinity,.45,65940000]];
+      tax=0;
+      for(var i=0;i<t.length;i++) if(base<=t[i][0]){ tax=base*t[i][1]-t[i][2]; rateNote="누진세율 "+(t[i][1]*100)+"%"; break; }
+    }
+    tax=Math.max(0,tax);
+    var local=tax*0.1, total=tax+local;
+
+    return {
+      hero:{k:"양도소득세 합계", v:F.kor(total), sub:F.won(total), cls:"down"},
+      stats:[
+        {k:"양도차익", v:F.won(gain), cls:"up", sub:exemptNote||"양도−취득−경비"},
+        {k:"장기보유공제", v:F.won(ltDeduct), sub:F.pct(ltRate,0)+" · "+ltNote},
+        {k:"실수령 (세후)", v:F.won(gain-total), cls:"up"}
+      ],
+      hint:rateNote+" · 보유 "+F.num(hold,1)+"년",
+      cols:["단계","금액"],
+      rows:[
+        ["양도가액", F.won(sale)],
+        ["취득가액", "− "+F.won(buy)],
+        ["필요경비", "− "+F.won(cost)],
+        ["양도차익", F.won(gain)],
+        [isOne?"과세대상 차익 (12억 초과분)":"과세대상 차익", F.won(taxableGain)],
+        ["장기보유특별공제 "+F.pct(ltRate,0), "− "+F.won(ltDeduct)],
+        ["양도소득금액", F.won(income)],
+        ["기본공제", "− "+F.won(BASIC)],
+        ["과세표준", F.won(base)],
+        ["양도소득세", F.won(tax)],
+        ["지방소득세 10%", F.won(local)],
+        ["합계", F.won(total)]
+      ],
+      extra:"<div class='note'>주택 <b>1건</b> 양도를 전제로 한 개략 계산입니다. "+
+        "다주택 중과세율, 조정대상지역 여부, 일시적 2주택, 상속·증여 취득, "+
+        "감면 특례는 반영하지 않았습니다. 실제 신고는 홈택스나 세무 전문가를 통해 확인하세요.</div>"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>

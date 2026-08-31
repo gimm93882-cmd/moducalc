@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BMI 계산기 | 체질량지수와 하루 필요 칼로리</title>
+<meta name="description" content="키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.">
+<link rel="canonical" href="https://moducalc.kr/bmi/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="BMI 계산기 | 체질량지수와 하루 필요 칼로리">
+<meta property="og:description" content="키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.">
+<meta property="og:url" content="https://moducalc.kr/bmi/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.hubhead{margin-bottom:30px}
+.group{margin-bottom:30px}
+.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "BMI·칼로리 계산기", "url": "https://moducalc.kr/bmi/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "BMI 24인데 비만인가요?", "acceptedAnswer": {"@type": "Answer", "text": "한국 기준으로는 과체중(23~24.9) 구간입니다. WHO 국제 기준으로는 정상 범위입니다. 기준선이 달라 생기는 차이입니다."}}, {"@type": "Question", "name": "기초대사량보다 적게 먹어도 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "권장하지 않습니다. 근육이 함께 빠지고 기초대사량이 떨어져 장기적으로 불리합니다."}}, {"@type": "Question", "name": "운동을 많이 하는데 BMI가 높게 나옵니다.", "acceptedAnswer": {"@type": "Answer", "text": "BMI는 근육과 지방을 구분하지 못합니다. 근육량이 많으면 실제보다 높게 나오므로 체지방률이나 허리둘레를 함께 보시는 편이 정확합니다."}}, {"@type": "Question", "name": "하루 500kcal 줄이면 얼마나 빠지나요?", "acceptedAnswer": {"@type": "Answer", "text": "지방 1kg은 약 7,700kcal에 해당합니다. 하루 500kcal 적자면 주당 약 0.45kg 속도입니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow">부동산·생활</p><h1>BMI·칼로리 계산기</h1><p>키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>한국 기준은 세계보건기구 기준과 다릅니다</h3>
+<p>BMI = 체중(kg) ÷ 키(m)²입니다. 그런데 <strong>비만 판정 기준선이 다릅니다.</strong></p>
+<p>WHO 국제 기준은 BMI 25 이상을 과체중, 30 이상을 비만으로 봅니다.
+반면 대한비만학회의 아시아·태평양 기준은 <strong>23 이상 과체중, 25 이상 비만</strong>입니다.
+같은 체중이라도 아시아인이 더 낮은 BMI에서 대사질환 위험이 올라가기 때문입니다.
+이 계산기는 한국 기준을 씁니다.</p>
+
+<h3>기초대사량과 하루 소모량</h3>
+<p><strong>기초대사량(BMR)</strong>은 아무것도 안 하고 누워만 있어도 소모되는 열량입니다.
+호흡, 체온 유지, 장기 활동에 쓰입니다.</p>
+<p><strong>하루 소모량(TDEE)</strong>은 여기에 활동량을 곱한 값입니다.
+사무직이면 BMR × 1.2, 주 3~5회 운동하면 × 1.55 정도입니다.
+살을 빼려면 이 숫자보다 적게 먹어야 합니다.</p>
+<p>계산에는 미플린-세인트 지어(Mifflin-St Jeor) 공식을 씁니다.
+현재 가장 널리 쓰이는 추정식이지만 개인차가 있어 ±10% 정도 오차는 정상입니다.</p>
+
+<h3>감량 속도는 하루 500kcal이 기준</h3>
+<p>지방 1kg을 빼려면 약 7,700kcal의 적자가 필요합니다.
+하루 500kcal씩 덜 먹으면 일주일에 3,500kcal, 약 0.45kg이 빠집니다.
+<strong>한 달에 2kg 정도가 무리 없는 속도</strong>입니다.</p>
+<p>하루 소모량보다 극단적으로 적게 먹으면 근육이 함께 빠지고 기초대사량이 떨어져
+오히려 되돌리기 어려워집니다. 기초대사량 아래로는 내려가지 않는 편이 좋습니다.</p>
+
+<h3>BMI의 한계</h3>
+<p>BMI는 체중과 키만 봅니다. <strong>근육과 지방을 구분하지 못합니다.</strong>
+근육량이 많은 사람은 BMI가 높게 나오지만 비만이 아닙니다.
+반대로 체중은 정상인데 체지방률이 높은 경우도 잡아내지 못합니다.</p>
+<p>허리둘레를 함께 보면 도움이 됩니다. 남성 90cm, 여성 85cm 이상이면
+복부비만으로 보고 대사질환 위험이 올라갑니다.</p>
+
+<h3>참고 사항</h3>
+<p>이 계산기는 일반적인 추정식에 따른 참고 수치이며 의학적 진단이 아닙니다.
+체중 변화가 급격하거나 건강 문제가 있다면 의료진과 상담하세요.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>BMI 24인데 비만인가요?</summary><div class="a">한국 기준으로는 과체중(23~24.9) 구간입니다. WHO 국제 기준으로는 정상 범위입니다. 기준선이 달라 생기는 차이입니다.</div></details>
+<details><summary>기초대사량보다 적게 먹어도 되나요?</summary><div class="a">권장하지 않습니다. 근육이 함께 빠지고 기초대사량이 떨어져 장기적으로 불리합니다.</div></details>
+<details><summary>운동을 많이 하는데 BMI가 높게 나옵니다.</summary><div class="a">BMI는 근육과 지방을 구분하지 못합니다. 근육량이 많으면 실제보다 높게 나오므로 체지방률이나 허리둘레를 함께 보시는 편이 정확합니다.</div></details>
+<details><summary>하루 500kcal 줄이면 얼마나 빠지나요?</summary><div class="a">지방 1kg은 약 7,700kcal에 해당합니다. 하루 500kcal 적자면 주당 약 0.45kg 속도입니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"bmi",
+  formTitle:"신체 정보",
+  fields:[
+    {k:"sex", label:"성별", type:"seg", options:[
+      {value:"m", label:"남성"}, {value:"f", label:"여성"}]},
+    {k:"height", label:"키", suffix:"cm", value:170, step:0.1, min:1},
+    {k:"weight", label:"몸무게", suffix:"kg", value:70, step:0.1, min:1},
+    {k:"age", label:"나이", suffix:"세", value:35, step:1, min:1},
+    {k:"act", label:"활동량", type:"select", value:"1.375", options:[
+      {value:"1.2", label:"거의 안 움직임 (사무직)"},
+      {value:"1.375", label:"가벼운 활동 (주 1~3회 운동)"},
+      {value:"1.55", label:"보통 (주 3~5회 운동)"},
+      {value:"1.725", label:"많음 (주 6~7회 운동)"},
+      {value:"1.9", label:"매우 많음 (육체노동·선수)"}]},
+    {k:"goal", label:"목표", type:"seg", options:[
+      {value:"keep", label:"유지"}, {value:"lose", label:"감량"}, {value:"gain", label:"증량"}]}
+  ],
+  compute:function(v,F){
+    var h=(v.height||1)/100, w=v.weight||1, age=v.age||1;
+    var bmi=w/(h*h);
+    /* 대한비만학회 아시아·태평양 기준 */
+    var label, cls;
+    if(bmi<18.5){label="저체중";cls="down";}
+    else if(bmi<23){label="정상";cls="up";}
+    else if(bmi<25){label="과체중";cls="";}
+    else if(bmi<30){label="비만 1단계";cls="down";}
+    else if(bmi<35){label="비만 2단계";cls="down";}
+    else {label="비만 3단계";cls="down";}
+
+    /* Mifflin-St Jeor */
+    var bmr = 10*w + 6.25*(v.height||1) - 5*age + (v.sex==="f" ? -161 : 5);
+    var tdee = bmr*(+v.act||1.375);
+    var target = v.goal==="lose" ? tdee-500 : v.goal==="gain" ? tdee+400 : tdee;
+
+    /* 정상 체중 범위 (BMI 18.5~22.9) */
+    var lo=18.5*h*h, hi=22.9*h*h;
+
+    return {
+      hero:{k:"체질량지수 (BMI)", v:F.num(bmi,1), cls:cls, sub:label},
+      stats:[
+        {k:"기초대사량", v:F.num(bmr)+" kcal", sub:"가만히 있어도 쓰는 열량"},
+        {k:"하루 소모량", v:F.num(tdee)+" kcal", sub:"활동량 반영"},
+        {k:"목표 섭취량", v:F.num(target)+" kcal",
+         cls: v.goal==="lose"?"down":v.goal==="gain"?"up":"",
+         sub: v.goal==="lose"?"하루 -500":v.goal==="gain"?"하루 +400":"현 체중 유지"}
+      ],
+      hint:label+" · "+(v.sex==="f"?"여성":"남성")+" "+age+"세",
+      extra:"<div class='note'>키 "+F.num(v.height,1)+"cm 기준 정상 체중 범위는 "+
+        "<b>"+F.num(lo,1)+"~"+F.num(hi,1)+"kg</b> 입니다 (BMI 18.5~22.9). "+
+        (v.goal==="lose" ? "하루 500kcal 적자면 주당 약 0.5kg 감량 속도입니다. " : "")+
+        "BMI 는 근육량을 구분하지 못해 운동선수처럼 근육이 많으면 실제보다 높게 나옵니다.</div>",
+      cols:["구분","BMI","키 "+F.num(v.height,0)+"cm 기준 체중"],
+      rows:[
+        ["저체중","18.5 미만","~ "+F.num(18.5*h*h,1)+"kg"],
+        ["정상","18.5 ~ 22.9",F.num(18.5*h*h,1)+" ~ "+F.num(22.9*h*h,1)+"kg"],
+        ["과체중","23 ~ 24.9",F.num(23*h*h,1)+" ~ "+F.num(24.9*h*h,1)+"kg"],
+        ["비만 1단계","25 ~ 29.9",F.num(25*h*h,1)+" ~ "+F.num(29.9*h*h,1)+"kg"],
+        ["비만 2단계","30 ~ 34.9",F.num(30*h*h,1)+" ~ "+F.num(34.9*h*h,1)+"kg"],
+        ["비만 3단계","35 이상",F.num(35*h*h,1)+"kg ~"]
+      ],
+      tableHint:"대한비만학회 기준"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>

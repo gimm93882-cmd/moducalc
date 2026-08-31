@@ -1252,3 +1252,963 @@ Calc.mount({
          u"해당 시·도 조례를 확인하세요."),
     ],
 )
+
+# ───────────────────────── 연차 개수 ─────────────────────────
+add(
+    slug="yeoncha", name=u"연차 개수 계산기", group=u"급여·노무",
+    title=u"연차 계산기 | 입사일 기준 연차 개수와 가산 연차",
+    desc=u"입사일과 기준일로 발생한 연차휴가 일수를 계산합니다. 1년 미만 월차와 3년 이상 가산 연차를 반영합니다.",
+    kw=u"입사일 기준 연차 일수와 가산 연차",
+    spec=u"""
+Calc.mount({
+  id:"yeoncha",
+  formTitle:"재직 정보",
+  fields:[
+    {k:"join", label:"입사일", type:"date", value:"2022-03-02"},
+    {k:"base", label:"기준일", sub:"비우면 오늘", type:"date", value:""},
+    {k:"rate", label:"통상시급", sub:"미사용 연차수당 계산용", suffix:"원", value:0, step:100, min:0},
+    {k:"hours", label:"1일 근로시간", suffix:"시간", value:8, step:0.5, min:0}
+  ],
+  compute:function(v,F){
+    var D=24*3600*1000;
+    var a=new Date((v.join||"2022-01-01")+"T00:00:00");
+    var b=v.base ? new Date(v.base+"T00:00:00") : new Date(new Date().toDateString());
+    if(isNaN(a)||isNaN(b)||b<a) return {hero:{k:"오류",v:"날짜를 확인해 주세요"}};
+
+    var days=Math.round((b-a)/D);
+    var years=Math.floor(days/365);
+    var months=Math.floor(days/30.44);
+
+    var monthly=0, annual=0, added=0;
+    if(years<1){
+      /* 1년 미만: 1개월 개근마다 1일, 최대 11일 */
+      monthly=Math.min(11, Math.floor(days/30.44));
+    } else {
+      annual=15;
+      /* 3년차부터 2년마다 1일 가산, 총 25일 상한 */
+      if(years>=3) added=Math.min(10, Math.floor((years-1)/2));
+      annual=Math.min(25, 15+added);
+    }
+    var total=years<1 ? monthly : annual;
+    var pay=(v.rate||0)*(v.hours||8)*total;
+
+    return {
+      hero:{k: years<1 ? "발생한 연차 (1년 미만)" : years+"년차 연차",
+            v:F.num(total)+"일", cls:"up",
+            sub: years<1 ? "1개월 개근마다 1일" : (added? "기본 15일 + 가산 "+added+"일" : "기본 15일")},
+      stats:[
+        {k:"재직기간", v:years+"년 "+(months-years*12)+"개월", sub:F.num(days)+"일"},
+        {k:"미사용 시 수당", v: v.rate ? F.won(pay) : "—", sub: v.rate ? total+"일 × "+F.num(v.hours,1)+"시간" : "통상시급 입력 시"},
+        {k:"다음 갱신", v: years<1 ? "입사 1년 후" : (years+1)+"년차"}
+      ],
+      hint:F.num(days)+"일 근속",
+      cols:["연차","발생 일수","비고"],
+      rows:(function(){
+        var r=[["1년 미만","최대 11일","1개월 개근마다 1일"]];
+        for(var y=1;y<=10;y++){
+          var ad = y>=3 ? Math.min(10,Math.floor((y-1)/2)) : 0;
+          var d=Math.min(25,15+ad);
+          r.push([y+"년차", d+"일", ad? "기본 15 + 가산 "+ad : "기본"]);
+        }
+        return r;
+      })(),
+      tableHint:"근속연수별 연차",
+      extra:"<div class='note'>회계연도 기준으로 운영하는 회사는 입사일 기준과 결과가 다를 수 있습니다. "+
+        "취업규칙과 근로계약서를 확인하세요. 주 15시간 미만 근로자는 연차휴가 대상이 아닙니다.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>연차는 언제 몇 개 생기나</h3>
+<p>근로기준법상 연차유급휴가는 근속기간에 따라 이렇게 발생합니다.</p>
+<ul>
+<li><strong>1년 미만</strong> — 1개월을 개근할 때마다 1일씩, 최대 11일</li>
+<li><strong>1년 이상</strong> — 1년간 80% 이상 출근하면 15일</li>
+<li><strong>3년 이상</strong> — 2년마다 1일씩 가산, <strong>최대 25일</strong>까지</li>
+</ul>
+
+<h3>가산 연차 계산</h3>
+<p>3년차에 1일이 붙어 16일, 5년차에 17일, 7년차에 18일 식으로 2년마다 하루씩 늘어납니다.
+21년차에 25일이 되면 그 뒤로는 더 늘지 않습니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>근속</th><th>연차</th><th>근속</th><th>연차</th></tr></thead>
+<tbody>
+<tr><td>1~2년</td><td class="n">15일</td><td>11~12년</td><td class="n">20일</td></tr>
+<tr><td>3~4년</td><td class="n">16일</td><td>13~14년</td><td class="n">21일</td></tr>
+<tr><td>5~6년</td><td class="n">17일</td><td>15~16년</td><td class="n">22일</td></tr>
+<tr><td>7~8년</td><td class="n">18일</td><td>17~18년</td><td class="n">23일</td></tr>
+<tr><td>9~10년</td><td class="n">19일</td><td>21년~</td><td class="n">25일 (상한)</td></tr>
+</tbody></table></div>
+
+<h3>입사일 기준과 회계연도 기준</h3>
+<p>법이 정한 원칙은 <strong>입사일 기준</strong>입니다. 다만 관리 편의를 위해
+<strong>회계연도(보통 1월 1일)</strong>를 기준으로 일괄 부여하는 회사가 많습니다.
+회계연도 기준으로 운영하더라도 퇴사 시점에는 입사일 기준으로 정산해
+근로자에게 불리하지 않게 맞춰야 합니다.</p>
+<p>이 계산기는 <strong>입사일 기준</strong>으로 계산합니다.
+회사가 회계연도 기준이라면 실제 부여 일수가 다를 수 있으니 취업규칙을 확인하세요.</p>
+
+<h3>연차수당</h3>
+<p>쓰지 못한 연차는 수당으로 받습니다. <strong>연차수당 = 통상임금(시급) × 1일 근로시간 × 미사용 일수</strong>입니다.
+8시간 근무에 통상시급 15,000원이고 5일이 남았다면 60만원입니다.
+통상시급 칸에 값을 넣으면 계산해 드립니다.</p>
+
+<h3>연차 사용 촉진</h3>
+<p>회사가 법에 정한 절차대로 사용을 촉진했는데도 근로자가 쓰지 않으면
+미사용 연차에 대한 수당 지급 의무가 없어질 수 있습니다.
+촉진 절차에는 서면 통보 등 요건이 있으니, 분쟁이 있다면 고용노동부에 문의하세요.</p>
+
+<h3>대상에서 빠지는 경우</h3>
+<p>주 소정근로시간이 15시간 미만인 근로자는 연차휴가 대상이 아닙니다.
+상시 근로자 5인 미만 사업장도 연차휴가 규정이 적용되지 않습니다.</p>
+""",
+    faq=[
+        (u"입사 6개월인데 연차가 있나요?",
+         u"1년 미만이면 1개월 개근마다 1일씩 발생합니다. 6개월이면 최대 6일입니다."),
+        (u"회사가 회계연도 기준이라는데 다른가요?",
+         u"부여 시점이 달라 중간에는 일수가 다를 수 있습니다. 다만 퇴사 시에는 입사일 기준으로 "
+         u"정산해 근로자에게 불리하지 않아야 합니다."),
+        (u"연차가 25일보다 많아질 수 있나요?",
+         u"법정 한도는 25일입니다. 다만 회사가 취업규칙으로 더 줄 수는 있습니다."),
+        (u"5인 미만 사업장도 연차가 있나요?",
+         u"상시 근로자 5인 미만 사업장에는 연차휴가 규정이 적용되지 않습니다."),
+    ],
+)
+
+# ───────────────────────── BMI · 칼로리 ─────────────────────────
+add(
+    slug="bmi", name=u"BMI·칼로리 계산기", group=u"부동산·생활",
+    title=u"BMI 계산기 | 체질량지수와 하루 필요 칼로리",
+    desc=u"키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.",
+    kw=u"체질량지수, 기초대사량, 하루 필요 칼로리",
+    spec=u"""
+Calc.mount({
+  id:"bmi",
+  formTitle:"신체 정보",
+  fields:[
+    {k:"sex", label:"성별", type:"seg", options:[
+      {value:"m", label:"남성"}, {value:"f", label:"여성"}]},
+    {k:"height", label:"키", suffix:"cm", value:170, step:0.1, min:1},
+    {k:"weight", label:"몸무게", suffix:"kg", value:70, step:0.1, min:1},
+    {k:"age", label:"나이", suffix:"세", value:35, step:1, min:1},
+    {k:"act", label:"활동량", type:"select", value:"1.375", options:[
+      {value:"1.2", label:"거의 안 움직임 (사무직)"},
+      {value:"1.375", label:"가벼운 활동 (주 1~3회 운동)"},
+      {value:"1.55", label:"보통 (주 3~5회 운동)"},
+      {value:"1.725", label:"많음 (주 6~7회 운동)"},
+      {value:"1.9", label:"매우 많음 (육체노동·선수)"}]},
+    {k:"goal", label:"목표", type:"seg", options:[
+      {value:"keep", label:"유지"}, {value:"lose", label:"감량"}, {value:"gain", label:"증량"}]}
+  ],
+  compute:function(v,F){
+    var h=(v.height||1)/100, w=v.weight||1, age=v.age||1;
+    var bmi=w/(h*h);
+    /* 대한비만학회 아시아·태평양 기준 */
+    var label, cls;
+    if(bmi<18.5){label="저체중";cls="down";}
+    else if(bmi<23){label="정상";cls="up";}
+    else if(bmi<25){label="과체중";cls="";}
+    else if(bmi<30){label="비만 1단계";cls="down";}
+    else if(bmi<35){label="비만 2단계";cls="down";}
+    else {label="비만 3단계";cls="down";}
+
+    /* Mifflin-St Jeor */
+    var bmr = 10*w + 6.25*(v.height||1) - 5*age + (v.sex==="f" ? -161 : 5);
+    var tdee = bmr*(+v.act||1.375);
+    var target = v.goal==="lose" ? tdee-500 : v.goal==="gain" ? tdee+400 : tdee;
+
+    /* 정상 체중 범위 (BMI 18.5~22.9) */
+    var lo=18.5*h*h, hi=22.9*h*h;
+
+    return {
+      hero:{k:"체질량지수 (BMI)", v:F.num(bmi,1), cls:cls, sub:label},
+      stats:[
+        {k:"기초대사량", v:F.num(bmr)+" kcal", sub:"가만히 있어도 쓰는 열량"},
+        {k:"하루 소모량", v:F.num(tdee)+" kcal", sub:"활동량 반영"},
+        {k:"목표 섭취량", v:F.num(target)+" kcal",
+         cls: v.goal==="lose"?"down":v.goal==="gain"?"up":"",
+         sub: v.goal==="lose"?"하루 -500":v.goal==="gain"?"하루 +400":"현 체중 유지"}
+      ],
+      hint:label+" · "+(v.sex==="f"?"여성":"남성")+" "+age+"세",
+      extra:"<div class='note'>키 "+F.num(v.height,1)+"cm 기준 정상 체중 범위는 "+
+        "<b>"+F.num(lo,1)+"~"+F.num(hi,1)+"kg</b> 입니다 (BMI 18.5~22.9). "+
+        (v.goal==="lose" ? "하루 500kcal 적자면 주당 약 0.5kg 감량 속도입니다. " : "")+
+        "BMI 는 근육량을 구분하지 못해 운동선수처럼 근육이 많으면 실제보다 높게 나옵니다.</div>",
+      cols:["구분","BMI","키 "+F.num(v.height,0)+"cm 기준 체중"],
+      rows:[
+        ["저체중","18.5 미만","~ "+F.num(18.5*h*h,1)+"kg"],
+        ["정상","18.5 ~ 22.9",F.num(18.5*h*h,1)+" ~ "+F.num(22.9*h*h,1)+"kg"],
+        ["과체중","23 ~ 24.9",F.num(23*h*h,1)+" ~ "+F.num(24.9*h*h,1)+"kg"],
+        ["비만 1단계","25 ~ 29.9",F.num(25*h*h,1)+" ~ "+F.num(29.9*h*h,1)+"kg"],
+        ["비만 2단계","30 ~ 34.9",F.num(30*h*h,1)+" ~ "+F.num(34.9*h*h,1)+"kg"],
+        ["비만 3단계","35 이상",F.num(35*h*h,1)+"kg ~"]
+      ],
+      tableHint:"대한비만학회 기준"
+    };
+  }
+});""",
+    guide=u"""
+<h3>한국 기준은 세계보건기구 기준과 다릅니다</h3>
+<p>BMI = 체중(kg) ÷ 키(m)²입니다. 그런데 <strong>비만 판정 기준선이 다릅니다.</strong></p>
+<p>WHO 국제 기준은 BMI 25 이상을 과체중, 30 이상을 비만으로 봅니다.
+반면 대한비만학회의 아시아·태평양 기준은 <strong>23 이상 과체중, 25 이상 비만</strong>입니다.
+같은 체중이라도 아시아인이 더 낮은 BMI에서 대사질환 위험이 올라가기 때문입니다.
+이 계산기는 한국 기준을 씁니다.</p>
+
+<h3>기초대사량과 하루 소모량</h3>
+<p><strong>기초대사량(BMR)</strong>은 아무것도 안 하고 누워만 있어도 소모되는 열량입니다.
+호흡, 체온 유지, 장기 활동에 쓰입니다.</p>
+<p><strong>하루 소모량(TDEE)</strong>은 여기에 활동량을 곱한 값입니다.
+사무직이면 BMR × 1.2, 주 3~5회 운동하면 × 1.55 정도입니다.
+살을 빼려면 이 숫자보다 적게 먹어야 합니다.</p>
+<p>계산에는 미플린-세인트 지어(Mifflin-St Jeor) 공식을 씁니다.
+현재 가장 널리 쓰이는 추정식이지만 개인차가 있어 ±10% 정도 오차는 정상입니다.</p>
+
+<h3>감량 속도는 하루 500kcal이 기준</h3>
+<p>지방 1kg을 빼려면 약 7,700kcal의 적자가 필요합니다.
+하루 500kcal씩 덜 먹으면 일주일에 3,500kcal, 약 0.45kg이 빠집니다.
+<strong>한 달에 2kg 정도가 무리 없는 속도</strong>입니다.</p>
+<p>하루 소모량보다 극단적으로 적게 먹으면 근육이 함께 빠지고 기초대사량이 떨어져
+오히려 되돌리기 어려워집니다. 기초대사량 아래로는 내려가지 않는 편이 좋습니다.</p>
+
+<h3>BMI의 한계</h3>
+<p>BMI는 체중과 키만 봅니다. <strong>근육과 지방을 구분하지 못합니다.</strong>
+근육량이 많은 사람은 BMI가 높게 나오지만 비만이 아닙니다.
+반대로 체중은 정상인데 체지방률이 높은 경우도 잡아내지 못합니다.</p>
+<p>허리둘레를 함께 보면 도움이 됩니다. 남성 90cm, 여성 85cm 이상이면
+복부비만으로 보고 대사질환 위험이 올라갑니다.</p>
+
+<h3>참고 사항</h3>
+<p>이 계산기는 일반적인 추정식에 따른 참고 수치이며 의학적 진단이 아닙니다.
+체중 변화가 급격하거나 건강 문제가 있다면 의료진과 상담하세요.</p>
+""",
+    faq=[
+        (u"BMI 24인데 비만인가요?",
+         u"한국 기준으로는 과체중(23~24.9) 구간입니다. WHO 국제 기준으로는 정상 범위입니다. "
+         u"기준선이 달라 생기는 차이입니다."),
+        (u"기초대사량보다 적게 먹어도 되나요?",
+         u"권장하지 않습니다. 근육이 함께 빠지고 기초대사량이 떨어져 장기적으로 불리합니다."),
+        (u"운동을 많이 하는데 BMI가 높게 나옵니다.",
+         u"BMI는 근육과 지방을 구분하지 못합니다. 근육량이 많으면 실제보다 높게 나오므로 "
+         u"체지방률이나 허리둘레를 함께 보시는 편이 정확합니다."),
+        (u"하루 500kcal 줄이면 얼마나 빠지나요?",
+         u"지방 1kg은 약 7,700kcal에 해당합니다. 하루 500kcal 적자면 주당 약 0.45kg 속도입니다."),
+    ],
+)
+
+# ───────────────────────── 취득세 ─────────────────────────
+add(
+    slug="chwideukse", name=u"취득세 계산기", group=u"부동산·생활",
+    title=u"취득세 계산기 | 주택 취득세·지방교육세·농특세 계산",
+    desc=u"주택 취득가액으로 취득세와 지방교육세, 농어촌특별세를 계산합니다. 주택 수와 전용면적에 따른 차이를 반영합니다.",
+    kw=u"주택 취득세·지방교육세·농특세 합계",
+    spec=u"""
+Calc.mount({
+  id:"chwideukse",
+  formTitle:"취득 정보",
+  sideNote:"세율은 개정될 수 있습니다. 실제 신고 전 위택스나 관할 지자체에서 확인하세요.",
+  fields:[
+    {k:"price", label:"취득가액", suffix:"원", value:600000000, step:10000000, min:0},
+    {k:"area", label:"전용면적", sub:"85㎡ 초과 시 농특세", suffix:"㎡", value:84.9, step:0.01, min:0},
+    /* 값에 숫자만 쓰면 엔진이 숫자로 변환해 문자열 비교가 어긋난다. 접두사를 붙인다. */
+    {k:"houses", label:"취득 후 주택 수", type:"select", value:"h1", options:[
+      {value:"h1", label:"1주택"},
+      {value:"h2c", label:"2주택 (조정대상지역)"},
+      {value:"h2n", label:"2주택 (비조정)"},
+      {value:"h3c", label:"3주택 (조정) 또는 4주택 이상"},
+      {value:"h3n", label:"3주택 (비조정)"}]}
+  ],
+  compute:function(v,F){
+    var p=v.price||0, area=v.area||0, h=v.houses;
+    var rate, note="";
+
+    if(h==="h1" || h==="h2n"){
+      /* 표준세율: 6억 이하 1%, 6~9억 비례, 9억 초과 3% */
+      if(p<=600000000) rate=1;
+      else if(p<=900000000){
+        rate = (p*2/300000000 - 3);
+        rate = Math.round(rate*100)/100;
+      } else rate=3;
+      note = h==="h2n" ? "비조정지역 2주택은 표준세율" : "1주택 표준세율";
+    } else if(h==="h2c" || h==="h3n"){
+      rate=8; note="중과세율 8%";
+    } else {
+      rate=12; note="중과세율 12%";
+    }
+
+    var acq=p*rate/100;
+    /* 지방교육세: 표준세율 구간은 취득세율의 1/10, 중과 구간은 0.4% */
+    var eduRate = rate<=3 ? rate/10 : 0.4;
+    var edu=p*eduRate/100;
+    /* 농어촌특별세: 전용 85㎡ 초과분만. 표준 0.2%, 중과 구간 가산 */
+    var farmRate = area>85 ? (rate<=3 ? 0.2 : (rate===8 ? 0.6 : 1.0)) : 0;
+    var farm=p*farmRate/100;
+    var total=acq+edu+farm;
+
+    return {
+      hero:{k:"취득세 등 합계", v:F.kor(total), sub:F.won(total), cls:"down"},
+      stats:[
+        {k:"취득세", v:F.won(acq), sub:F.pct(rate,2)},
+        {k:"지방교육세", v:F.won(edu), sub:F.pct(eduRate,2)},
+        {k:"농어촌특별세", v: farmRate? F.won(farm):"—", sub: area>85 ? F.pct(farmRate,2) : "85㎡ 이하 비과세"}
+      ],
+      hint:note+" · "+F.kor(p),
+      extra:"<div class='note'>"+
+        (p>600000000 && p<=900000000 && rate<=3
+          ? "6억 초과 9억 이하 구간은 세율이 <b>비례해서 올라갑니다.</b> "+
+            "세율(%) = 취득가액 × 2 ÷ 3억 − 3 이며, 이 금액에서는 <b>"+F.pct(rate,2)+"</b> 입니다.<br><br>"
+          : "")+
+        "표시된 금액에 <b>인지세·법무사 보수·중개보수</b>는 포함되지 않았습니다. "+
+        "생애최초 구입, 신혼부부, 일시적 2주택 등 감면 요건에 해당하면 실제 부담이 줄어듭니다. "+
+        "감면은 요건이 까다로우니 위택스나 관할 지자체에서 확인하세요.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>취득세는 세 가지를 함께 냅니다</h3>
+<ul>
+<li><strong>취득세</strong> — 본세</li>
+<li><strong>지방교육세</strong> — 취득세에 부가</li>
+<li><strong>농어촌특별세</strong> — 전용면적 85㎡를 넘을 때만</li>
+</ul>
+<p>흔히 "취득세 1%"라고 하지만 지방교육세 0.1%가 더 붙어 실제로는 1.1%입니다.
+85㎡를 넘으면 농특세 0.2%가 더해져 1.3%가 됩니다.</p>
+
+<h3>6억 초과 9억 이하는 세율이 비례해서 올라갑니다</h3>
+<p>여기서 계산을 많이 틀립니다. 6억까지는 1%, 9억부터는 3%인데,
+그 사이는 <strong>계단이 아니라 직선</strong>으로 올라갑니다.</p>
+<p><strong>세율(%) = 취득가액 × 2 ÷ 3억 − 3</strong></p>
+<div class="tablewrap"><table>
+<thead><tr><th>취득가액</th><th>취득세율</th><th>지방교육세</th><th>합계(85㎡ 이하)</th></tr></thead>
+<tbody>
+<tr><td>6억</td><td class="n">1.00%</td><td class="n">0.10%</td><td class="n">1.10%</td></tr>
+<tr><td>7억</td><td class="n">1.67%</td><td class="n">0.17%</td><td class="n">1.84%</td></tr>
+<tr><td>8억</td><td class="n">2.33%</td><td class="n">0.23%</td><td class="n">2.56%</td></tr>
+<tr><td>9억</td><td class="n">3.00%</td><td class="n">0.30%</td><td class="n">3.30%</td></tr>
+</tbody></table></div>
+<p>6억에서 1원만 넘어도 세율이 껑충 뛰는 구조가 아니라는 점이 중요합니다.</p>
+
+<h3>85㎡ 기준선</h3>
+<p>전용면적 85㎡ 이하는 농어촌특별세가 <strong>비과세</strong>입니다.
+84.9㎡와 85.1㎡의 세금이 달라지는 이유입니다.
+아파트 분양 면적이 84㎡에 몰려 있는 데는 이런 배경도 있습니다.</p>
+
+<h3>다주택 중과</h3>
+<p>주택 수와 조정대상지역 여부에 따라 8% 또는 12%가 적용됩니다.
+중과 구간에서는 지방교육세와 농특세도 함께 올라가 부담이 크게 늘어납니다.
+조정대상지역 지정은 수시로 바뀌므로 취득 시점의 지정 여부를 확인해야 합니다.</p>
+
+<h3>감면 제도</h3>
+<p>생애최초 주택 구입, 신혼부부, 일시적 2주택 등 요건에 해당하면 감면받을 수 있습니다.
+요건이 까다롭고 사후 관리 조건도 있어, 해당한다고 생각되면 반드시
+위택스나 관할 시·군·구청에 확인하세요.</p>
+
+<h3>이 계산에 없는 비용</h3>
+<p>취득세 외에 <strong>인지세, 법무사 보수, 중개보수, 국민주택채권 매입</strong> 비용이 별도로 듭니다.
+중개보수는 <a href="../brokerage/">중개보수 계산기</a>에서 확인하실 수 있습니다.</p>
+""",
+    faq=[
+        (u"6억 1천만원이면 세율이 얼마인가요?",
+         u"6억 초과 구간은 비례 계산합니다. 6억 1천만원이면 약 1.07%입니다. "
+         u"6억을 넘는 순간 3%가 되는 것이 아닙니다."),
+        (u"85㎡ 기준은 공급면적인가요 전용면적인가요?",
+         u"전용면적 기준입니다. 84㎡ 아파트는 대부분 농특세가 비과세됩니다."),
+        (u"생애최초인데 감면받을 수 있나요?",
+         u"요건에 해당하면 감면이 가능합니다. 다만 소득·주택가격·사후 거주 요건 등이 있어 "
+         u"위택스나 관할 지자체 확인이 필요합니다. 이 계산기는 감면 전 금액입니다."),
+        (u"조정대상지역인지 어떻게 아나요?",
+         u"국토교통부 고시로 지정되며 수시로 바뀝니다. 취득 시점 기준으로 확인하셔야 합니다."),
+    ],
+)
+
+# ───────────────────────── 자동차 할부 ─────────────────────────
+add(
+    slug="carloan", name=u"자동차 할부 계산기", group=u"대출·예금",
+    title=u"자동차 할부 계산기 | 월 납입금과 총 이자 계산",
+    desc=u"차량가격, 선수금, 유예금(잔가)으로 자동차 할부의 월 납입금과 총 이자를 계산합니다.",
+    kw=u"선수금·유예금 반영한 월 납입금과 총이자",
+    spec=u"""
+Calc.mount({
+  id:"carloan",
+  formTitle:"할부 조건",
+  fields:[
+    {k:"price", label:"차량가격", suffix:"원", value:40000000, step:1000000, min:0},
+    {k:"down", label:"선수금", sub:"계약 시 내는 돈", suffix:"원", value:8000000, step:1000000, min:0},
+    {k:"balloon", label:"유예금 (잔가)", sub:"만기에 한 번에 갚는 금액", suffix:"원", value:0, step:1000000, min:0},
+    {k:"rate", label:"연이자율", suffix:"%", value:6.9, step:0.1, min:0},
+    {k:"months", label:"할부기간", suffix:"개월", value:60, step:1, min:1}
+  ],
+  compute:function(v,F){
+    var P=v.price||0, dn=Math.min(v.down||0,P), B=Math.min(v.balloon||0, P-dn);
+    var fin=P-dn, i=(v.rate||0)/100/12, n=Math.max(1,Math.round(v.months||1));
+
+    var m;
+    if(i>0){
+      var disc=Math.pow(1+i,-n);
+      m = (fin - B*disc) * i / (1-disc);
+    } else {
+      m = (fin-B)/n;
+    }
+    var totalPaid = m*n + B + dn;
+    var interest = totalPaid - P;
+
+    var rows=[], bal=fin;
+    for(var k=1;k<=n && rows.length<600;k++){
+      var it=bal*i, pr=m-it;
+      if(k===n){ pr=bal-B; }
+      bal-=pr;
+      rows.push([k+"회", F.won(pr), F.won(it), F.won(k===n? m+B : m), F.won(Math.max(bal,0))]);
+    }
+
+    return {
+      hero:{k:"월 납입금", v:F.kor(m), sub:F.won(m)},
+      stats:[
+        {k:"할부 원금", v:F.won(fin), sub:"차량가 − 선수금"},
+        {k:"총 이자", v:F.won(interest), cls:"down"},
+        {k:"총 지출", v:F.won(totalPaid), sub:"선수금 포함"}
+      ],
+      hint:F.num(n)+"개월 · 연 "+F.num(v.rate,1)+"%"+(B?" · 유예 "+F.kor(B):""),
+      extra:"<div class='note'>"+
+        (B? "만기에 유예금 <b>"+F.won(B)+"</b> 을 한 번에 갚아야 합니다. "+
+            "월 납입금은 줄지만 이자를 더 내며, 만기에 목돈이 필요합니다. "
+          : "")+
+        "취득세·등록세·보험료·탁송료는 포함되지 않았습니다. "+
+        "실제 계약에는 중도상환수수료나 저당설정비가 붙을 수 있습니다.</div>",
+      cols:["회차","원금","이자","납입액","잔액"],
+      rows:rows,
+      tableHint: n>600 ? "앞 600회차만" : F.num(n)+"회차"
+    };
+  }
+});""",
+    guide=u"""
+<h3>할부는 세 덩어리로 나뉩니다</h3>
+<ul>
+<li><strong>선수금</strong> — 계약할 때 미리 내는 돈. 많이 낼수록 할부 원금이 줄어 이자가 적습니다.</li>
+<li><strong>할부 원금</strong> — 매달 나눠 갚는 부분</li>
+<li><strong>유예금(잔가)</strong> — 만기에 한 번에 갚는 부분. 월 납입금을 낮추는 대신 목돈이 필요합니다.</li>
+</ul>
+
+<h3>유예할부의 함정</h3>
+<p>유예금을 크게 잡으면 월 납입금이 눈에 띄게 줄어듭니다.
+4,000만원 차를 선수금 800만원에 60개월 할부하면 월 63만원 정도인데,
+유예금 1,000만원을 잡으면 월 49만원으로 내려갑니다.</p>
+<p>다만 <strong>만기에 1,000만원을 한 번에 마련해야 합니다.</strong>
+그때 목돈이 없으면 다시 대출을 받거나 차를 넘기게 되고,
+그 과정에서 이자를 또 부담하게 됩니다. 유예금은 미룬 것이지 없어진 것이 아닙니다.</p>
+<p>게다가 유예금에도 할부 기간 내내 이자가 붙습니다. 위 조건에서 총 이자는 593만원에서 <strong>753만원</strong>으로 160만원 늘어납니다.
+계산기에서 유예금을 0으로 놓고 비교해 보세요.</p>
+
+<h3>차량가격 외에 드는 돈</h3>
+<p>계약서에 적힌 차량가격만 준비하면 안 됩니다.</p>
+<ul>
+<li><strong>취득세</strong> — 승용차 7% (경차·전기차 등 감면 있음)</li>
+<li><strong>공채 매입</strong> — 지역과 배기량에 따라 다름</li>
+<li><strong>등록비·탁송료</strong></li>
+<li><strong>자동차보험</strong> — 첫해 부담이 큽니다</li>
+</ul>
+<p>이 계산기는 순수 할부금만 다룹니다. 위 비용을 따로 잡아두셔야 합니다.</p>
+
+<h3>이자율을 낮추는 것이 가장 확실합니다</h3>
+<p>4,000만원 60개월 기준으로 금리가 1%p 낮아지면 총 이자가 100만원 가까이 줄어듭니다.
+제조사 할부, 카드사 할부, 은행 오토론의 금리와 조건을 비교해 보시고,
+현금 구매 시 할인(현금가 할인)과도 비교해 보세요.</p>
+
+<h3>중도상환</h3>
+<p>일찍 갚으면 남은 이자를 아낄 수 있지만 중도상환수수료가 붙는 경우가 많습니다.
+약정서에서 수수료율과 면제 조건을 확인하세요. 이 계산기는 반영하지 않습니다.</p>
+""",
+    faq=[
+        (u"유예금을 크게 잡으면 유리한가요?",
+         u"월 납입금은 줄지만 총 이자는 늘고, 만기에 목돈이 필요합니다. "
+         u"유예금을 0으로 두고 비교해 보시면 차이가 보입니다."),
+        (u"취득세도 계산되나요?",
+         u"포함되지 않습니다. 승용차 취득세는 7% 수준이며 차종에 따라 감면이 있습니다. "
+         u"차량가격 외에 별도로 준비하셔야 합니다."),
+        (u"선수금을 얼마나 넣는 게 좋나요?",
+         u"많이 넣을수록 이자가 줄지만 현금 흐름이 빡빡해집니다. "
+         u"선수금을 바꿔가며 월 납입금과 총 이자를 비교해 보세요."),
+        (u"저금리 할부가 정말 유리한가요?",
+         u"저금리 대신 차량 할인이 줄어드는 경우가 많습니다. "
+         u"현금가 할인을 받고 별도 대출을 쓰는 쪽과 총 지출을 비교해 보세요."),
+    ],
+)
+
+# ───────────────────────── 양도소득세 ─────────────────────────
+add(
+    slug="yangdo", name=u"양도소득세 계산기", group=u"부동산·생활",
+    title=u"양도소득세 계산기 | 주택 양도세와 장기보유특별공제",
+    desc=u"양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.",
+    kw=u"양도차익·장특공제 반영한 양도세와 지방소득세",
+    spec=u"""
+Calc.mount({
+  id:"yangdo",
+  formTitle:"양도 정보",
+  sideNote:"주택 1건 양도를 전제로 한 개략 계산입니다. 다주택 중과, 조정대상지역, 감면 특례는 반영하지 않습니다.",
+  fields:[
+    {k:"sale", label:"양도가액", sub:"판 금액", suffix:"원", value:900000000, step:10000000, min:0},
+    {k:"buy", label:"취득가액", sub:"산 금액", suffix:"원", value:500000000, step:10000000, min:0},
+    {k:"cost", label:"필요경비", sub:"취득세·중개보수·수선비 등", suffix:"원", value:20000000, step:1000000, min:0},
+    {k:"hold", label:"보유기간", suffix:"년", value:10, step:0.5, min:0},
+    {k:"live", label:"거주기간", sub:"1세대1주택 공제용", suffix:"년", value:10, step:0.5, min:0},
+    {k:"one", label:"1세대 1주택", type:"seg", options:[
+      {value:"1", label:"해당"}, {value:"0", label:"해당 없음"}]}
+  ],
+  compute:function(v,F){
+    var sale=v.sale||0, buy=v.buy||0, cost=v.cost||0;
+    var hold=v.hold||0, live=v.live||0, isOne=v.one==1;
+    var gain=sale-buy-cost;
+
+    if(gain<=0){
+      return {hero:{k:"양도차익", v:"손실", cls:"down", sub:F.won(gain)},
+              extra:"<div class='note'>양도차익이 없으면 양도소득세도 없습니다. "+
+                "다만 같은 해 다른 양도소득과 통산할 수 있으니 신고는 확인해 보세요.</div>"};
+    }
+
+    /* 1세대1주택: 12억 초과분만 과세 */
+    var HIGH=1200000000;
+    var taxableGain=gain, exemptNote="";
+    if(isOne){
+      if(sale<=HIGH){
+        return {hero:{k:"양도소득세", v:"비과세", cls:"up", sub:"1세대 1주택 12억 이하"},
+                stats:[{k:"양도차익", v:F.won(gain)},{k:"양도가액", v:F.won(sale)},
+                       {k:"보유기간", v:F.num(hold,1)+"년"}],
+                extra:"<div class='note'>1세대 1주택이고 양도가액이 <b>12억원 이하</b>라 비과세입니다. "+
+                  "다만 <b>2년 이상 보유</b>(취득 당시 조정대상지역이면 2년 이상 거주) 요건을 "+
+                  "충족해야 합니다. 요건을 못 채우면 과세됩니다.</div>"};
+      }
+      taxableGain = gain*(sale-HIGH)/sale;
+      exemptNote = "12억 초과분만 과세";
+    }
+
+    /* 장기보유특별공제 */
+    var ltRate=0, ltNote="";
+    if(isOne && live>=2 && hold>=3){
+      var h=Math.min(Math.floor(hold),10)*4, l=Math.min(Math.floor(live),10)*4;
+      ltRate=Math.min(80, h+l);
+      ltNote="보유 "+h+"% + 거주 "+l+"%";
+    } else if(hold>=3){
+      ltRate=Math.min(30, Math.floor(hold)*2);
+      ltNote="보유 "+Math.floor(hold)+"년 × 2%";
+    } else {
+      ltNote="3년 미만은 공제 없음";
+    }
+    var ltDeduct=taxableGain*ltRate/100;
+    var income=taxableGain-ltDeduct;
+
+    var BASIC=2500000;
+    var base=Math.max(0, income-BASIC);
+
+    /* 세율: 단기보유 중과 */
+    var tax, rateNote;
+    if(hold<1){ tax=base*0.70; rateNote="1년 미만 70%"; }
+    else if(hold<2){ tax=base*0.60; rateNote="1~2년 60%"; }
+    else {
+      var t=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+             [150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],
+             [1000000000,.42,35940000],[Infinity,.45,65940000]];
+      tax=0;
+      for(var i=0;i<t.length;i++) if(base<=t[i][0]){ tax=base*t[i][1]-t[i][2]; rateNote="누진세율 "+(t[i][1]*100)+"%"; break; }
+    }
+    tax=Math.max(0,tax);
+    var local=tax*0.1, total=tax+local;
+
+    return {
+      hero:{k:"양도소득세 합계", v:F.kor(total), sub:F.won(total), cls:"down"},
+      stats:[
+        {k:"양도차익", v:F.won(gain), cls:"up", sub:exemptNote||"양도−취득−경비"},
+        {k:"장기보유공제", v:F.won(ltDeduct), sub:F.pct(ltRate,0)+" · "+ltNote},
+        {k:"실수령 (세후)", v:F.won(gain-total), cls:"up"}
+      ],
+      hint:rateNote+" · 보유 "+F.num(hold,1)+"년",
+      cols:["단계","금액"],
+      rows:[
+        ["양도가액", F.won(sale)],
+        ["취득가액", "− "+F.won(buy)],
+        ["필요경비", "− "+F.won(cost)],
+        ["양도차익", F.won(gain)],
+        [isOne?"과세대상 차익 (12억 초과분)":"과세대상 차익", F.won(taxableGain)],
+        ["장기보유특별공제 "+F.pct(ltRate,0), "− "+F.won(ltDeduct)],
+        ["양도소득금액", F.won(income)],
+        ["기본공제", "− "+F.won(BASIC)],
+        ["과세표준", F.won(base)],
+        ["양도소득세", F.won(tax)],
+        ["지방소득세 10%", F.won(local)],
+        ["합계", F.won(total)]
+      ],
+      extra:"<div class='note'>주택 <b>1건</b> 양도를 전제로 한 개략 계산입니다. "+
+        "다주택 중과세율, 조정대상지역 여부, 일시적 2주택, 상속·증여 취득, "+
+        "감면 특례는 반영하지 않았습니다. 실제 신고는 홈택스나 세무 전문가를 통해 확인하세요.</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>계산 순서</h3>
+<p>양도소득세는 단계를 밟아 내려갑니다.</p>
+<ol>
+<li><strong>양도차익</strong> = 양도가액 − 취득가액 − 필요경비</li>
+<li><strong>장기보유특별공제</strong>를 뺍니다</li>
+<li><strong>기본공제 250만원</strong>을 뺍니다 (연 1회)</li>
+<li>남은 <strong>과세표준</strong>에 세율을 곱합니다</li>
+<li><strong>지방소득세</strong>를 양도세의 10%만큼 더합니다</li>
+</ol>
+
+<h3>필요경비에 넣을 수 있는 것</h3>
+<p>취득할 때 낸 <strong>취득세·등록세</strong>, <strong>중개보수</strong>, <strong>법무사 비용</strong>,
+자본적 지출에 해당하는 <strong>수선비</strong>(발코니 확장, 새시 교체, 난방 교체 등)를 넣습니다.
+도배·장판 같은 원상복구성 지출은 인정되지 않습니다.
+증빙이 없으면 인정받기 어려우니 계약서와 영수증을 보관하셔야 합니다.</p>
+
+<h3>1세대 1주택 비과세는 12억까지</h3>
+<p>1세대가 1주택을 <strong>2년 이상 보유</strong>(취득 당시 조정대상지역이었다면 2년 이상 거주)하고
+양도가액이 <strong>12억원 이하</strong>면 비과세입니다.</p>
+<p>12억을 넘으면 <strong>초과분에 해당하는 차익만</strong> 과세합니다.
+15억에 팔아 차익이 5억이라면, 5억 × (15억−12억) ÷ 15억 = 1억에 대해서만 세금을 냅니다.
+전액이 과세되는 것이 아닙니다.</p>
+
+<h3>장기보유특별공제 — 1주택이면 최대 80%</h3>
+<p>오래 보유할수록 공제가 커집니다. 두 갈래로 나뉩니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>구분</th><th>공제율</th><th>상한</th></tr></thead>
+<tbody>
+<tr><td>일반 (3년 이상)</td><td class="n">보유 연 2%</td><td class="n">30% (15년)</td></tr>
+<tr><td>1세대1주택 (2년 이상 거주)</td><td class="n">보유 연 4% + 거주 연 4%</td><td class="n">80% (각 10년)</td></tr>
+</tbody></table></div>
+<p>1주택자가 10년 보유하고 10년 거주하면 40% + 40% = <strong>80% 공제</strong>입니다.
+차익의 80%가 빠지므로 세금이 크게 줄어듭니다. 거주 요건이 붙는 이유입니다.</p>
+<p><strong>3년 미만은 공제가 아예 없습니다.</strong></p>
+
+<h3>단기 보유는 세율이 크게 올라갑니다</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>보유기간</th><th>세율</th></tr></thead>
+<tbody>
+<tr><td>1년 미만</td><td class="n">70%</td></tr>
+<tr><td>1년 이상 2년 미만</td><td class="n">60%</td></tr>
+<tr><td>2년 이상</td><td class="n">6~45% 누진</td></tr>
+</tbody></table></div>
+<p>여기에 지방소득세 10%가 더 붙습니다. 1년 미만이면 실질 77%입니다.
+단기 매매 차익은 대부분 세금으로 나갑니다.</p>
+
+<h3>신고 기한</h3>
+<p>양도일이 속한 달의 말일부터 <strong>2개월 이내</strong>에 예정신고·납부해야 합니다.
+같은 해에 두 건 이상 양도했다면 다음 해 5월에 확정신고로 합산합니다.
+기한을 넘기면 가산세가 붙습니다.</p>
+
+<h3>이 계산기가 다루지 않는 것</h3>
+<p>다주택 중과세율, 조정대상지역 지정, 일시적 2주택 특례, 상속·증여로 취득한 경우,
+분양권·입주권, 재개발·재건축, 각종 감면 특례는 반영하지 않았습니다.
+양도세는 사안마다 결론이 크게 달라지므로 <strong>실제 신고 전 홈택스나 세무 전문가 확인이 필요합니다.</strong></p>
+""",
+    faq=[
+        (u"1세대 1주택인데 15억에 팔면 세금이 얼마인가요?",
+         u"12억 초과분에 해당하는 차익만 과세합니다. 전액이 과세되는 것이 아니라 "
+         u"차익 × (양도가액−12억) ÷ 양도가액 만큼만 대상이 됩니다."),
+        (u"장기보유특별공제 80%는 누가 받나요?",
+         u"1세대 1주택으로 2년 이상 거주한 경우, 보유 연 4%와 거주 연 4%를 합해 최대 80%입니다. "
+         u"10년 보유 + 10년 거주가 상한입니다."),
+        (u"필요경비에 인테리어 비용을 넣을 수 있나요?",
+         u"발코니 확장, 새시 교체처럼 자산 가치를 높이는 자본적 지출은 인정됩니다. "
+         u"도배·장판 같은 원상복구성 지출은 인정되지 않습니다. 증빙이 필요합니다."),
+        (u"다주택자인데 이 계산이 맞나요?",
+         u"이 계산기는 주택 1건 양도를 전제로 합니다. 다주택 중과세율은 반영하지 않았으므로 "
+         u"실제 세액은 더 클 수 있습니다. 세무 전문가 상담을 권합니다."),
+        (u"언제까지 신고해야 하나요?",
+         u"양도일이 속한 달의 말일부터 2개월 이내에 예정신고·납부합니다."),
+    ],
+)
+
+# ───────────────────────── 실업급여 ─────────────────────────
+add(
+    slug="silup", name=u"실업급여 계산기", group=u"급여·노무",
+    title=u"실업급여 계산기 | 구직급여 일액과 총 수령액",
+    desc=u"퇴직 전 평균임금과 고용보험 가입기간으로 구직급여 일액과 소정급여일수, 총 수령액을 계산합니다.",
+    kw=u"구직급여 일액·소정급여일수·총 수령액",
+    spec=u"""
+Calc.mount({
+  id:"silup",
+  formTitle:"이직 정보",
+  sideNote:"상한액과 최저임금은 해마다 바뀝니다. 고용보험 홈페이지에서 당해 연도 기준을 확인해 값을 고쳐 쓰세요.",
+  fields:[
+    {k:"pay3", label:"퇴직 전 3개월 임금", sub:"세전 총액", suffix:"원", value:9000000, step:100000, min:0},
+    {k:"days", label:"3개월 총일수", sub:"달력상 일수", suffix:"일", value:91, step:1, min:1},
+    {k:"insured", label:"고용보험 가입기간", type:"select", value:"3", options:[
+      {value:"0", label:"1년 미만"},
+      {value:"1", label:"1년 이상 3년 미만"},
+      {value:"3", label:"3년 이상 5년 미만"},
+      {value:"5", label:"5년 이상 10년 미만"},
+      {value:"10", label:"10년 이상"}]},
+    {k:"age", label:"이직 당시 연령", type:"seg", options:[
+      {value:"u50", label:"50세 미만"}, {value:"o50", label:"50세 이상·장애인"}]},
+    {k:"cap", label:"1일 상한액", suffix:"원", value:66000, step:1000, min:0},
+    {k:"minwage", label:"최저임금 시급", suffix:"원", value:10320, step:10, min:0}
+  ],
+  compute:function(v,F){
+    var avg=(v.pay3||0)/Math.max(1,v.days||1);
+    var raw=avg*0.6;
+    var cap=v.cap||66000;
+    var floor=(v.minwage||0)*0.8*8;          /* 하한 = 최저임금 80% × 8시간 */
+    /* 하한이 상한을 넘는 해가 있다(최저임금이 오르는데 상한이 묶여 있을 때).
+       그때는 하한이 우선한다. min 을 먼저 걸면 하한 보장이 무너진다. */
+    var daily=Math.max(floor, Math.min(cap, raw));
+    var capped = floor>cap ? "하한이 상한 초과 — 하한 적용"
+               : raw>cap ? "상한 적용"
+               : raw<floor ? "하한 적용" : "평균임금 60%";
+
+    var tbl={
+      u50:{"0":120,"1":150,"3":180,"5":210,"10":240},
+      o50:{"0":120,"1":180,"3":210,"5":240,"10":270}
+    };
+    var n=tbl[v.age][String(v.insured)] || 120;
+    var total=daily*n;
+
+    return {
+      hero:{k:"예상 총 수령액", v:F.kor(total), sub:F.won(total), cls:"up"},
+      stats:[
+        {k:"1일 구직급여", v:F.won(daily), sub:capped},
+        {k:"소정급여일수", v:F.num(n)+"일", sub:"약 "+F.num(n/30,1)+"개월"},
+        {k:"1일 평균임금", v:F.won(avg)}
+      ],
+      hint:(v.age==="o50"?"50세 이상":"50세 미만")+" · 가입 "+
+           ({"0":"1년 미만","1":"1~3년","3":"3~5년","5":"5~10년","10":"10년 이상"}[String(v.insured)]),
+      cols:["가입기간","50세 미만","50세 이상·장애인"],
+      rows:[
+        ["1년 미만","120일","120일"],
+        ["1~3년","150일","180일"],
+        ["3~5년","180일","210일"],
+        ["5~10년","210일","240일"],
+        ["10년 이상","240일","270일"]
+      ],
+      tableHint:"소정급여일수",
+      extra:"<div class='note'>구직급여는 <b>퇴직하면 자동으로 나오는 돈이 아닙니다.</b> "+
+        "비자발적 이직(권고사직·계약만료·경영상 해고 등)이고, 이직 전 18개월간 피보험 단위기간이 "+
+        "<b>180일 이상</b>이어야 하며, 적극적으로 재취업 활동을 해야 계속 지급됩니다. "+
+        "자발적 퇴사는 원칙적으로 대상이 아니지만 임금체불 등 정당한 사유가 인정되면 예외가 있습니다. "+
+        "1일 상한액은 <b>"+F.won(cap)+"</b>, 하한액은 최저임금 80%×8시간으로 <b>"+F.won(floor)+"</b> 입니다."+
+        (floor>cap ? "<br><br><b>지금 넣으신 값에서는 하한액이 상한액보다 큽니다.</b> "+
+          "최저임금은 올랐는데 상한액이 그대로일 때 생기는 상황으로, 이 경우 하한액이 적용됩니다. "+
+          "두 값 모두 고용보험 홈페이지에서 당해 연도 기준을 확인해 넣으세요." : "")+"</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>얼마를 받나</h3>
+<p><strong>1일 구직급여 = 퇴직 전 3개월 평균임금 × 60%</strong>입니다.
+다만 상한과 하한이 있습니다.</p>
+<ul>
+<li><strong>상한액</strong> — 아무리 임금이 높아도 이 금액을 넘지 않습니다.</li>
+<li><strong>하한액</strong> — 최저임금의 80% × 8시간. 임금이 낮아도 이 아래로는 내려가지 않습니다.</li>
+</ul>
+<p>두 값 모두 해마다 바뀌므로 계산기의 입력 항목으로 열어두었습니다.
+고용보험 홈페이지에서 당해 연도 기준을 확인해 넣으세요.</p>
+
+<h3>며칠 받나 — 소정급여일수</h3>
+<p>고용보험 가입기간과 이직 당시 연령으로 정해집니다.
+가입기간이 길수록, 50세 이상이면 더 오래 받습니다.
+최소 120일에서 최대 270일입니다.</p>
+
+<h3>받으려면 갖춰야 할 조건</h3>
+<p>퇴직했다고 자동으로 나오지 않습니다. 세 가지를 모두 충족해야 합니다.</p>
+<ol>
+<li>이직 전 18개월간 <strong>피보험 단위기간 180일 이상</strong></li>
+<li><strong>비자발적 이직</strong> — 권고사직, 계약만료, 경영상 해고 등</li>
+<li><strong>재취업 노력</strong> — 구직활동을 증명해야 계속 지급됩니다</li>
+</ol>
+
+<h3>자발적 퇴사는 원칙적으로 안 됩니다</h3>
+<p>본인이 사표를 낸 경우는 대상이 아닙니다. 다만 정당한 사유가 인정되면 예외가 있습니다.</p>
+<ul>
+<li>임금체불이 있었던 경우</li>
+<li>최저임금에 미달한 경우</li>
+<li>사업장 이전 등으로 통근이 왕복 3시간 이상 걸리게 된 경우</li>
+<li>질병으로 업무 수행이 어렵고 회사가 배치전환을 해주지 못한 경우</li>
+<li>직장 내 괴롭힘·성희롱 등</li>
+</ul>
+<p>인정 여부는 고용센터가 판단합니다. 해당한다고 생각되면 증빙을 준비해 상담받으세요.</p>
+
+<h3>신청은 빨리 하셔야 합니다</h3>
+<p>구직급여는 <strong>이직일 다음 날부터 12개월 이내</strong>에만 받을 수 있습니다.
+이 기간이 지나면 소정급여일수가 남아 있어도 지급이 끝납니다.
+퇴직 후 미루지 말고 워크넷 구직등록과 수급자격 신청을 진행하세요.</p>
+
+<h3>실제 절차</h3>
+<ol>
+<li>회사가 <strong>이직확인서</strong>와 피보험자격 상실 신고를 제출</li>
+<li>워크넷에 <strong>구직등록</strong></li>
+<li>고용보험 홈페이지에서 <strong>수급자격 신청자 온라인 교육</strong> 수강</li>
+<li>거주지 관할 <strong>고용센터 방문</strong> 신청</li>
+<li>수급자격 인정 후 <strong>1~4주마다 실업인정</strong> 받으며 지급</li>
+</ol>
+""",
+    faq=[
+        (u"자발적으로 퇴사했는데 받을 수 있나요?",
+         u"원칙적으로 대상이 아닙니다. 다만 임금체불, 통근 곤란, 괴롭힘 등 정당한 사유가 "
+         u"인정되면 예외가 있습니다. 고용센터에서 판단하므로 증빙을 준비해 상담받으세요."),
+        (u"상한액과 하한액이 기본값과 다릅니다.",
+         u"해마다 바뀝니다. 상한액과 최저임금을 입력 항목으로 열어두었으니 "
+         u"고용보험 홈페이지에서 당해 연도 기준을 확인해 넣으세요."),
+        (u"180일은 어떻게 세나요?",
+         u"이직 전 18개월 동안의 피보험 단위기간을 셉니다. 실제로 보수를 받은 날 기준이라 "
+         u"단순 재직일수와 다를 수 있습니다."),
+        (u"퇴직하고 언제까지 신청해야 하나요?",
+         u"이직일 다음 날부터 12개월 이내입니다. 이 기간이 지나면 남은 일수가 있어도 "
+         u"지급이 종료되므로 서둘러 신청하세요."),
+        (u"아르바이트를 하면 못 받나요?",
+         u"소득이 발생하면 반드시 실업인정 시 신고해야 합니다. 신고하지 않으면 부정수급이 되어 "
+         u"반환은 물론 추가 징수와 처벌을 받을 수 있습니다."),
+    ],
+)
+
+# ───────────────────────── 환율 ─────────────────────────
+add(
+    slug="hwanyul", name=u"환율 계산기", group=u"부동산·생활",
+    title=u"환율 계산기 | 실시간 환율로 원화 환전 금액 계산",
+    desc=u"달러·엔·유로 등 주요 통화와 원화를 환산합니다. 실시간 환율을 불러오고 환전 수수료도 반영합니다.",
+    kw=u"실시간 환율 환산, 환전 수수료 반영",
+    spec=u"""
+(function(){
+  var RATES=null;   /* 1 외화 = ? 원 */
+  var FALLBACK={USD:1380, JPY:9.1, EUR:1490, CNY:190, GBP:1750,
+                AUD:900, CAD:1010, HKD:177, THB:39, VND:0.054, SGD:1030, CHF:1560};
+
+  var C = Calc.mount({
+    id:"hwanyul",
+    formTitle:"환전 정보",
+    fields:[
+      {k:"dir", label:"방향", type:"seg", options:[
+        {value:"f2k", label:"외화 → 원화"}, {value:"k2f", label:"원화 → 외화"}]},
+      {k:"cur", label:"통화", type:"select", value:"USD", options:[
+        {value:"USD", label:"미국 달러 (USD)"},
+        {value:"JPY", label:"일본 엔 (JPY)"},
+        {value:"EUR", label:"유로 (EUR)"},
+        {value:"CNY", label:"중국 위안 (CNY)"},
+        {value:"GBP", label:"영국 파운드 (GBP)"},
+        {value:"AUD", label:"호주 달러 (AUD)"},
+        {value:"CAD", label:"캐나다 달러 (CAD)"},
+        {value:"HKD", label:"홍콩 달러 (HKD)"},
+        {value:"SGD", label:"싱가포르 달러 (SGD)"},
+        {value:"CHF", label:"스위스 프랑 (CHF)"},
+        {value:"THB", label:"태국 바트 (THB)"},
+        {value:"VND", label:"베트남 동 (VND)"}]},
+      {k:"amount", label:"금액", suffix:"", value:100, step:1, min:0},
+      {k:"rate", label:"환율", sub:"1 외화당 원화. 자동으로 채워집니다", suffix:"원", value:1380, step:0.0001, min:0},
+      {k:"fee", label:"환전 수수료", sub:"은행 스프레드", suffix:"%", value:0, step:0.1, min:0}
+    ],
+    compute:function(v,F){
+      var r=v.rate||0, a=v.amount||0, fee=(v.fee||0)/100;
+      var cur=v.cur||"USD";
+      var out, heroK, heroV, sub;
+
+      if(v.dir==="k2f"){
+        var eff=r*(1+fee);                 /* 살 때는 비싸게 */
+        out = eff>0 ? a/eff : 0;
+        heroK="받는 외화"; heroV=F.num(out,2)+" "+cur;
+        sub=F.won(a)+" 기준";
+      } else {
+        var eff2=r*(1-fee);                /* 팔 때는 싸게 */
+        out=a*eff2;
+        heroK="받는 원화"; heroV=F.kor(out);
+        sub=F.num(a,2)+" "+cur+" 기준";
+      }
+
+      var jpyNote = cur==="JPY"
+        ? "<br>일본 엔은 보통 <b>100엔당</b> 가격으로 표시합니다. 100엔 = "+F.won(r*100)+" 입니다."
+        : "";
+
+      return {
+        hero:{k:heroK, v:heroV, sub:sub, cls:"up"},
+        stats:[
+          {k:"적용 환율", v:F.num(r,2)+"원", sub:"1 "+cur},
+          {k:"수수료", v: fee? F.pct(v.fee,2) : "없음",
+           sub: fee? (v.dir==="k2f"?"살 때 가산":"팔 때 차감") : "은행별로 다름"},
+          {k:"수수료 없을 때", v: v.dir==="k2f" ? F.num(r>0?a/r:0,2)+" "+cur : F.won(a*r)}
+        ],
+        hint:(RATES? "실시간 시세":"기준 시세")+" · 1 "+cur+" = "+F.num(r,2)+"원",
+        extra:"<div class='note'>표시되는 환율은 <b>매매기준율</b>에 가까운 참고 시세입니다. "+
+          "실제 은행 창구에서는 살 때와 팔 때 값이 달라 <b>스프레드</b>가 붙습니다. "+
+          "현찰 환전은 보통 1.5~2%, 송금은 그보다 낮습니다. 수수료 칸에 넣어 비교해 보세요."+
+          jpyNote+"</div>"
+      };
+    }
+  });
+
+  /* 실시간 시세. 실패해도 기본값으로 계속 동작한다. */
+  function applyRate(){
+    var sel=document.getElementById("f_cur"), inp=document.getElementById("f_rate");
+    if(!sel||!inp) return;
+    var cur=sel.value;
+    var r = (RATES && RATES[cur]) || FALLBACK[cur];
+    if(r){ inp.value = r>=100 ? r.toFixed(2) : r.toFixed(4); C.run(); }
+  }
+
+  var sel=document.getElementById("f_cur");
+  if(sel) sel.addEventListener("change", applyRate);
+
+  try{
+    fetch("https://open.er-api.com/v6/latest/KRW")
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.rates) return;
+        RATES={};
+        for(var k in FALLBACK){
+          if(d.rates[k]) RATES[k] = 1/d.rates[k];   /* KRW 기준 -> 1외화당 원화 */
+        }
+        applyRate();
+        var h=document.querySelector(".panel-head .hint");
+        if(h && d.time_last_update_utc) h.title = "기준 " + d.time_last_update_utc;
+      })
+      .catch(function(){ /* 조용히 기본값 유지 */ });
+  }catch(e){}
+})();""",
+    guide=u"""
+<h3>매매기준율과 실제 환전 금액은 다릅니다</h3>
+<p>포털이나 뉴스에서 보는 "달러 환율 1,380원"은 <strong>매매기준율</strong>입니다.
+은행이 서로 거래하는 도매 가격에 가까운 값이라, 개인이 창구에서 그 가격으로 바꾸지 못합니다.</p>
+<p>은행은 <strong>살 때(Buy)</strong>와 <strong>팔 때(Sell)</strong> 가격을 따로 매깁니다.
+그 차이를 <strong>스프레드</strong>라고 하며, 이것이 은행의 수수료입니다.</p>
+
+<h3>스프레드는 방법에 따라 크게 다릅니다</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>방법</th><th>대략적인 스프레드</th></tr></thead>
+<tbody>
+<tr><td>공항 환전소</td><td class="n">3~5%</td></tr>
+<tr><td>은행 창구 현찰</td><td class="n">1.5~2%</td></tr>
+<tr><td>모바일 앱 환전 (우대 적용)</td><td class="n">0.2~1%</td></tr>
+<tr><td>해외송금 (전신환)</td><td class="n">1% 내외</td></tr>
+<tr><td>해외 카드 결제</td><td class="n">1~2% + 브랜드 수수료</td></tr>
+</tbody></table></div>
+<p>100만원을 환전할 때 공항에서 4%면 4만원, 앱에서 0.5%면 5천원입니다.
+같은 돈인데 3만 5천원 차이가 납니다. 수수료 칸에 숫자를 넣어 비교해 보세요.</p>
+
+<h3>엔화는 100엔 단위로 표시합니다</h3>
+<p>일본 엔은 관행적으로 <strong>100엔당 가격</strong>으로 고시합니다.
+"엔화 환율 910원"은 100엔이 910원이라는 뜻이고, 1엔은 9.1원입니다.
+이 계산기는 <strong>1엔 기준</strong>으로 입력받되, 100엔 환산 금액도 함께 보여드립니다.</p>
+
+<h3>환전 우대율</h3>
+<p>은행 앱에서 미리 신청하면 스프레드의 일정 비율을 깎아주는 <strong>환전 우대</strong>가 있습니다.
+"90% 우대"는 스프레드를 90% 깎아준다는 뜻이지 환율을 90%로 해준다는 말이 아닙니다.
+스프레드가 2%인데 90% 우대면 실제 부담은 0.2%가 됩니다.</p>
+
+<h3>해외 결제는 환전과 다릅니다</h3>
+<p>해외에서 카드로 결제하면 카드 브랜드(비자·마스터) 수수료와 국내 카드사 수수료가 붙습니다.
+현지 통화로 결제할지 원화로 결제할지 묻는 <strong>DCC</strong>가 뜨면
+반드시 <strong>현지 통화</strong>를 고르세요. 원화 결제를 고르면 수수료가 추가로 붙습니다.</p>
+
+<h3>환율은 실시간으로 변합니다</h3>
+<p>이 계산기는 공개 환율 API에서 시세를 불러옵니다. 참고용 값이며 실제 거래 시점의
+고시 환율과 다를 수 있습니다. 시세를 불러오지 못하면 기준값이 들어가니,
+정확한 계산이 필요하면 거래 은행의 고시 환율을 직접 넣어 쓰세요.</p>
+""",
+    faq=[
+        (u"표시된 환율이 은행과 다릅니다.",
+         u"이 계산기는 매매기준율에 가까운 참고 시세를 보여줍니다. 은행 창구는 여기에 "
+         u"스프레드를 얹은 값을 적용합니다. 수수료 칸에 스프레드를 넣으면 비슷해집니다."),
+        (u"엔화 환율이 9원으로 나옵니다.",
+         u"이 계산기는 1엔 기준입니다. 뉴스에 나오는 900원대는 100엔 기준이라 100배 차이입니다. "
+         u"결과 아래에 100엔 환산 금액도 표시됩니다."),
+        (u"환율을 직접 넣을 수 있나요?",
+         u"환율 칸을 고쳐 쓰시면 됩니다. 거래 은행 고시 환율을 넣으면 실제와 가까워집니다."),
+        (u"수수료는 얼마로 넣어야 하나요?",
+         u"공항 환전 3~5%, 은행 창구 1.5~2%, 앱 우대 환전 0.2~1% 정도가 일반적입니다. "
+         u"정확한 값은 이용하시는 은행에서 확인하세요."),
+    ],
+)
