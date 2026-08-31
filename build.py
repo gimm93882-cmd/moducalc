@@ -43,6 +43,27 @@ _ad_file = os.path.join(ROOT, "src", "adsense.txt")
 if os.path.exists(_ad_file):
     ADSENSE = io.open(_ad_file, encoding="utf-8").read().strip()
 
+# 검색엔진 사이트 소유 확인 태그.
+#
+# src/verify.txt 에 한 줄에 하나씩 "name=content" 형식으로 적으면
+# 모든 페이지 <head> 에 <meta name="..." content="..."> 로 들어간다.
+# 주석(#)과 빈 줄은 무시한다.
+#
+#   google-site-verification=abc123...
+#   naver-site-verification=def456...
+#
+# 구글 서치콘솔에서 "도메인 속성"으로 등록하면 DNS TXT 로 확인하므로 이 파일이 필요 없다.
+# "URL 접두어"로 등록해 HTML 태그 방식을 고를 때만 쓴다.
+VERIFY = []
+_v_file = os.path.join(ROOT, "src", "verify.txt")
+if os.path.exists(_v_file):
+    for line in io.open(_v_file, encoding="utf-8"):
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, val = line.partition("=")
+        VERIFY.append((name.strip(), val.strip()))
+
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
            "<text y='.9em' font-size='90'>🧮</text></svg>")
 
@@ -69,7 +90,7 @@ SHELL = u"""<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
-<style>{css}</style>{jsonld}{adsense}
+<style>{css}</style>{verify}{jsonld}{adsense}
 </head>
 <body>
 <nav class="sitenav"><div class="in">
@@ -103,6 +124,11 @@ def nav_html(up, path):
     return nav, foot
 
 
+def verify_head():
+    """검색엔진 소유 확인 메타 태그."""
+    return "".join('\n<meta name="%s" content="%s">' % (n, v) for n, v in VERIFY)
+
+
 def adsense_head():
     """애드센스 스크립트와 사이트 확인용 메타 태그. ID 가 없으면 아무것도 넣지 않는다."""
     if not ADSENSE:
@@ -119,8 +145,8 @@ def shell(path, title, desc, body, up="", jsonld=None):
           % json.dumps(jsonld, ensure_ascii=False)) if jsonld else ""
     return SHELL.format(title=title, desc=desc, base=BASE, path=path, site=SITE,
                         favicon=FAVICON, css=CSS, jsonld=ld, adsense=adsense_head(),
-                        nav=nav, up=up or "./", body=body, contact=CONTACT,
-                        footlinks=foot)
+                        verify=verify_head(), nav=nav, up=up or "./", body=body,
+                        contact=CONTACT, footlinks=foot)
 
 
 def faq_block(faq):
@@ -273,6 +299,8 @@ def main():
 
     print(u"페이지 %d개 · %.0f KB" % (len(urls), total / 1024.0))
     print(u"애드센스 %s" % (ADSENSE if ADSENSE else u"미설정 (src/adsense.txt 없음)"))
+    print(u"소유확인 %s" % (", ".join(n for n, v in VERIFY) if VERIFY
+                            else u"미설정 (src/verify.txt 없음)"))
     print(u"기준 주소 %s" % BASE)
     for c in items:
         print(u"  /%-12s %s" % (c["slug"] + "/", c["name"]))

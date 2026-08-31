@@ -42,6 +42,19 @@ python3 build.py
 python3 build.py https://moducalc.kr
 ```
 
+## 검색엔진 소유 확인
+
+`src/verify.txt` 에 한 줄에 하나씩 `name=content` 로 적으면 모든 페이지 `<head>` 에
+메타 태그가 들어갑니다.
+
+```
+google-site-verification=abc123...
+naver-site-verification=def456...
+```
+
+구글 서치콘솔을 **도메인 속성**으로 등록하면 DNS TXT 로 확인하므로 이 파일이 필요 없습니다.
+**URL 접두어**로 등록해 HTML 태그 방식을 고를 때만 씁니다.
+
 ## 애드센스
 
 게시자 ID 를 `src/adsense.txt` 에 한 줄로 넣고 다시 빌드하면 **모든 페이지**에
