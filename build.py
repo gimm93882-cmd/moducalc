@@ -289,6 +289,40 @@ def main():
     write("sitemap.xml", sm)
     write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % BASE)
 
+    # RSS. 계산기 사이트라 원래 필요 없지만 네이버 서치어드바이저가 제출 항목으로 두고 있다.
+    # 각 계산기를 항목으로 넣어 수집 경로를 하나 더 열어준다.
+    import email.utils
+    now = email.utils.formatdate(usegmt=True)
+
+    def esc(t):
+        return (t.replace("&", "&amp;").replace("<", "&lt;")
+                 .replace(">", "&gt;").replace('"', "&quot;"))
+
+    entries = "".join(
+        u"  <item>\n"
+        u"    <title>%s</title>\n"
+        u"    <link>%s/%s/</link>\n"
+        u"    <guid isPermaLink=\"true\">%s/%s/</guid>\n"
+        u"    <description>%s</description>\n"
+        u"    <pubDate>%s</pubDate>\n"
+        u"  </item>\n"
+        % (esc(c["name"]), BASE, c["slug"], BASE, c["slug"], esc(c["desc"]), now)
+        for c in items)
+
+    rss = (u'<?xml version="1.0" encoding="UTF-8"?>\n'
+           u'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+           u'<channel>\n'
+           u'  <title>%s</title>\n'
+           u'  <link>%s/</link>\n'
+           u'  <description>급여·대출·세금·부동산 계산기 모음</description>\n'
+           u'  <language>ko</language>\n'
+           u'  <lastBuildDate>%s</lastBuildDate>\n'
+           u'  <atom:link href="%s/rss.xml" rel="self" type="application/rss+xml"/>\n'
+           u'%s'
+           u'</channel>\n</rss>\n'
+           % (SITE, BASE, now, BASE, entries))
+    write("rss.xml", rss)
+
     # ads.txt — 광고 재고를 팔 권한이 있는 판매자를 명시한다.
     # 없으면 승인 후 애드센스에 "승인되지 않은 판매자" 경고가 뜨고 수익이 줄 수 있다.
     if ADSENSE:
