@@ -226,18 +226,112 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 @media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
 
 /* ─── 허브 ─────────────────────────────────────────────── */
-.hubhead{margin-bottom:30px}
-.group{margin-bottom:30px}
-.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
-  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
 .group h2::after{content:"";flex:1;height:1px;background:var(--line)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
   border:1px solid var(--line);border-radius:12px;text-decoration:none;
-  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
 .card:hover{border-color:var(--accent);transform:translateY(-1px)}
-.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
 .card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
 
 /* ─── 본문 ─────────────────────────────────────────────── */
 .prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
@@ -285,7 +379,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 <a href="../privacy.html">개인정보처리방침</a>
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
-<div class="wrap"><header><p class="eyebrow">부동산·생활</p><h1>환율 계산기</h1><p>달러·엔·유로 등 주요 통화와 원화를 환산합니다. 실시간 환율을 불러오고 환전 수수료도 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 부동산·생활</p><h1>환율 계산기</h1><p>달러·엔·유로 등 주요 통화와 원화를 환산합니다. 실시간 환율을 불러오고 환전 수수료도 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
 <h3>매매기준율과 실제 환전 금액은 다릅니다</h3>
 <p>포털이나 뉴스에서 보는 "달러 환율 1,380원"은 <strong>매매기준율</strong>입니다.
 은행이 서로 거래하는 도매 가격에 가까운 값이라, 개인이 창구에서 그 가격으로 바꾸지 못합니다.</p>
@@ -327,7 +421,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 </article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>표시된 환율이 은행과 다릅니다.</summary><div class="a">이 계산기는 매매기준율에 가까운 참고 시세를 보여줍니다. 은행 창구는 여기에 스프레드를 얹은 값을 적용합니다. 수수료 칸에 스프레드를 넣으면 비슷해집니다.</div></details>
 <details><summary>엔화 환율이 9원으로 나옵니다.</summary><div class="a">이 계산기는 1엔 기준입니다. 뉴스에 나오는 900원대는 100엔 기준이라 100배 차이입니다. 결과 아래에 100엔 환산 금액도 표시됩니다.</div></details>
 <details><summary>환율을 직접 넣을 수 있나요?</summary><div class="a">환율 칸을 고쳐 쓰시면 됩니다. 거래 은행 고시 환율을 넣으면 실제와 가까워집니다.</div></details>
-<details><summary>수수료는 얼마로 넣어야 하나요?</summary><div class="a">공항 환전 3~5%, 은행 창구 1.5~2%, 앱 우대 환전 0.2~1% 정도가 일반적입니다. 정확한 값은 이용하시는 은행에서 확인하세요.</div></details></article></div><script>/* 계산기 공용 엔진.
+<details><summary>수수료는 얼마로 넣어야 하나요?</summary><div class="a">공항 환전 3~5%, 은행 창구 1.5~2%, 앱 우대 환전 0.2~1% 정도가 일반적입니다. 정확한 값은 이용하시는 은행에서 확인하세요.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../pyeong/"><span class="cname">평수 계산기</span><span class="ckw">평 ↔ ㎡ 변환, 전용률 확인</span></a><a class="card" href="../date/"><span class="cname">날짜 계산기</span><span class="ckw">디데이, 날짜 사이 일수, N일 후</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
  * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.

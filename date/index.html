@@ -226,18 +226,112 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 @media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
 
 /* ─── 허브 ─────────────────────────────────────────────── */
-.hubhead{margin-bottom:30px}
-.group{margin-bottom:30px}
-.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
-  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
 .group h2::after{content:"";flex:1;height:1px;background:var(--line)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
   border:1px solid var(--line);border-radius:12px;text-decoration:none;
-  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
 .card:hover{border-color:var(--accent);transform:translateY(-1px)}
-.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
 .card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
 
 /* ─── 본문 ─────────────────────────────────────────────── */
 .prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
@@ -285,7 +379,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 <a href="../privacy.html">개인정보처리방침</a>
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
-<div class="wrap"><header><p class="eyebrow">부동산·생활</p><h1>날짜 계산기</h1><p>두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 부동산·생활</p><h1>날짜 계산기</h1><p>두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
 <h3>당일을 세느냐 마느냐</h3>
 <p>날짜 계산에서 다툼이 생기는 지점입니다. 이 계산기는 기본적으로 <strong>당일을 빼고</strong>
 셉니다. 1월 1일에서 1월 2일까지는 1일입니다. 당일을 포함하는 방식(초일 산입)으로 세면 2일이 됩니다.</p>
@@ -307,7 +401,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 </ul>
 </article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>당일이 포함되나요?</summary><div class="a">기본 계산은 당일을 빼고 셉니다. 결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다.</div></details>
 <details><summary>공휴일과 주말을 뺀 영업일도 셀 수 있나요?</summary><div class="a">현재는 달력상 일수만 계산합니다. 영업일 계산은 공휴일 지정이 해마다 달라져 별도 확인이 필요합니다.</div></details>
-<details><summary>날짜를 비워두면 어떻게 되나요?</summary><div class="a">오늘 날짜가 기준으로 들어갑니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+<details><summary>날짜를 비워두면 어떻게 되나요?</summary><div class="a">오늘 날짜가 기준으로 들어갑니다.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../pyeong/"><span class="cname">평수 계산기</span><span class="ckw">평 ↔ ㎡ 변환, 전용률 확인</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a><a class="card" href="../yangdo/"><span class="cname">양도소득세 계산기</span><span class="ckw">양도차익·장특공제 반영한 양도세와 지방소득세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
  * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.

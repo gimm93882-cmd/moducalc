@@ -226,18 +226,112 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 @media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
 
 /* ─── 허브 ─────────────────────────────────────────────── */
-.hubhead{margin-bottom:30px}
-.group{margin-bottom:30px}
-.group h2{font-size:15px;font-weight:700;margin:0 0 12px;color:var(--muted);
-  letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
 .group h2::after{content:"";flex:1;height:1px;background:var(--line)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{display:flex;flex-direction:column;gap:5px;padding:17px 18px;background:var(--surface);
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
   border:1px solid var(--line);border-radius:12px;text-decoration:none;
-  box-shadow:var(--shadow);transition:border-color .12s,transform .08s}
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
 .card:hover{border-color:var(--accent);transform:translateY(-1px)}
-.card .cname{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
 .card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
 
 /* ─── 본문 ─────────────────────────────────────────────── */
 .prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
@@ -285,7 +379,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 <a href="../privacy.html">개인정보처리방침</a>
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
-<div class="wrap"><header><p class="eyebrow">급여·노무</p><h1>퇴직금 계산기</h1><p>입사일과 퇴사일, 최근 3개월 급여로 퇴직금을 계산합니다. 상여금과 연차수당을 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 급여·노무</p><h1>퇴직금 계산기</h1><p>입사일과 퇴사일, 최근 3개월 급여로 퇴직금을 계산합니다. 상여금과 연차수당을 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
 <h3>퇴직금 계산식</h3>
 <p><strong>퇴직금 = 1일 평균임금 × 30일 × (재직일수 ÷ 365)</strong></p>
 <p>대략 <em>1년에 한 달치 월급</em>이라고 생각하면 맞습니다. 3년 일했으면 석 달치 정도입니다.</p>
@@ -317,7 +411,7 @@ footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-si
 </article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>퇴사일은 언제로 넣나요?</summary><div class="a">마지막 근무일의 다음날을 넣습니다. 12월 31일까지 근무했다면 다음 해 1월 1일입니다.</div></details>
 <details><summary>3개월 급여에 무엇을 포함하나요?</summary><div class="a">기본급과 정기적으로 지급된 수당을 포함한 세전 총액입니다. 상여금과 연차수당은 별도 칸에 연간 금액으로 넣으면 3/12만 반영됩니다.</div></details>
 <details><summary>1년에서 며칠 모자랍니다.</summary><div class="a">계속근로기간이 1년 미만이면 법정 퇴직금 대상이 아닙니다. 하루 차이로 갈리므로 입사일과 퇴사일을 정확히 확인하세요.</div></details>
-<details><summary>실제 받은 금액과 다릅니다.</summary><div class="a">퇴직연금 제도(DB·DC), 회사 규정, 통상임금 적용 여부, 퇴직소득세에 따라 달라집니다. 이 계산은 법정 최저 기준의 세전 추정치입니다.</div></details></article></div><script>/* 계산기 공용 엔진.
+<details><summary>실제 받은 금액과 다릅니다.</summary><div class="a">퇴직연금 제도(DB·DC), 회사 규정, 통상임금 적용 여부, 퇴직소득세에 따라 달라집니다. 이 계산은 법정 최저 기준의 세전 추정치입니다.</div></details></article></div><div class="wrap"><section class="related"><h2>급여·노무 계산기 더 보기</h2><div class="cards"><a class="card" href="../juhyu/"><span class="cname">주휴수당 계산기</span><span class="ckw">시급·주 근로시간으로 주휴수당과 월급 환산</span></a><a class="card" href="../insurance/"><span class="cname">4대보험 계산기</span><span class="ckw">국민연금·건강보험·고용보험 근로자/사업주 부담</span></a><a class="card" href="../salary/"><span class="cname">연봉 실수령액 계산기</span><span class="ckw">연봉에서 4대보험·소득세 빼고 월 실수령액</span></a><a class="card" href="../yeoncha/"><span class="cname">연차 개수 계산기</span><span class="ckw">입사일 기준 연차 일수와 가산 연차</span></a><a class="card" href="../silup/"><span class="cname">실업급여 계산기</span><span class="ckw">구직급여 일액·소정급여일수·총 수령액</span></a><a class="card" href="../yeonmal/"><span class="cname">연말정산 환급금 계산기</span><span class="ckw">신용카드·의료비·연금저축 반영한 환급 예상액</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
  * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.

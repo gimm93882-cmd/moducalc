@@ -69,6 +69,7 @@ FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='
 
 CSS = io.open(os.path.join(ROOT, "src", "site.css"), encoding="utf-8").read()
 ENGINE = io.open(os.path.join(ROOT, "src", "engine.js"), encoding="utf-8").read()
+HUBJS = io.open(os.path.join(ROOT, "src", "hub.js"), encoding="utf-8").read()
 
 SHELL = u"""<!doctype html>
 <html lang="ko">
@@ -172,17 +173,32 @@ def app_ld(name, url, desc):
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}
 
 
-def calc_page(c):
+def related_html(c, items):
+    """같은 분류의 다른 계산기. 내부 링크가 늘면 색인과 체류시간 모두에 도움이 된다."""
+    rows = [x for x in items if x["group"] == c["group"] and x["slug"] != c["slug"]][:6]
+    if not rows:
+        return ""
+    return (u'<section class="related"><h2>%s 계산기 더 보기</h2><div class="cards">%s</div>'
+            u'<p class="allink"><a href="../">전체 계산기 보기 \u2192</a></p></section>'
+            % (c["group"], "".join(
+                u'<a class="card" href="../%s/"><span class="cname">%s</span>'
+                u'<span class="ckw">%s</span></a>' % (x["slug"], x["name"], x["kw"])
+                for x in rows)))
+
+
+def calc_page(c, items):
     url = "%s/%s/" % (BASE, c["slug"])
     body = (
         u'<div class="wrap">'
-        u'<header><p class="eyebrow">%s</p><h1>%s</h1><p>%s</p></header>'
+        u'<header><p class="eyebrow"><a href="../">전체 계산기</a> · %s</p>'
+        u'<h1>%s</h1><p>%s</p></header>'
         u'<div id="calc"></div>'
         u'</div>'
         u'<div class="prose"><article>%s</article>%s</div>'
+        u'<div class="wrap">%s</div>'
         u'<script>%s</script><script>%s</script>'
         % (c["group"], c["name"], c["desc"], c["guide"], faq_block(c.get("faq")),
-           ENGINE, c["spec"])
+           related_html(c, items), ENGINE, c["spec"])
     )
     ld = [app_ld(c["name"], url, c["desc"])]
     if c.get("faq"):
@@ -190,36 +206,72 @@ def calc_page(c):
     return shell("/%s/" % c["slug"], c["title"], c["desc"], body, up="../", jsonld=ld)
 
 
+def card_html(c):
+    return (u'<a class="card" href="%s/" data-slug="%s" data-name="%s" '
+            u'data-kw="%s" data-group="%s">'
+            u'<button class="star" type="button" data-slug="%s" '
+            u'aria-pressed="false" aria-label="즐겨찾기">\u2606</button>'
+            u'<span class="cname">%s</span><span class="ckw">%s</span></a>'
+            % (c["slug"], c["slug"], c["name"], c["kw"], c["group"],
+               c["slug"], c["name"], c["kw"]))
+
+
 def hub_page(items):
-    cards = []
+    tabs = [u'<button class="tab" type="button" data-cat="all" aria-selected="true">'
+            u'전체 <span class="n">%d</span></button>' % len(items)]
+    for g in GROUPS:
+        n = len([c for c in items if c["group"] == g])
+        if n:
+            tabs.append(u'<button class="tab" type="button" data-cat="%s" aria-selected="false">'
+                        u'%s <span class="n">%d</span></button>' % (g, g, n))
+
+    sections = []
     for g in GROUPS:
         rows = [c for c in items if c["group"] == g]
         if not rows:
             continue
-        cards.append(u'<section class="group"><h2>%s</h2><div class="cards">%s</div></section>'
-                     % (g, "".join(
-                         u'<a class="card" href="%s/"><span class="cname">%s</span>'
-                         u'<span class="ckw">%s</span></a>' % (c["slug"], c["name"], c["kw"])
-                         for c in rows)))
+        sections.append(u'<section class="group" data-group="%s"><h2>%s</h2>'
+                        u'<div class="cards">%s</div></section>'
+                        % (g, g, "".join(card_html(c) for c in rows)))
+
     body = (
+        u'<div class="landing">'
+        u'  <div class="landing-in">'
+        u'    <p class="eyebrow">무료 · 가입 없음 · 설치 없음</p>'
+        u'    <h1>필요한 계산,<br><em>여기서 끝냅니다</em></h1>'
+        u'    <p class="lede">급여와 세금, 대출과 부동산까지 자주 쓰는 계산 %d가지. '
+        u'모든 계산은 브라우저 안에서 이루어지며 입력한 값은 서버로 전송되지 않습니다.</p>'
+        u'    <div class="search">'
+        u'      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/>'
+        u'<line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>'
+        u'      <input id="q" type="text" autocomplete="off" '
+        u'placeholder="계산기 검색  (초성도 됩니다 · ㅂㄱㅅ)" aria-label="계산기 검색">'
+        u'      <button id="qclear" type="button" hidden aria-label="지우기">\u00d7</button>'
+        u'    </div>'
+        u'  </div>'
+        u'</div>'
         u'<div class="wrap">'
-        u'<header class="hubhead"><p class="eyebrow">무료 · 가입 없음</p>'
-        u'<h1>필요한 계산, <em>여기서</em></h1>'
-        u'<p>급여와 퇴직금, 대출 이자, 부가세와 마진율, 부동산 면적까지. '
-        u'자주 쓰는 계산 %d가지를 한곳에 모았습니다. 모든 계산은 브라우저 안에서 이루어지며 '
-        u'입력한 값은 서버로 전송되지 않습니다.</p></header>'
-        u'%s</div>'
+        u'  <div class="tabs" role="tablist">%s</div>'
+        u'  <section class="group" id="favgroup" hidden>'
+        u'    <h2>즐겨찾기</h2><div class="cards" id="favcards"></div>'
+        u'  </section>'
+        u'  %s'
+        u'  <p class="empty" id="empty" hidden>찾는 계산기가 없습니다. 다른 말로 검색해 보세요.</p>'
+        u'</div>'
         u'<div class="prose"><article>%s</article>%s</div>'
-        % (len(items), "".join(cards), content.HUB_GUIDE, faq_block(content.HUB_FAQ))
+        u'<script>%s</script>'
+        % (len(items), "".join(tabs), "".join(sections),
+           content.HUB_GUIDE, faq_block(content.HUB_FAQ), HUBJS)
     )
+
     ld = {"@context": "https://schema.org", "@type": "ItemList",
           "name": u"모두계산기 계산기 목록",
           "itemListElement": [{"@type": "ListItem", "position": i + 1,
                                "name": c["name"], "url": "%s/%s/" % (BASE, c["slug"])}
                               for i, c in enumerate(items)]}
-    return shell("/", u"모두계산기 | 급여·대출·세금·부동산 계산기 모음",
-                 u"연봉 실수령액, 퇴직금, 대출 이자, 부가세, 마진율, 평수까지 "
-                 u"자주 쓰는 계산기 %d가지. 무료이고 가입이 필요 없습니다." % len(items),
+    return shell("/", u"모두계산기 | 급여·대출·세금·부동산 계산기 %d종" % len(items),
+                 u"연봉 실수령액, 퇴직금, 대출 이자, 부가세, 취득세, 양도소득세까지 "
+                 u"자주 쓰는 계산기 %d가지를 한곳에. 무료이고 가입이 필요 없습니다." % len(items),
                  body, up="", jsonld=[ld, faq_ld(content.HUB_FAQ)])
 
 
@@ -251,14 +303,17 @@ def main():
     total += write("index.html", hub_page(items))
 
     for c in calcs.CALCS:
-        total += write("%s/index.html" % c["slug"], calc_page(c))
+        total += write("%s/index.html" % c["slug"], calc_page(c, items))
 
     # 복리: 기존 전용 마크업 + 가이드
     widget = io.open(os.path.join(ROOT, "src", "calculator.html"), encoding="utf-8").read()
-    body = (u'<div class="wrap"><header><p class="eyebrow">투자</p>'
+    body = (u'<div class="wrap"><header>'
+            u'<p class="eyebrow"><a href="../">전체 계산기</a> · 투자</p>'
             u'<h1>복리 계산기</h1><p>%s</p></header></div>%s'
             u'<div class="prose"><article>%s</article>%s</div>'
-            % (bokri["desc"], widget, content.GUIDE, faq_block(content.FAQ)))
+            u'<div class="wrap">%s</div>'
+            % (bokri["desc"], widget, content.GUIDE, faq_block(content.FAQ),
+               related_html(bokri, items)))
     total += write("bokri/index.html",
                    shell("/bokri/", bokri["title"], bokri["desc"], body, up="../",
                          jsonld=[app_ld(bokri["name"], BASE + "/bokri/", bokri["desc"]),

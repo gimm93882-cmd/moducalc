@@ -6,6 +6,7 @@
 
 ```
 src/engine.js      계산기 공용 엔진 (폼 렌더링 · 포맷 · 저장)
+src/hub.js         허브 화면 (검색 · 카테고리 · 즐겨찾기)
 src/calcs.py       계산기 정의 (필드 + compute + 가이드 + FAQ)
 src/calculator.html 복리 계산기 전용 마크업
 src/content.py     허브 가이드 · 정책 문서
