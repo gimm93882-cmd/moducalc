@@ -318,6 +318,10 @@ header .eyebrow a:hover{text-decoration:underline}
 .prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
 @media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose .doch1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em
+}
 .prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
   font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
 .prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;

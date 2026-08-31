@@ -276,7 +276,8 @@ def hub_page(items):
 
 
 def doc_page(path, title, desc, heading, html):
-    body = u'<div class="prose"><article><h2>%s</h2>%s</article></div>' % (heading, html)
+    # 문서 페이지의 대표 제목은 h1 이어야 한다. h2 로 두면 페이지에 h1 이 없어진다.
+    body = u'<div class="prose"><article><h1 class="doch1">%s</h1>%s</article></div>' % (heading, html)
     return shell(path, title, desc, body, up="")
 
 

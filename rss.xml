@@ -5,231 +5,231 @@
   <link>https://moducalc.kr/</link>
   <description>급여·대출·세금·부동산 계산기 모음</description>
   <language>ko</language>
-  <lastBuildDate>Mon, 31 Aug 2026 10:18:58 GMT</lastBuildDate>
+  <lastBuildDate>Mon, 31 Aug 2026 10:25:52 GMT</lastBuildDate>
   <atom:link href="https://moducalc.kr/rss.xml" rel="self" type="application/rss+xml"/>
   <item>
     <title>부가세 계산기</title>
     <link>https://moducalc.kr/bugagse/</link>
     <guid isPermaLink="true">https://moducalc.kr/bugagse/</guid>
     <description>공급가액에서 부가세를 더하거나, 합계금액에서 부가세를 역산합니다. 세율도 바꿀 수 있습니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>마진율 계산기</title>
     <link>https://moducalc.kr/margin/</link>
     <guid isPermaLink="true">https://moducalc.kr/margin/</guid>
     <description>원가와 판매가로 마진율·마진액·원가율을 계산하고, 목표 마진율에 맞는 판매가를 역산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>카드 수수료 계산기</title>
     <link>https://moducalc.kr/card/</link>
     <guid isPermaLink="true">https://moducalc.kr/card/</guid>
     <description>카드 결제금액에서 수수료를 빼고 실제로 입금되는 금액을 계산합니다. 월 매출 기준 부담액도 확인할 수 있습니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>평수 계산기</title>
     <link>https://moducalc.kr/pyeong/</link>
     <guid isPermaLink="true">https://moducalc.kr/pyeong/</guid>
     <description>평과 제곱미터를 서로 변환합니다. 공급면적과 전용면적 차이, 전용률도 함께 확인할 수 있습니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>날짜 계산기</title>
     <link>https://moducalc.kr/date/</link>
     <guid isPermaLink="true">https://moducalc.kr/date/</guid>
     <description>두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>주휴수당 계산기</title>
     <link>https://moducalc.kr/juhyu/</link>
     <guid isPermaLink="true">https://moducalc.kr/juhyu/</guid>
     <description>시급과 주 근로시간으로 주휴수당을 계산합니다. 주 15시간 기준과 월 환산 급여도 함께 확인합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>대출 이자 계산기</title>
     <link>https://moducalc.kr/loan/</link>
     <guid isPermaLink="true">https://moducalc.kr/loan/</guid>
     <description>주택담보대출·신용대출의 월 상환액과 총이자를 계산합니다. 원리금균등·원금균등·만기일시 세 방식을 비교하고 상환 스케줄을 확인할 수 있습니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>예적금 계산기</title>
     <link>https://moducalc.kr/deposit/</link>
     <guid isPermaLink="true">https://moducalc.kr/deposit/</guid>
     <description>정기예금과 정기적금의 만기 수령액을 계산합니다. 단리·복리, 이자소득세 15.4%를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>4대보험 계산기</title>
     <link>https://moducalc.kr/insurance/</link>
     <guid isPermaLink="true">https://moducalc.kr/insurance/</guid>
     <description>월 급여로 국민연금·건강보험·장기요양·고용보험의 근로자 부담금과 사업주 부담금을 계산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>연봉 실수령액 계산기</title>
     <link>https://moducalc.kr/salary/</link>
     <guid isPermaLink="true">https://moducalc.kr/salary/</guid>
     <description>연봉에서 4대보험과 소득세를 뺀 월 실수령액을 계산합니다. 부양가족과 비과세액을 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>퇴직금 계산기</title>
     <link>https://moducalc.kr/severance/</link>
     <guid isPermaLink="true">https://moducalc.kr/severance/</guid>
     <description>입사일과 퇴사일, 최근 3개월 급여로 퇴직금을 계산합니다. 상여금과 연차수당을 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>전월세 전환 계산기</title>
     <link>https://moducalc.kr/jeonwolse/</link>
     <guid isPermaLink="true">https://moducalc.kr/jeonwolse/</guid>
     <description>전월세 전환율로 전세보증금을 월세로 바꾸거나, 월세를 전세로 환산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>부동산 중개보수 계산기</title>
     <link>https://moducalc.kr/brokerage/</link>
     <guid isPermaLink="true">https://moducalc.kr/brokerage/</guid>
     <description>거래금액에 따른 부동산 중개보수 상한을 계산합니다. 매매와 임대차, 주택과 오피스텔을 구분합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>연차 개수 계산기</title>
     <link>https://moducalc.kr/yeoncha/</link>
     <guid isPermaLink="true">https://moducalc.kr/yeoncha/</guid>
     <description>입사일과 기준일로 발생한 연차휴가 일수를 계산합니다. 1년 미만 월차와 3년 이상 가산 연차를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>BMI·칼로리 계산기</title>
     <link>https://moducalc.kr/bmi/</link>
     <guid isPermaLink="true">https://moducalc.kr/bmi/</guid>
     <description>키와 몸무게로 BMI를 계산하고, 기초대사량과 활동량을 반영한 하루 필요 칼로리를 알려줍니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>취득세 계산기</title>
     <link>https://moducalc.kr/chwideukse/</link>
     <guid isPermaLink="true">https://moducalc.kr/chwideukse/</guid>
     <description>주택 취득가액으로 취득세와 지방교육세, 농어촌특별세를 계산합니다. 주택 수와 전용면적에 따른 차이를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>자동차 할부 계산기</title>
     <link>https://moducalc.kr/carloan/</link>
     <guid isPermaLink="true">https://moducalc.kr/carloan/</guid>
     <description>차량가격, 선수금, 유예금(잔가)으로 자동차 할부의 월 납입금과 총 이자를 계산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>양도소득세 계산기</title>
     <link>https://moducalc.kr/yangdo/</link>
     <guid isPermaLink="true">https://moducalc.kr/yangdo/</guid>
     <description>양도가액과 취득가액으로 양도소득세를 계산합니다. 장기보유특별공제, 1세대1주택 비과세, 단기보유 중과세율을 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>실업급여 계산기</title>
     <link>https://moducalc.kr/silup/</link>
     <guid isPermaLink="true">https://moducalc.kr/silup/</guid>
     <description>퇴직 전 평균임금과 고용보험 가입기간으로 구직급여 일액과 소정급여일수, 총 수령액을 계산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>환율 계산기</title>
     <link>https://moducalc.kr/hwanyul/</link>
     <guid isPermaLink="true">https://moducalc.kr/hwanyul/</guid>
     <description>달러·엔·유로 등 주요 통화와 원화를 환산합니다. 실시간 환율을 불러오고 환전 수수료도 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>만 나이 계산기</title>
     <link>https://moducalc.kr/mannai/</link>
     <guid isPermaLink="true">https://moducalc.kr/mannai/</guid>
     <description>생년월일을 넣으면 만 나이와 연 나이를 계산합니다. 다음 생일까지 남은 날짜와 띠도 함께 보여줍니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>주택담보대출 한도 계산기</title>
     <link>https://moducalc.kr/ltv/</link>
     <guid isPermaLink="true">https://moducalc.kr/ltv/</guid>
     <description>주택가격과 연소득으로 LTV와 DSR 기준 대출 한도를 각각 계산하고, 실제 받을 수 있는 금액을 알려줍니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>증여세 계산기</title>
     <link>https://moducalc.kr/jeungyeo/</link>
     <guid isPermaLink="true">https://moducalc.kr/jeungyeo/</guid>
     <description>증여재산가액과 증여자와의 관계로 증여세를 계산합니다. 증여재산공제와 신고세액공제를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>종합소득세 계산기</title>
     <link>https://moducalc.kr/jonghap/</link>
     <guid isPermaLink="true">https://moducalc.kr/jonghap/</guid>
     <description>총수입금액과 필요경비로 종합소득세를 계산합니다. 인적공제와 누진세율, 지방소득세를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>연말정산 환급금 계산기</title>
     <link>https://moducalc.kr/yeonmal/</link>
     <guid isPermaLink="true">https://moducalc.kr/yeonmal/</guid>
     <description>총급여와 공제 항목으로 연말정산 결정세액을 계산하고, 이미 낸 세금과 비교해 환급 또는 추가 납부액을 알려줍니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>재산세 계산기</title>
     <link>https://moducalc.kr/jaesanse/</link>
     <guid isPermaLink="true">https://moducalc.kr/jaesanse/</guid>
     <description>주택 공시가격으로 재산세와 도시지역분, 지방교육세를 계산합니다. 1주택 특례세율도 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>자동차세 계산기</title>
     <link>https://moducalc.kr/jadongchase/</link>
     <guid isPermaLink="true">https://moducalc.kr/jadongchase/</guid>
     <description>배기량과 차령으로 자동차세를 계산합니다. 지방교육세와 연납 할인, 차령 감면을 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>중도상환수수료 계산기</title>
     <link>https://moducalc.kr/jungdo/</link>
     <guid isPermaLink="true">https://moducalc.kr/jungdo/</guid>
     <description>중도상환수수료를 계산하고, 아끼는 이자와 비교해 지금 갚는 것이 유리한지 확인합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>상속세 계산기</title>
     <link>https://moducalc.kr/sangsokse/</link>
     <guid isPermaLink="true">https://moducalc.kr/sangsokse/</guid>
     <description>상속재산에서 채무와 상속공제를 빼고 상속세를 계산합니다. 일괄공제 5억, 배우자공제, 금융재산공제를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>시간외수당 계산기</title>
     <link>https://moducalc.kr/overtime/</link>
     <guid isPermaLink="true">https://moducalc.kr/overtime/</guid>
     <description>통상시급으로 연장근로·야간근로·휴일근로 가산수당을 계산합니다. 5인 미만 사업장 여부를 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>육아휴직 급여 계산기</title>
     <link>https://moducalc.kr/yuka/</link>
     <guid isPermaLink="true">https://moducalc.kr/yuka/</guid>
     <description>통상임금과 휴직 기간으로 육아휴직 급여를 계산합니다. 기간별 상한액과 하한액을 반영합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
   <item>
     <title>복리 계산기</title>
     <link>https://moducalc.kr/bokri/</link>
     <guid isPermaLink="true">https://moducalc.kr/bokri/</guid>
     <description>원금과 회차당 수익률로 복리를 계산합니다. 레버리지와 수수료를 수익률로 환산하고, 목표 금액까지 걸리는 회차를 역산하며, 승률을 넣으면 실제 기대값으로 다시 계산합니다.</description>
-    <pubDate>Mon, 31 Aug 2026 10:18:58 GMT</pubDate>
+    <pubDate>Mon, 31 Aug 2026 10:25:52 GMT</pubDate>
   </item>
 </channel>
 </rss>
