@@ -31,6 +31,18 @@ CONTACT = "gimm93882@gmail.com"
 UPDATED = "2026-08-31"
 GROUPS = [u"급여·노무", u"대출·예금", u"사업·세금", u"부동산·생활", u"투자"]
 
+# 구글 애드센스 게시자 ID. "ca-pub-" 로 시작하는 16자리 숫자다.
+#
+# 비워두면 광고 관련 코드가 전혀 들어가지 않는다. 값을 넣으면
+#   - 모든 페이지 <head> 에 애드센스 스크립트와 사이트 확인용 메타 태그가 붙고
+#   - ads.txt 가 생성된다 (없으면 승인 후 "승인되지 않은 판매자" 경고가 뜬다)
+#
+# 파일 src/adsense.txt 가 있으면 그 내용을 우선한다. 저장소에 커밋해도 되는 값이다.
+ADSENSE = ""
+_ad_file = os.path.join(ROOT, "src", "adsense.txt")
+if os.path.exists(_ad_file):
+    ADSENSE = io.open(_ad_file, encoding="utf-8").read().strip()
+
 FAVICON = ("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
            "<text y='.9em' font-size='90'>🧮</text></svg>")
 
@@ -57,7 +69,7 @@ SHELL = u"""<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
-<style>{css}</style>{jsonld}
+<style>{css}</style>{jsonld}{adsense}
 </head>
 <body>
 <nav class="sitenav"><div class="in">
@@ -91,13 +103,24 @@ def nav_html(up, path):
     return nav, foot
 
 
+def adsense_head():
+    """애드센스 스크립트와 사이트 확인용 메타 태그. ID 가 없으면 아무것도 넣지 않는다."""
+    if not ADSENSE:
+        return ""
+    return ('\n<meta name="google-adsense-account" content="%s">'
+            '\n<script async src="https://pagead2.googlesyndication.com/pagead/js/'
+            'adsbygoogle.js?client=%s" crossorigin="anonymous"></script>'
+            % (ADSENSE, ADSENSE))
+
+
 def shell(path, title, desc, body, up="", jsonld=None):
     nav, foot = nav_html(up, path)
     ld = ('\n<script type="application/ld+json">%s</script>'
           % json.dumps(jsonld, ensure_ascii=False)) if jsonld else ""
     return SHELL.format(title=title, desc=desc, base=BASE, path=path, site=SITE,
-                        favicon=FAVICON, css=CSS, jsonld=ld, nav=nav, up=up or "./",
-                        body=body, contact=CONTACT, footlinks=foot)
+                        favicon=FAVICON, css=CSS, jsonld=ld, adsense=adsense_head(),
+                        nav=nav, up=up or "./", body=body, contact=CONTACT,
+                        footlinks=foot)
 
 
 def faq_block(faq):
@@ -239,10 +262,17 @@ def main():
           + "</urlset>\n")
     write("sitemap.xml", sm)
     write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % BASE)
+
+    # ads.txt — 광고 재고를 팔 권한이 있는 판매자를 명시한다.
+    # 없으면 승인 후 애드센스에 "승인되지 않은 판매자" 경고가 뜨고 수익이 줄 수 있다.
+    if ADSENSE:
+        pub = ADSENSE.replace("ca-", "")
+        write("ads.txt", "google.com, %s, DIRECT, f08c47fec0942fa0\n" % pub)
     if BASE.startswith("https://moducalc.kr"):
         write("CNAME", "moducalc.kr\n")
 
     print(u"페이지 %d개 · %.0f KB" % (len(urls), total / 1024.0))
+    print(u"애드센스 %s" % (ADSENSE if ADSENSE else u"미설정 (src/adsense.txt 없음)"))
     print(u"기준 주소 %s" % BASE)
     for c in items:
         print(u"  /%-12s %s" % (c["slug"] + "/", c["name"]))

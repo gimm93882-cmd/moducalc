@@ -42,6 +42,19 @@ python3 build.py
 python3 build.py https://moducalc.kr
 ```
 
+## 애드센스
+
+게시자 ID 를 `src/adsense.txt` 에 한 줄로 넣고 다시 빌드하면 **모든 페이지**에
+확인용 메타 태그와 광고 스크립트가 들어가고 `ads.txt` 가 생성됩니다.
+
+```bash
+echo "ca-pub-여기에번호" > src/adsense.txt
+python3 build.py
+```
+
+파일이 없으면 광고 관련 코드가 전혀 들어가지 않습니다.
+`ads.txt` 가 없으면 승인 후 "승인되지 않은 판매자" 경고가 뜨므로 함께 생성합니다.
+
 ## 고지
 
 계산 결과는 입력값에 대한 산술 결과이며 세무·법률·노무·투자 자문이 아닙니다.
