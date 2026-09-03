@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>전기요금 계산기 | 주택용 누진제 단계별 요금 계산</title>
+<meta name="description" content="사용량(kWh)으로 주택용 전기요금을 계산합니다. 누진 3단계, 기후환경요금, 부가세, 전력기반기금을 모두 반영합니다.">
+<link rel="canonical" href="https://moducalc.kr/jeongi/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="전기요금 계산기 | 주택용 누진제 단계별 요금 계산">
+<meta property="og:description" content="사용량(kWh)으로 주택용 전기요금을 계산합니다. 누진 3단계, 기후환경요금, 부가세, 전력기반기금을 모두 반영합니다.">
+<meta property="og:url" content="https://moducalc.kr/jeongi/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose .doch1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em
+}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "전기요금 계산기", "url": "https://moducalc.kr/jeongi/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "사용량(kWh)으로 주택용 전기요금을 계산합니다. 누진 3단계, 기후환경요금, 부가세, 전력기반기금을 모두 반영합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "고지서 금액과 조금 다릅니다.", "acceptedAnswer": {"@type": "Answer", "text": "단가 개정, 복지 할인, 검침일 기준 일할 계산, 미납·연체료 등이 반영되면 달라집니다. 기후환경요금과 연료비조정액을 고지서 값으로 맞추면 가까워집니다."}}, {"@type": "Question", "name": "저압인지 고압인지 어떻게 아나요?", "acceptedAnswer": {"@type": "Answer", "text": "고지서나 관리비 명세서에 표시됩니다. 아파트는 대체로 고압, 단독주택은 저압인 경우가 많습니다."}}, {"@type": "Question", "name": "여름 누진 완화는 언제 적용되나요?", "acceptedAnswer": {"@type": "Answer", "text": "7월과 8월 사용분에 적용됩니다. 검침일 기준이라 고지서 대상 기간을 확인하세요."}}, {"@type": "Question", "name": "400kWh를 조금 넘겼는데 요금이 많이 올랐습니다.", "acceptedAnswer": {"@type": "Answer", "text": "3단계 단가가 1단계의 2.6배이고, 기본요금도 7,300원으로 뜁니다. 구간 경계에서 요금이 계단처럼 오르는 구조입니다."}}, {"@type": "Question", "name": "전기요금 누진제는 왜 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "과다 사용을 억제하고 저소비 가구의 부담을 낮추기 위한 구조입니다. 이 계산기는 제도의 타당성이 아니라 현행 요금표에 따른 금액만 계산합니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 부동산·생활</p><h1>전기요금 계산기</h1><p>사용량(kWh)으로 주택용 전기요금을 계산합니다. 누진 3단계, 기후환경요금, 부가세, 전력기반기금을 모두 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>전기요금은 곱셈이 아닙니다</h3>
+<p>350kWh를 썼다고 <em>350 × 단가</em>로 계산하면 틀립니다.
+주택용 전기는 <strong>누진제</strong>라 사용량 구간마다 단가가 다릅니다.
+많이 쓸수록 뒤쪽 사용량에 더 비싼 단가가 붙습니다.</p>
+
+<h3>누진 3단계</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>단계</th><th>평상시</th><th>여름 (7~8월)</th><th>저압 단가</th></tr></thead>
+<tbody>
+<tr><td>1단계</td><td>~200kWh</td><td>~300kWh</td><td class="n">120.0원</td></tr>
+<tr><td>2단계</td><td>201~400kWh</td><td>301~450kWh</td><td class="n">214.6원</td></tr>
+<tr><td>3단계</td><td>400kWh 초과</td><td>450kWh 초과</td><td class="n">307.3원</td></tr>
+</tbody></table></div>
+<p>3단계 단가는 1단계의 <strong>2.6배</strong>입니다.
+400kWh에서 401kWh로 1kWh만 넘어가도 그 1kWh는 307원이 됩니다.</p>
+
+<h3>여름에는 구간이 늘어납니다</h3>
+<p>에어컨 사용이 몰리는 <strong>7~8월</strong>에는 1단계가 300kWh, 2단계가 450kWh로 완화됩니다.
+같은 400kWh라도 여름이면 2단계 안에 들어가 요금이 줄어듭니다.
+계절 항목을 바꿔가며 비교해 보세요.</p>
+
+<h3>고지서에 붙는 것들</h3>
+<p>전력량요금만 내는 게 아닙니다.</p>
+<ul>
+<li><strong>기본요금</strong> — 사용 구간에 따른 정액. 400kWh를 넘으면 7,300원으로 크게 뜁니다.</li>
+<li><strong>기후환경요금</strong> — kWh당 부과. 신재생에너지 의무이행 비용 등에 쓰입니다.</li>
+<li><strong>연료비조정액</strong> — 분기마다 조정됩니다. 마이너스일 때도 있습니다.</li>
+<li><strong>부가가치세</strong> — 공급가액의 10%</li>
+<li><strong>전력산업기반기금</strong> — 공급가액의 3.7%</li>
+</ul>
+<p>부가세와 기금까지 더하면 공급가액보다 <strong>13.7%</strong> 더 나옵니다.</p>
+
+<h3>저압과 고압</h3>
+<p>단독주택과 소규모 건물은 대체로 <strong>저압</strong>, 아파트처럼 고압으로 받아
+단지에서 나눠 쓰는 곳은 <strong>고압</strong>입니다. 고압이 단가가 더 쌉니다.
+고지서나 관리비 명세서에서 확인할 수 있습니다.</p>
+
+<h3>사용량을 줄이면 얼마나 아끼나</h3>
+<p>누진제 때문에 <strong>줄이는 효과가 구간마다 다릅니다.</strong>
+3단계에 있는 사람이 10kWh를 줄이면 약 3,000원이 줄지만,
+1단계에 있는 사람이 같은 10kWh를 줄이면 1,200원입니다.
+많이 쓰는 집일수록 절약 효과가 큽니다.</p>
+<p>계산기에서 사용량을 바꿔가며 구간 경계 근처의 차이를 확인해 보세요.</p>
+
+<h3>단가는 바뀝니다</h3>
+<p>전기요금 단가는 한국전력 요금표 개정으로 바뀝니다.
+기후환경요금과 연료비조정액은 특히 자주 조정됩니다.
+계산기의 해당 항목을 <strong>입력값으로 열어두었으니</strong> 고지서와 다르면 직접 고쳐 쓰세요.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>고지서 금액과 조금 다릅니다.</summary><div class="a">단가 개정, 복지 할인, 검침일 기준 일할 계산, 미납·연체료 등이 반영되면 달라집니다. 기후환경요금과 연료비조정액을 고지서 값으로 맞추면 가까워집니다.</div></details>
+<details><summary>저압인지 고압인지 어떻게 아나요?</summary><div class="a">고지서나 관리비 명세서에 표시됩니다. 아파트는 대체로 고압, 단독주택은 저압인 경우가 많습니다.</div></details>
+<details><summary>여름 누진 완화는 언제 적용되나요?</summary><div class="a">7월과 8월 사용분에 적용됩니다. 검침일 기준이라 고지서 대상 기간을 확인하세요.</div></details>
+<details><summary>400kWh를 조금 넘겼는데 요금이 많이 올랐습니다.</summary><div class="a">3단계 단가가 1단계의 2.6배이고, 기본요금도 7,300원으로 뜁니다. 구간 경계에서 요금이 계단처럼 오르는 구조입니다.</div></details>
+<details><summary>전기요금 누진제는 왜 있나요?</summary><div class="a">과다 사용을 억제하고 저소비 가구의 부담을 낮추기 위한 구조입니다. 이 계산기는 제도의 타당성이 아니라 현행 요금표에 따른 금액만 계산합니다.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../pyeong/"><span class="cname">평수 계산기</span><span class="ckw">평 ↔ ㎡ 변환, 전용률 확인</span></a><a class="card" href="../date/"><span class="cname">날짜 계산기</span><span class="ckw">디데이, 날짜 사이 일수, N일 후</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"jeongi",
+  formTitle:"사용 정보",
+  sideNote:"단가는 한국전력 요금표가 개정되면 바뀝니다. 고지서와 다르면 아래 단가 항목을 고쳐 쓰세요.",
+  fields:[
+    {k:"kwh", label:"사용량", suffix:"kWh", value:350, step:10, min:0},
+    {k:"type", label:"주택용", type:"seg", options:[
+      {value:"low", label:"저압"}, {value:"high", label:"고압"}]},
+    {k:"season", label:"계절", type:"seg", options:[
+      {value:"normal", label:"평상시"}, {value:"summer", label:"여름 (7~8월)"}]},
+    {k:"climate", label:"기후환경요금", suffix:"원/kWh", value:9.0, step:0.1, min:0},
+    {k:"fuel", label:"연료비조정액", sub:"분기마다 바뀜, 음수 가능", suffix:"원/kWh", value:5.0, step:0.1},
+    {k:"family", label:"복지 할인", sub:"대가족·출산 등, 없으면 0", suffix:"원", value:0, step:1000, min:0}
+  ],
+  compute:function(v,F){
+    var kwh=Math.max(0, v.kwh||0);
+    var low = v.type!=="high";
+    var summer = v.season==="summer";
+
+    /* 누진 구간. 여름(7~8월)은 1·2단계 상한이 늘어난다. */
+    var T1 = summer ? 300 : 200;
+    var T2 = summer ? 450 : 400;
+
+    /* 기본요금 (구간별 정액) */
+    var baseTable = low ? [910, 1600, 7300] : [730, 1260, 6060];
+    var tier = kwh<=T1 ? 0 : kwh<=T2 ? 1 : 2;
+    var base = baseTable[tier];
+
+    /* 전력량요금 단가 */
+    var rate = low ? [120.0, 214.6, 307.3] : [105.0, 174.0, 242.3];
+
+    var seg=[
+      Math.min(kwh, T1),
+      Math.max(0, Math.min(kwh, T2) - T1),
+      Math.max(0, kwh - T2)
+    ];
+    var energy = seg[0]*rate[0] + seg[1]*rate[1] + seg[2]*rate[2];
+
+    var climate = kwh*(v.climate||0);
+    var fuel = kwh*(v.fuel||0);
+    var discount = Math.min(v.family||0, base+energy+climate+fuel);
+
+    var supply = base + energy + climate + fuel - discount;   /* 공급가액 */
+    var vat = Math.round(supply*0.1);
+    var fund = Math.floor(supply*0.037/10)*10;                /* 전력산업기반기금 */
+    var total = Math.floor((supply + vat + fund)/10)*10;      /* 10원 미만 절사 */
+
+    var avg = kwh>0 ? total/kwh : 0;
+
+    return {
+      hero:{k:"청구 예상액", v:F.kor(total), sub:F.won(total), cls:"down"},
+      stats:[
+        {k:"전력량요금", v:F.won(energy), sub: tier===2 ? "3단계 적용" : (tier===1 ? "2단계 적용" : "1단계")},
+        {k:"기본요금", v:F.won(base)},
+        {k:"kWh당 평균", v:F.won(avg), sub:"누진 반영 실단가"}
+      ],
+      hint:(low?"저압":"고압")+" · "+(summer?"여름 누진완화":"평상시")+" · "+F.num(kwh)+"kWh",
+      cols:["단계","사용량","단가","금액"],
+      rows:[
+        ["1단계 (~"+T1+"kWh)", F.num(seg[0])+"kWh", F.num(rate[0],1)+"원", F.won(seg[0]*rate[0])],
+        ["2단계 ("+(T1+1)+"~"+T2+")", F.num(seg[1])+"kWh", F.num(rate[1],1)+"원", F.won(seg[1]*rate[1])],
+        ["3단계 ("+T2+" 초과)", F.num(seg[2])+"kWh", F.num(rate[2],1)+"원", F.won(seg[2]*rate[2])],
+        ["기본요금", "—", "—", F.won(base)],
+        ["기후환경요금", F.num(kwh)+"kWh", F.num(v.climate,1)+"원", F.won(climate)],
+        ["연료비조정액", F.num(kwh)+"kWh", F.num(v.fuel,1)+"원", F.won(fuel)],
+        ["복지 할인", "—", "—", discount? "− "+F.won(discount) : "—"],
+        ["공급가액", "—", "—", F.won(supply)],
+        ["부가가치세 10%", "—", "—", F.won(vat)],
+        ["전력기반기금 3.7%", "—", "—", F.won(fund)],
+        ["합계", "—", "—", F.won(total)]
+      ],
+      tableHint:"10원 미만 절사",
+      extra:"<div class='note'>"+
+        (tier===2
+          ? "<b>3단계 구간에 들어갔습니다.</b> "+F.num(seg[2])+"kWh 가 최고 단가 "+F.num(rate[2],1)+"원으로 계산됩니다. "+
+            "1단계의 <b>"+ (rate[2]/rate[0]).toFixed(1) +"배</b>입니다. "+F.num(T2)+"kWh 아래로 줄이면 부담이 크게 줄어듭니다."
+          : tier===1
+            ? "2단계 구간입니다. "+F.num(T2)+"kWh 를 넘기면 단가가 "+F.num(rate[2],1)+"원으로 뜁니다. "+
+              "남은 여유는 <b>"+F.num(T2-kwh)+"kWh</b> 입니다."
+            : "1단계 구간이라 가장 낮은 단가가 적용됩니다.")+
+        (summer ? "<br><br>여름철(7~8월)에는 누진 구간이 <b>300/450kWh</b> 로 완화됩니다." : "")+
+        "</div>"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>

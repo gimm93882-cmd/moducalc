@@ -3713,3 +3713,162 @@ Calc.mount({
          u"적용 요건은 고용센터에서 확인하세요."),
     ],
 )
+
+# ───────────────────────── 전기요금 ─────────────────────────
+add(
+    slug="jeongi", name=u"전기요금 계산기", group=u"부동산·생활",
+    title=u"전기요금 계산기 | 주택용 누진제 단계별 요금 계산",
+    desc=u"사용량(kWh)으로 주택용 전기요금을 계산합니다. 누진 3단계, 기후환경요금, 부가세, 전력기반기금을 모두 반영합니다.",
+    kw=u"누진 3단계·기후환경요금·부가세 포함 실제 청구액",
+    spec=u"""
+Calc.mount({
+  id:"jeongi",
+  formTitle:"사용 정보",
+  sideNote:"단가는 한국전력 요금표가 개정되면 바뀝니다. 고지서와 다르면 아래 단가 항목을 고쳐 쓰세요.",
+  fields:[
+    {k:"kwh", label:"사용량", suffix:"kWh", value:350, step:10, min:0},
+    {k:"type", label:"주택용", type:"seg", options:[
+      {value:"low", label:"저압"}, {value:"high", label:"고압"}]},
+    {k:"season", label:"계절", type:"seg", options:[
+      {value:"normal", label:"평상시"}, {value:"summer", label:"여름 (7~8월)"}]},
+    {k:"climate", label:"기후환경요금", suffix:"원/kWh", value:9.0, step:0.1, min:0},
+    {k:"fuel", label:"연료비조정액", sub:"분기마다 바뀜, 음수 가능", suffix:"원/kWh", value:5.0, step:0.1},
+    {k:"family", label:"복지 할인", sub:"대가족·출산 등, 없으면 0", suffix:"원", value:0, step:1000, min:0}
+  ],
+  compute:function(v,F){
+    var kwh=Math.max(0, v.kwh||0);
+    var low = v.type!=="high";
+    var summer = v.season==="summer";
+
+    /* 누진 구간. 여름(7~8월)은 1·2단계 상한이 늘어난다. */
+    var T1 = summer ? 300 : 200;
+    var T2 = summer ? 450 : 400;
+
+    /* 기본요금 (구간별 정액) */
+    var baseTable = low ? [910, 1600, 7300] : [730, 1260, 6060];
+    var tier = kwh<=T1 ? 0 : kwh<=T2 ? 1 : 2;
+    var base = baseTable[tier];
+
+    /* 전력량요금 단가 */
+    var rate = low ? [120.0, 214.6, 307.3] : [105.0, 174.0, 242.3];
+
+    var seg=[
+      Math.min(kwh, T1),
+      Math.max(0, Math.min(kwh, T2) - T1),
+      Math.max(0, kwh - T2)
+    ];
+    var energy = seg[0]*rate[0] + seg[1]*rate[1] + seg[2]*rate[2];
+
+    var climate = kwh*(v.climate||0);
+    var fuel = kwh*(v.fuel||0);
+    var discount = Math.min(v.family||0, base+energy+climate+fuel);
+
+    var supply = base + energy + climate + fuel - discount;   /* 공급가액 */
+    var vat = Math.round(supply*0.1);
+    var fund = Math.floor(supply*0.037/10)*10;                /* 전력산업기반기금 */
+    var total = Math.floor((supply + vat + fund)/10)*10;      /* 10원 미만 절사 */
+
+    var avg = kwh>0 ? total/kwh : 0;
+
+    return {
+      hero:{k:"청구 예상액", v:F.kor(total), sub:F.won(total), cls:"down"},
+      stats:[
+        {k:"전력량요금", v:F.won(energy), sub: tier===2 ? "3단계 적용" : (tier===1 ? "2단계 적용" : "1단계")},
+        {k:"기본요금", v:F.won(base)},
+        {k:"kWh당 평균", v:F.won(avg), sub:"누진 반영 실단가"}
+      ],
+      hint:(low?"저압":"고압")+" · "+(summer?"여름 누진완화":"평상시")+" · "+F.num(kwh)+"kWh",
+      cols:["단계","사용량","단가","금액"],
+      rows:[
+        ["1단계 (~"+T1+"kWh)", F.num(seg[0])+"kWh", F.num(rate[0],1)+"원", F.won(seg[0]*rate[0])],
+        ["2단계 ("+(T1+1)+"~"+T2+")", F.num(seg[1])+"kWh", F.num(rate[1],1)+"원", F.won(seg[1]*rate[1])],
+        ["3단계 ("+T2+" 초과)", F.num(seg[2])+"kWh", F.num(rate[2],1)+"원", F.won(seg[2]*rate[2])],
+        ["기본요금", "—", "—", F.won(base)],
+        ["기후환경요금", F.num(kwh)+"kWh", F.num(v.climate,1)+"원", F.won(climate)],
+        ["연료비조정액", F.num(kwh)+"kWh", F.num(v.fuel,1)+"원", F.won(fuel)],
+        ["복지 할인", "—", "—", discount? "− "+F.won(discount) : "—"],
+        ["공급가액", "—", "—", F.won(supply)],
+        ["부가가치세 10%", "—", "—", F.won(vat)],
+        ["전력기반기금 3.7%", "—", "—", F.won(fund)],
+        ["합계", "—", "—", F.won(total)]
+      ],
+      tableHint:"10원 미만 절사",
+      extra:"<div class='note'>"+
+        (tier===2
+          ? "<b>3단계 구간에 들어갔습니다.</b> "+F.num(seg[2])+"kWh 가 최고 단가 "+F.num(rate[2],1)+"원으로 계산됩니다. "+
+            "1단계의 <b>"+ (rate[2]/rate[0]).toFixed(1) +"배</b>입니다. "+F.num(T2)+"kWh 아래로 줄이면 부담이 크게 줄어듭니다."
+          : tier===1
+            ? "2단계 구간입니다. "+F.num(T2)+"kWh 를 넘기면 단가가 "+F.num(rate[2],1)+"원으로 뜁니다. "+
+              "남은 여유는 <b>"+F.num(T2-kwh)+"kWh</b> 입니다."
+            : "1단계 구간이라 가장 낮은 단가가 적용됩니다.")+
+        (summer ? "<br><br>여름철(7~8월)에는 누진 구간이 <b>300/450kWh</b> 로 완화됩니다." : "")+
+        "</div>"
+    };
+  }
+});""",
+    guide=u"""
+<h3>전기요금은 곱셈이 아닙니다</h3>
+<p>350kWh를 썼다고 <em>350 × 단가</em>로 계산하면 틀립니다.
+주택용 전기는 <strong>누진제</strong>라 사용량 구간마다 단가가 다릅니다.
+많이 쓸수록 뒤쪽 사용량에 더 비싼 단가가 붙습니다.</p>
+
+<h3>누진 3단계</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>단계</th><th>평상시</th><th>여름 (7~8월)</th><th>저압 단가</th></tr></thead>
+<tbody>
+<tr><td>1단계</td><td>~200kWh</td><td>~300kWh</td><td class="n">120.0원</td></tr>
+<tr><td>2단계</td><td>201~400kWh</td><td>301~450kWh</td><td class="n">214.6원</td></tr>
+<tr><td>3단계</td><td>400kWh 초과</td><td>450kWh 초과</td><td class="n">307.3원</td></tr>
+</tbody></table></div>
+<p>3단계 단가는 1단계의 <strong>2.6배</strong>입니다.
+400kWh에서 401kWh로 1kWh만 넘어가도 그 1kWh는 307원이 됩니다.</p>
+
+<h3>여름에는 구간이 늘어납니다</h3>
+<p>에어컨 사용이 몰리는 <strong>7~8월</strong>에는 1단계가 300kWh, 2단계가 450kWh로 완화됩니다.
+같은 400kWh라도 여름이면 2단계 안에 들어가 요금이 줄어듭니다.
+계절 항목을 바꿔가며 비교해 보세요.</p>
+
+<h3>고지서에 붙는 것들</h3>
+<p>전력량요금만 내는 게 아닙니다.</p>
+<ul>
+<li><strong>기본요금</strong> — 사용 구간에 따른 정액. 400kWh를 넘으면 7,300원으로 크게 뜁니다.</li>
+<li><strong>기후환경요금</strong> — kWh당 부과. 신재생에너지 의무이행 비용 등에 쓰입니다.</li>
+<li><strong>연료비조정액</strong> — 분기마다 조정됩니다. 마이너스일 때도 있습니다.</li>
+<li><strong>부가가치세</strong> — 공급가액의 10%</li>
+<li><strong>전력산업기반기금</strong> — 공급가액의 3.7%</li>
+</ul>
+<p>부가세와 기금까지 더하면 공급가액보다 <strong>13.7%</strong> 더 나옵니다.</p>
+
+<h3>저압과 고압</h3>
+<p>단독주택과 소규모 건물은 대체로 <strong>저압</strong>, 아파트처럼 고압으로 받아
+단지에서 나눠 쓰는 곳은 <strong>고압</strong>입니다. 고압이 단가가 더 쌉니다.
+고지서나 관리비 명세서에서 확인할 수 있습니다.</p>
+
+<h3>사용량을 줄이면 얼마나 아끼나</h3>
+<p>누진제 때문에 <strong>줄이는 효과가 구간마다 다릅니다.</strong>
+3단계에 있는 사람이 10kWh를 줄이면 약 3,000원이 줄지만,
+1단계에 있는 사람이 같은 10kWh를 줄이면 1,200원입니다.
+많이 쓰는 집일수록 절약 효과가 큽니다.</p>
+<p>계산기에서 사용량을 바꿔가며 구간 경계 근처의 차이를 확인해 보세요.</p>
+
+<h3>단가는 바뀝니다</h3>
+<p>전기요금 단가는 한국전력 요금표 개정으로 바뀝니다.
+기후환경요금과 연료비조정액은 특히 자주 조정됩니다.
+계산기의 해당 항목을 <strong>입력값으로 열어두었으니</strong> 고지서와 다르면 직접 고쳐 쓰세요.</p>
+""",
+    faq=[
+        (u"고지서 금액과 조금 다릅니다.",
+         u"단가 개정, 복지 할인, 검침일 기준 일할 계산, 미납·연체료 등이 반영되면 달라집니다. "
+         u"기후환경요금과 연료비조정액을 고지서 값으로 맞추면 가까워집니다."),
+        (u"저압인지 고압인지 어떻게 아나요?",
+         u"고지서나 관리비 명세서에 표시됩니다. 아파트는 대체로 고압, 단독주택은 저압인 경우가 많습니다."),
+        (u"여름 누진 완화는 언제 적용되나요?",
+         u"7월과 8월 사용분에 적용됩니다. 검침일 기준이라 고지서 대상 기간을 확인하세요."),
+        (u"400kWh를 조금 넘겼는데 요금이 많이 올랐습니다.",
+         u"3단계 단가가 1단계의 2.6배이고, 기본요금도 7,300원으로 뜁니다. "
+         u"구간 경계에서 요금이 계단처럼 오르는 구조입니다."),
+        (u"전기요금 누진제는 왜 있나요?",
+         u"과다 사용을 억제하고 저소비 가구의 부담을 낮추기 위한 구조입니다. "
+         u"이 계산기는 제도의 타당성이 아니라 현행 요금표에 따른 금액만 계산합니다."),
+    ],
+)
