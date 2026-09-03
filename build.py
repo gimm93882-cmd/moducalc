@@ -78,6 +78,7 @@ SHELL = u"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{desc}">
+<meta name="keywords" content="{keywords}">
 <link rel="canonical" href="{base}{path}">
 <meta name="theme-color" content="#FF6B00">
 <link rel="icon" href="{favicon}">
@@ -113,6 +114,29 @@ SHELL = u"""<!doctype html>
 """
 
 
+def keyword_list(items):
+    """사이트 전체 계산기 이름과 설명에서 키워드를 뽑는다.
+
+    구글은 meta keywords 를 무시한다(2009년부터). 네이버도 쓰지 않는다.
+    순위에는 영향이 없고, 사이트가 무엇을 다루는지 기계적으로 드러내는 용도다.
+    실제 검색 노출은 각 페이지의 title·본문이 결정한다.
+    """
+    words = []
+    for c in items:
+        name = c["name"]
+        words.append(name)
+        # "부가세 계산기" -> "부가세" 도 함께 넣는다
+        stem = name.replace(u" 계산기", "").strip()
+        if stem and stem != name:
+            words.append(stem)
+    seen, out = set(), []
+    for w in words:
+        if w not in seen:
+            seen.add(w)
+            out.append(w)
+    return ", ".join(out)
+
+
 def nav_html(up, path):
     items = [(up, "/", u"전체 계산기"),
              (up + "about.html", "/about.html", u"소개"),
@@ -140,6 +164,9 @@ def adsense_head():
             % (ADSENSE, ADSENSE))
 
 
+KEYWORDS = ""   # main() 에서 채운다
+
+
 def shell(path, title, desc, body, up="", jsonld=None):
     nav, foot = nav_html(up, path)
     ld = ('\n<script type="application/ld+json">%s</script>'
@@ -147,7 +174,7 @@ def shell(path, title, desc, body, up="", jsonld=None):
     return SHELL.format(title=title, desc=desc, base=BASE, path=path, site=SITE,
                         favicon=FAVICON, css=CSS, jsonld=ld, adsense=adsense_head(),
                         verify=verify_head(), nav=nav, up=up or "./", body=body,
-                        contact=CONTACT, footlinks=foot)
+                        contact=CONTACT, footlinks=foot, keywords=KEYWORDS)
 
 
 def faq_block(faq):
@@ -270,8 +297,8 @@ def hub_page(items):
                                "name": c["name"], "url": "%s/%s/" % (BASE, c["slug"])}
                               for i, c in enumerate(items)]}
     return shell("/", u"모두계산기 | 급여·대출·세금·부동산 계산기 %d종" % len(items),
-                 u"연봉 실수령액, 퇴직금, 대출 이자, 부가세, 취득세, 양도소득세까지 "
-                 u"자주 쓰는 계산기 %d가지를 한곳에. 무료이고 가입이 필요 없습니다." % len(items),
+                 u"연봉 실수령액·퇴직금·4대보험, 대출 이자·주담대 한도, 부가세·종합소득세·"
+                 u"양도세·취득세, 전기요금·평수·전월세까지 계산기 %d종. 가입 없이 무료." % len(items),
                  body, up="", jsonld=[ld, faq_ld(content.HUB_FAQ)])
 
 
@@ -299,6 +326,9 @@ def main():
                      u"수익률로 환산하고, 목표 금액까지 걸리는 회차를 역산하며, "
                      u"승률을 넣으면 실제 기대값으로 다시 계산합니다."}
     items = calcs.CALCS + [bokri]
+
+    global KEYWORDS
+    KEYWORDS = keyword_list(items)
 
     total = 0
     total += write("index.html", hub_page(items))
