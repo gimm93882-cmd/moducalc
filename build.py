@@ -15,9 +15,11 @@ u"""모두계산기 정적 사이트 빌드.
 루트로 올라가는 접두사(up)를 페이지마다 다르게 넣는다.
 """
 
+import datetime
 import io
 import json
 import os
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
@@ -28,7 +30,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE = (sys.argv[1].rstrip("/") if len(sys.argv) > 1 else "https://moducalc.kr")
 SITE = u"모두계산기"
 CONTACT = "gimm93882@gmail.com"
-UPDATED = "2026-08-31"
+UPDATED = "2026-08-31"          # 정책 문서 최종 수정일 (사이트맵과 무관)
+TODAY = datetime.date.today().isoformat()
 GROUPS = [u"급여·노무", u"대출·예금", u"사업·세금", u"부동산·생활", u"투자"]
 
 # 구글 애드센스 게시자 ID. "ca-pub-" 로 시작하는 16자리 숫자다.
@@ -317,6 +320,34 @@ def write(rel, html):
     return os.path.getsize(p)
 
 
+def _git(*args):
+    try:
+        out = subprocess.check_output(("git",) + args, cwd=ROOT,
+                                      stderr=subprocess.DEVNULL)
+        return out.decode("utf-8").strip()
+    except Exception:
+        return ""
+
+
+def lastmod(url):
+    u"""사이트맵의 <lastmod>.
+
+    전 URL에 같은 날짜를 박아두면 구글에게 "아무것도 안 바뀌었다"고 말하는 셈이라
+    재크롤링 우선순위가 떨어진다. 실제로 바뀐 페이지만 오늘 날짜가 되도록,
+    파일이 HEAD와 다르면 오늘, 같으면 그 파일의 마지막 커밋 날짜를 쓴다.
+    git 이 없는 환경에서는 UPDATED 로 떨어진다.
+    """
+    rel = ("index.html" if url == "/"
+           else url[1:] + "index.html" if url.endswith("/")
+           else url[1:])
+    if not os.path.exists(os.path.join(ROOT, rel)):
+        return UPDATED
+    if _git("status", "--porcelain", "--", rel):     # 이번 빌드에서 바뀌었다
+        return TODAY
+    d = _git("log", "-1", "--format=%cs", "--", rel)
+    return d or TODAY
+
+
 def main():
     # 복리 계산기는 전용 로직(레버리지·목표역산·승률)이 있어 별도 페이지로 유지한다.
     bokri = {"slug": "bokri", "name": u"복리 계산기", "group": u"투자",
@@ -368,8 +399,10 @@ def main():
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
           + "".join('  <url><loc>%s%s</loc><lastmod>%s</lastmod>'
-                    '<changefreq>monthly</changefreq><priority>%s</priority></url>\n'
-                    % (BASE, u, UPDATED, "1.0" if u == "/" else "0.8" if u.endswith("/") else "0.3")
+                    '<changefreq>%s</changefreq><priority>%s</priority></url>\n'
+                    % (BASE, u, lastmod(u),
+                       "weekly" if u.endswith("/") else "yearly",
+                       "1.0" if u == "/" else "0.8" if u.endswith("/") else "0.3")
                     for u in urls)
           + "</urlset>\n")
     write("sitemap.xml", sm)
