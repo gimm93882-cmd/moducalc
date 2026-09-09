@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>평단가 계산기 | 물타기 후 평균단가·본전가 계산</title>
+<meta name="description" content="보유 수량과 평단가에 추가 매수를 더해 새 평균단가를 계산합니다. 목표 평단가에 필요한 수량, 본전 도달가, 물타기 배수별 시나리오까지 한 번에 봅니다.">
+<meta name="keywords" content="부가세 계산기, 부가세, 마진율 계산기, 마진율, 카드 수수료 계산기, 카드 수수료, 평수 계산기, 평수, 날짜 계산기, 날짜, 주휴수당 계산기, 주휴수당, 대출 이자 계산기, 대출 이자, 예적금 계산기, 예적금, 4대보험 계산기, 4대보험, 연봉 실수령액 계산기, 연봉 실수령액, 퇴직금 계산기, 퇴직금, 전월세 전환 계산기, 전월세 전환, 부동산 중개보수 계산기, 부동산 중개보수, 연차 개수 계산기, 연차 개수, BMI·칼로리 계산기, BMI·칼로리, 취득세 계산기, 취득세, 자동차 할부 계산기, 자동차 할부, 양도소득세 계산기, 양도소득세, 실업급여 계산기, 실업급여, 환율 계산기, 환율, 만 나이 계산기, 만 나이, 주택담보대출 한도 계산기, 주택담보대출 한도, 증여세 계산기, 증여세, 종합소득세 계산기, 종합소득세, 연말정산 환급금 계산기, 연말정산 환급금, 재산세 계산기, 재산세, 자동차세 계산기, 자동차세, 중도상환수수료 계산기, 중도상환수수료, 상속세 계산기, 상속세, 시간외수당 계산기, 시간외수당, 육아휴직 급여 계산기, 육아휴직 급여, 전기요금 계산기, 전기요금, 평단가 계산기, 평단가, 복리 계산기, 복리">
+<link rel="canonical" href="https://moducalc.kr/pyeongdanga/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="평단가 계산기 | 물타기 후 평균단가·본전가 계산">
+<meta property="og:description" content="보유 수량과 평단가에 추가 매수를 더해 새 평균단가를 계산합니다. 목표 평단가에 필요한 수량, 본전 도달가, 물타기 배수별 시나리오까지 한 번에 봅니다.">
+<meta property="og:url" content="https://moducalc.kr/pyeongdanga/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose .doch1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em
+}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "평단가 계산기", "url": "https://moducalc.kr/pyeongdanga/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "보유 수량과 평단가에 추가 매수를 더해 새 평균단가를 계산합니다. 목표 평단가에 필요한 수량, 본전 도달가, 물타기 배수별 시나리오까지 한 번에 봅니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "평단가를 현재가랑 똑같이 만들 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "만들 수 없습니다. 현재가에 아무리 많이 사도 기존 매입분이 남아 있어 평단가는 현재가보다 항상 높습니다. 무한히 사야 수렴하는 값이라 계산기에서도 ‘불가능’으로 표시됩니다."}}, {"@type": "Question", "name": "물타기를 하면 손실이 줄어드나요?", "acceptedAnswer": {"@type": "Answer", "text": "수익률 표시는 완만해지지만 손실 금액은 그대로입니다. 분모가 커져서 비율이 작아 보이는 것뿐입니다. 물타기가 실제로 바꾸는 것은 본전까지 필요한 반등 폭이고, 대신 더 떨어질 때의 손실 금액은 커집니다."}}, {"@type": "Question", "name": "코인도 이 계산기로 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "됩니다. 수량에 소수점을 넣으셔도 그대로 계산됩니다. 매도 비용만 거래소 수수료(대체로 0.04~0.25%)로 바꿔 넣으시면 됩니다. 코인은 증권거래세가 없습니다."}}, {"@type": "Question", "name": "매도 비용은 얼마로 넣어야 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "국내 주식은 증권사 수수료에 증권거래세를 더한 값, 코인은 거래소 수수료입니다. 세율과 수수료는 바뀌므로 본인 계좌의 실제 거래내역에서 확인하시는 편이 정확합니다."}}, {"@type": "Question", "name": "평단가에 매수 수수료도 포함되나요?", "acceptedAnswer": {"@type": "Answer", "text": "증권사 화면의 평균단가는 수수료 포함 여부가 앱마다 다릅니다. 이 계산기는 순수 매입가 기준으로 계산하고 수수료는 매도할 때 한 번에 반영합니다. 앱 표시와 몇 원 차이가 나면 대개 이 때문입니다."}}, {"@type": "Question", "name": "보유 수량의 몇 배까지 물타기하는 게 맞나요?", "acceptedAnswer": {"@type": "Answer", "text": "정답이 없습니다. 계산기 아래 표에서 배수별 평단가를 비교하시고, ‘그 금액을 넣은 뒤에도 다음 하락에 대응할 여력이 남는지’를 기준으로 판단하세요. 이 계산기는 금액과 평단가만 계산하며 투자 판단을 대신하지 않습니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 투자</p><h1>평단가 계산기</h1><p>보유 수량과 평단가에 추가 매수를 더해 새 평균단가를 계산합니다. 목표 평단가에 필요한 수량, 본전 도달가, 물타기 배수별 시나리오까지 한 번에 봅니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>평단가는 단순 평균이 아니라 가중평균입니다</h3>
+<p>5만원에 100주, 4만원에 100주를 샀다면 평단가는 4만 5천원입니다. 여기까지는 단순 평균과 같습니다.
+그런데 5만원에 <strong>100주</strong>, 4만원에 <strong>10주</strong>를 샀다면 평단가는 4만 5천원이 아니라
+<strong>49,090원</strong>입니다. 수량이 많은 쪽으로 끌려가기 때문입니다.</p>
+<p>공식은 하나뿐입니다.</p>
+<p><strong>평단가 = 총 매입금액 ÷ 총 수량</strong></p>
+<p>주식이든 코인이든 똑같습니다. 코인처럼 수량에 소수점이 들어가도 계산 방식은 바뀌지 않습니다.</p>
+
+<h3>물타기의 착시 — 평단가는 내려가지만 손실은 그대로입니다</h3>
+<p>이 계산기를 만든 가장 큰 이유입니다.</p>
+<p>5만원에 100주를 사서 4만원이 됐다면 손실은 <strong>100만원, −20%</strong>입니다.
+여기서 4만원에 100주를 더 사면 평단가는 4만 5천원이 되고, 수익률 표시는 <strong>−11.1%</strong>로 바뀝니다.
+숫자가 절반 가까이 좋아진 것처럼 보입니다.</p>
+<p>하지만 손실 금액은 여전히 <strong>100만원</strong>입니다. 1원도 줄지 않았습니다.
+바뀐 것은 분모뿐입니다. 900만원을 넣어서 −20%를 −11%로 만든 것이지, 손실을 회복한 것이 아닙니다.</p>
+<p>물타기가 실제로 하는 일은 <strong>본전 도달에 필요한 반등 폭을 줄이는 것</strong>입니다.
+평단가 5만원이면 25% 올라야 본전이지만, 4만 5천원이면 12.5%만 오르면 됩니다.
+대신 그 대가로 <strong>더 떨어졌을 때의 손실 금액이 2배가 됩니다.</strong></p>
+
+<h3>평단가를 목표까지 낮추는 데 필요한 수량</h3>
+<p>목표 평단가 A, 보유 수량 q, 보유 평단가 a, 매수 단가 p 라면</p>
+<p><strong>필요 수량 = q × (a − A) ÷ (A − p)</strong></p>
+<p>분모의 <strong>(A − p)</strong>가 핵심입니다. 목표 평단가를 매수 단가에 가깝게 잡을수록
+분모가 0에 가까워지고 필요 수량이 폭발적으로 늘어납니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>보유 평단가 5만원 · 100주 · 현재가 4만원</th><th>필요 추가 수량</th><th>필요 금액</th></tr></thead>
+<tbody>
+<tr><td>평단가를 48,000원으로</td><td class="n">25주</td><td class="n">100만원</td></tr>
+<tr><td>평단가를 45,000원으로</td><td class="n">100주</td><td class="n">400만원</td></tr>
+<tr><td>평단가를 42,000원으로</td><td class="n">400주</td><td class="n">1,600만원</td></tr>
+<tr><td>평단가를 41,000원으로</td><td class="n">900주</td><td class="n">3,600만원</td></tr>
+<tr><td>평단가를 40,000원으로</td><td class="n">불가능</td><td class="n">—</td></tr>
+</tbody></table></div>
+<p>현재가와 같은 평단가는 <strong>아무리 사도 만들 수 없습니다.</strong>
+무한히 사야 수렴하는 값이기 때문입니다. 물타기로 “본전 근처”를 만들려는 계획이
+현실적으로 어려운 이유가 여기 있습니다.</p>
+
+<h3>반토막에서 물타기를 하면</h3>
+<p>−50%는 계산이 특히 가혹합니다. 평단가 1만원짜리가 5천원이 됐을 때,
+5천원에 같은 수량을 사면 평단가는 7,500원이 됩니다.
+본전까지 필요한 반등은 100%에서 <strong>50%</strong>로 줄지만,
+투입 원금은 2배가 되고 여기서 다시 반토막이 나면 손실 금액도 2배가 됩니다.</p>
+<p>계산기 아래 표에서 보유 수량의 0.5배·1배·2배·3배·5배를 더 샀을 때 평단가가
+어떻게 움직이는지 한눈에 볼 수 있습니다. <strong>5배를 사도 평단가가 매수가까지는
+내려가지 않는다</strong>는 점을 확인해 보세요.</p>
+
+<h3>수수료와 세금</h3>
+<p>계산기의 ‘매도 비용’은 <strong>팔 때</strong> 빠지는 비율입니다.</p>
+<ul>
+<li><strong>국내 주식</strong> — 증권사 수수료(대체로 0.01~0.15%)에 증권거래세가 더해집니다.
+거래세율은 해마다 조정되므로 본인 계좌의 거래내역에서 확인하는 편이 정확합니다.</li>
+<li><strong>코인 현물</strong> — 거래소별로 0.04~0.25% 수준입니다. 거래세는 없습니다.</li>
+<li><strong>해외 주식</strong> — 수수료에 환전 스프레드가 더해지고, 양도차익은 연간 기본공제를 넘으면 신고 대상입니다.</li>
+</ul>
+<p>본전가가 평단가보다 조금 높게 나오는 이유가 이 비용입니다.
+평단가에 딱 맞춰 팔면 수수료만큼 손해입니다.</p>
+
+<h3>선물·레버리지에서는 평단가가 청산가를 결정합니다</h3>
+<p>현물에서 물타기는 기다릴 수 있으면 버티는 문제지만,
+<strong>레버리지 포지션에서는 평단가가 곧 청산가를 정합니다.</strong>
+추가 진입으로 평단가가 내려가면 청산가도 함께 내려가 버틸 수 있는 폭이 늘어납니다.
+다만 포지션 규모가 커진 만큼 <strong>청산됐을 때 잃는 금액도 같이 커집니다.</strong>
+증거금이 감당할 수 있는 범위인지 먼저 확인하세요.</p>
+
+<h3>분할매수와 물타기는 다릅니다</h3>
+<p>같은 행동처럼 보이지만 순서가 반대입니다.</p>
+<ul>
+<li><strong>분할매수</strong> — 처음부터 3~5회로 나눠 사겠다고 정해 두고, 정해진 가격대에서 계획대로 집행합니다.
+남은 자금이 계획 안에 있습니다.</li>
+<li><strong>물타기</strong> — 한 번에 다 산 뒤 떨어지자 계획에 없던 돈을 추가로 넣습니다.
+평단가가 내려가는 것은 같지만, 다음에 더 떨어지면 넣을 돈이 없습니다.</li>
+</ul>
+<p>계산 결과가 같아도 남은 여력이 다릅니다.
+계산기의 ‘필요 금액이 기존 투입액의 몇 %인지’ 표시를 기준으로,
+그 돈을 <strong>지금 넣어도 다음 하락에 대응할 수 있는지</strong> 먼저 따져 보세요.</p>
+
+<h3>이 계산기가 답하지 않는 것</h3>
+<p>이 페이지는 <strong>산수만</strong> 합니다. 추가로 사야 하는지, 손절해야 하는지,
+그 종목이 오를지는 계산할 수 없습니다.
+평단가를 얼마로 만들려면 돈이 얼마나 드는지, 그 뒤 본전이 어디인지만 정확히 보여줍니다.
+판단은 그 숫자를 보고 본인이 하시는 것입니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>평단가를 현재가랑 똑같이 만들 수 있나요?</summary><div class="a">만들 수 없습니다. 현재가에 아무리 많이 사도 기존 매입분이 남아 있어 평단가는 현재가보다 항상 높습니다. 무한히 사야 수렴하는 값이라 계산기에서도 ‘불가능’으로 표시됩니다.</div></details>
+<details><summary>물타기를 하면 손실이 줄어드나요?</summary><div class="a">수익률 표시는 완만해지지만 손실 금액은 그대로입니다. 분모가 커져서 비율이 작아 보이는 것뿐입니다. 물타기가 실제로 바꾸는 것은 본전까지 필요한 반등 폭이고, 대신 더 떨어질 때의 손실 금액은 커집니다.</div></details>
+<details><summary>코인도 이 계산기로 되나요?</summary><div class="a">됩니다. 수량에 소수점을 넣으셔도 그대로 계산됩니다. 매도 비용만 거래소 수수료(대체로 0.04~0.25%)로 바꿔 넣으시면 됩니다. 코인은 증권거래세가 없습니다.</div></details>
+<details><summary>매도 비용은 얼마로 넣어야 하나요?</summary><div class="a">국내 주식은 증권사 수수료에 증권거래세를 더한 값, 코인은 거래소 수수료입니다. 세율과 수수료는 바뀌므로 본인 계좌의 실제 거래내역에서 확인하시는 편이 정확합니다.</div></details>
+<details><summary>평단가에 매수 수수료도 포함되나요?</summary><div class="a">증권사 화면의 평균단가는 수수료 포함 여부가 앱마다 다릅니다. 이 계산기는 순수 매입가 기준으로 계산하고 수수료는 매도할 때 한 번에 반영합니다. 앱 표시와 몇 원 차이가 나면 대개 이 때문입니다.</div></details>
+<details><summary>보유 수량의 몇 배까지 물타기하는 게 맞나요?</summary><div class="a">정답이 없습니다. 계산기 아래 표에서 배수별 평단가를 비교하시고, ‘그 금액을 넣은 뒤에도 다음 하락에 대응할 여력이 남는지’를 기준으로 판단하세요. 이 계산기는 금액과 평단가만 계산하며 투자 판단을 대신하지 않습니다.</div></details></article></div><div class="wrap"><section class="related"><h2>투자 계산기 더 보기</h2><div class="cards"><a class="card" href="../bokri/"><span class="cname">복리 계산기</span><span class="ckw">레버리지·수수료 환산, 목표 금액 역산, 승률 보정</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"pyeongdanga",
+  formTitle:"보유 · 추가 매수",
+  sideNote:"주식·코인 모두 같은 방식으로 계산됩니다. 수량에 소수점이 들어가는 코인도 그대로 넣으시면 됩니다.",
+  fields:[
+    {k:"qty1", label:"보유 수량", sub:"주 / 개", value:100, step:1, min:0},
+    {k:"avg1", label:"보유 평단가", suffix:"원", value:50000, step:100, min:0},
+    {k:"cur", label:"현재가", suffix:"원", value:40000, step:100, min:0},
+    {k:"mode", label:"추가 매수 입력 방식", type:"seg", options:[
+      {value:"mq", label:"수량으로"}, {value:"ma", label:"금액으로"}]},
+    {k:"qty2", label:"추가 매수 수량", sub:"‘수량으로’ 일 때", value:100, step:1, min:0},
+    {k:"amt2", label:"추가 매수 금액", sub:"‘금액으로’ 일 때", suffix:"원", value:4000000, step:100000, min:0},
+    {k:"price2", label:"추가 매수 단가", suffix:"원", value:40000, step:100, min:0},
+    {k:"target", label:"목표 평단가", sub:"여기까지 낮추려면?", suffix:"원", value:45000, step:100, min:0},
+    {k:"sellfee", label:"매도 비용", sub:"수수료+세금, 코인은 0.1 내외", suffix:"%", value:0.2, step:0.01, min:0}
+  ],
+  compute:function(v,F){
+    var q1=Math.max(0, v.qty1||0), a1=Math.max(0, v.avg1||0);
+    var cur=Math.max(0, v.cur||0), p2=Math.max(0, v.price2||0);
+
+    /* 추가 매수 수량 — 금액으로 넣었으면 단가로 나눠 환산한다. */
+    var q2 = v.mode==="ma" ? (p2>0 ? (v.amt2||0)/p2 : 0) : Math.max(0, v.qty2||0);
+
+    var cost1=q1*a1, cost2=q2*p2;
+    var tq=q1+q2, tc=cost1+cost2;
+    var newAvg = tq>0 ? tc/tq : 0;
+
+    var fee=(v.sellfee||0)/100;
+    var value=tq*cur;
+    var pnl=value-tc;                 /* 매도 비용 전 평가손익 */
+    var net=value*(1-fee)-tc;         /* 팔았을 때 손에 남는 손익 */
+    var pctBefore = a1>0 ? (cur-a1)/a1*100 : 0;
+    var pctAfter  = newAvg>0 ? (cur-newAvg)/newAvg*100 : 0;
+    var be = fee<1 ? newAvg/(1-fee) : 0;   /* 매도 비용까지 덮는 본전가 */
+
+    /* 목표 평단가 A 에 필요한 추가 수량:  q = q1*(a1-A)/(A-p2) */
+    var A=Math.max(0, v.target||0), needQty=null, needAmt=null, why="";
+    if(q1<=0) why="보유 수량을 넣어 주세요.";
+    else if(A>=a1) why="목표 평단가가 이미 보유 평단가보다 높거나 같습니다.";
+    else if(A<=p2) why="매수 단가("+F.won(p2)+")보다 낮은 평단가는 아무리 사도 만들 수 없습니다.";
+    else { needQty=q1*(a1-A)/(A-p2); needAmt=needQty*p2; }
+
+    /* 보유 수량의 배수만큼 더 살 때의 평단가.  (a1 + m*p2)/(1+m) */
+    var muls=[0.5,1,2,3,5], rows=[];
+    rows.push(["현재 (추가 없음)", F.num(q1,4), "—", F.won(a1), F.signed(pctBefore)]);
+    for(var i=0;i<muls.length;i++){
+      var m=muls[i], mq=q1*m, ma=(a1+m*p2)/(1+m);
+      rows.push([
+        "보유의 "+m+"배 추가", F.num(mq,4), F.won(mq*p2), F.won(ma),
+        F.signed(ma>0?(cur-ma)/ma*100:0)
+      ]);
+    }
+
+    return {
+      hero:{k:"물타기 후 평단가", v:F.won(newAvg),
+            sub: q2>0 ? F.won(a1)+" → "+F.won(newAvg)+" ("+F.won(a1-newAvg)+" 하락)" : "추가 매수 없음",
+            cls: newAvg<a1 ? "up" : ""},
+      stats:[
+        {k:"총 수량", v:F.num(tq,4), sub:"보유 "+F.num(q1,4)+" + 추가 "+F.num(q2,4)},
+        {k:"총 매입금액", v:F.kor(tc), sub:F.won(tc)},
+        {k:"평가손익", v:F.kor(pnl), sub:F.signed(pctAfter), cls: pnl>=0?"up":"down"}
+      ],
+      hint:"현재가 "+F.won(cur),
+      cols:["시나리오","추가 수량","추가 금액","평단가","현재 수익률"],
+      rows:rows,
+      tableHint:"추가 매수 단가 "+F.won(p2)+" 기준",
+      extra:"<div class='note'>"+
+        (needQty!=null
+          ? "평단가를 <b>"+F.won(A)+"</b>까지 낮추려면 "+F.won(p2)+"에 <b>"+F.num(needQty,4)+"</b>만큼 더 사야 합니다. "+
+            "필요 금액은 <b>"+F.kor(needAmt)+"</b>, 이미 넣은 <b>"+F.kor(cost1)+"</b>의 "+
+            "<b>"+F.num(cost1>0?needAmt/cost1*100:0,0)+"%</b>입니다."
+          : "목표 평단가를 계산할 수 없습니다. "+why)+
+        "<br><br>"+
+        "지금 전부 팔면 매도 비용 "+F.pct(v.sellfee,2)+"를 빼고 <b>"+F.kor(net)+"</b>이 남습니다. "+
+        "본전 도달 가격은 <b>"+F.won(be)+"</b>입니다."+
+        ((q1>0 && q2>0 && newAvg<a1)
+          ? "<br><br>"+
+            "평단가는 "+F.won(a1)+"에서 "+F.won(newAvg)+"까지 내려갔지만, "+
+            "<b>손실 금액 자체는 줄지 않습니다.</b> 수익률 표시가 "+F.signed(pctBefore)+"에서 "+
+            F.signed(pctAfter)+"로 완만해 보이는 것은 분모가 커졌기 때문입니다."
+          : "")+
+        "</div>"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>
