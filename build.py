@@ -16,10 +16,11 @@ u"""모두계산기 정적 사이트 빌드.
 """
 
 import datetime
+import hashlib
 import io
 import json
 import os
-import subprocess
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
@@ -320,32 +321,46 @@ def write(rel, html):
     return os.path.getsize(p)
 
 
-def _git(*args):
+_LASTMOD_DB = os.path.join(ROOT, "lastmod.json")
+
+# 모든 페이지의 <meta name="keywords"> 에 계산기 전체 목록이 들어간다.
+# 그래서 계산기를 하나 추가하면 39개 페이지가 전부 다시 쓰이고,
+# 순진하게 파일 변경을 보면 매일 "전 페이지가 바뀌었다"가 된다.
+# 사이트맵이 매일 그렇게 말하면 lastmod 는 신호로서 값어치를 잃는다.
+# 이 줄만 빼고 내용을 비교한다.
+_KW_LINE = re.compile(r'(?m)^<meta name="keywords".*$')
+
+
+def _fingerprint(rel):
+    t = io.open(os.path.join(ROOT, rel), encoding="utf-8").read()
+    return hashlib.sha1(_KW_LINE.sub("", t).encode("utf-8")).hexdigest()
+
+
+def load_lastmod():
     try:
-        out = subprocess.check_output(("git",) + args, cwd=ROOT,
-                                      stderr=subprocess.DEVNULL)
-        return out.decode("utf-8").strip()
+        return json.load(io.open(_LASTMOD_DB, encoding="utf-8"))
     except Exception:
-        return ""
+        return {}
 
 
-def lastmod(url):
+def lastmod(url, db):
     u"""사이트맵의 <lastmod>.
 
-    전 URL에 같은 날짜를 박아두면 구글에게 "아무것도 안 바뀌었다"고 말하는 셈이라
-    재크롤링 우선순위가 떨어진다. 실제로 바뀐 페이지만 오늘 날짜가 되도록,
-    파일이 HEAD와 다르면 오늘, 같으면 그 파일의 마지막 커밋 날짜를 쓴다.
-    git 이 없는 환경에서는 UPDATED 로 떨어진다.
+    전 URL에 같은 날짜를 박아두면 구글에게 "아무것도 안 바뀌었다"고 말하는 셈이고,
+    반대로 매일 전 URL을 오늘로 갱신하면 "전부 바뀌었다"가 돼 둘 다 무시당한다.
+    내용 해시를 lastmod.json 에 남겨두고, 해시가 그대로면 이전 날짜를 유지한다.
     """
     rel = ("index.html" if url == "/"
            else url[1:] + "index.html" if url.endswith("/")
            else url[1:])
     if not os.path.exists(os.path.join(ROOT, rel)):
         return UPDATED
-    if _git("status", "--porcelain", "--", rel):     # 이번 빌드에서 바뀌었다
-        return TODAY
-    d = _git("log", "-1", "--format=%cs", "--", rel)
-    return d or TODAY
+    fp = _fingerprint(rel)
+    prev = db.get(url)
+    if prev and prev.get("hash") == fp:
+        return prev.get("date", TODAY)
+    db[url] = {"hash": fp, "date": TODAY}
+    return TODAY
 
 
 def main():
@@ -396,16 +411,19 @@ def main():
 
     urls = ["/"] + ["/%s/" % c["slug"] for c in items] + \
            ["/about.html", "/privacy.html", "/terms.html"]
+    db = load_lastmod()
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
           + "".join('  <url><loc>%s%s</loc><lastmod>%s</lastmod>'
                     '<changefreq>%s</changefreq><priority>%s</priority></url>\n'
-                    % (BASE, u, lastmod(u),
+                    % (BASE, u, lastmod(u, db),
                        "weekly" if u.endswith("/") else "yearly",
                        "1.0" if u == "/" else "0.8" if u.endswith("/") else "0.3")
                     for u in urls)
           + "</urlset>\n")
     write("sitemap.xml", sm)
+    io.open(_LASTMOD_DB, "w", encoding="utf-8").write(
+        json.dumps(db, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     write("robots.txt", "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % BASE)
 
     # RSS. 계산기 사이트라 원래 필요 없지만 네이버 서치어드바이저가 제출 항목으로 두고 있다.
