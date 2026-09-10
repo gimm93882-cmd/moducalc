@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>국민연금 예상 수령액 계산기 | 기본연금액·조기수령·연기연금</title>
+<meta name="description" content="가입 시작 연도와 가입기간, 기준소득월액으로 노령연금 월 수령액을 계산합니다. 연도별 소득대체율 상수, 20년 초과 가산, 조기수령 감액과 연기연금 가산을 모두 반영합니다.">
+<meta name="keywords" content="부가세 계산기, 부가세, 마진율 계산기, 마진율, 카드 수수료 계산기, 카드 수수료, 평수 계산기, 평수, 날짜 계산기, 날짜, 주휴수당 계산기, 주휴수당, 대출 이자 계산기, 대출 이자, 예적금 계산기, 예적금, 4대보험 계산기, 4대보험, 연봉 실수령액 계산기, 연봉 실수령액, 퇴직금 계산기, 퇴직금, 전월세 전환 계산기, 전월세 전환, 부동산 중개보수 계산기, 부동산 중개보수, 연차 개수 계산기, 연차 개수, BMI·칼로리 계산기, BMI·칼로리, 취득세 계산기, 취득세, 자동차 할부 계산기, 자동차 할부, 양도소득세 계산기, 양도소득세, 실업급여 계산기, 실업급여, 환율 계산기, 환율, 만 나이 계산기, 만 나이, 주택담보대출 한도 계산기, 주택담보대출 한도, 증여세 계산기, 증여세, 종합소득세 계산기, 종합소득세, 연말정산 환급금 계산기, 연말정산 환급금, 재산세 계산기, 재산세, 자동차세 계산기, 자동차세, 중도상환수수료 계산기, 중도상환수수료, 상속세 계산기, 상속세, 시간외수당 계산기, 시간외수당, 육아휴직 급여 계산기, 육아휴직 급여, 전기요금 계산기, 전기요금, 평단가 계산기, 평단가, 국민연금 예상 수령액 계산기, 국민연금 예상 수령액, 복리 계산기, 복리">
+<link rel="canonical" href="https://moducalc.kr/yeongeum/">
+<meta name="theme-color" content="#FF6B00">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="모두계산기">
+<meta property="og:title" content="국민연금 예상 수령액 계산기 | 기본연금액·조기수령·연기연금">
+<meta property="og:description" content="가입 시작 연도와 가입기간, 기준소득월액으로 노령연금 월 수령액을 계산합니다. 연도별 소득대체율 상수, 20년 초과 가산, 조기수령 감액과 연기연금 가산을 모두 반영합니다.">
+<meta property="og:url" content="https://moducalc.kr/yeongeum/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{
+  /* 밝은 배경 고정. 다크 모드 사용자에게도 같은 밝은 화면을 보여준다. */
+  --ground:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F5; --surface-3:#FAFBFC;
+  --ink:#101419; --ink-2:#3D4550; --muted:#7B8492;
+  --line:#E4E8ED; --line-2:#D3D9E0;
+  --accent:#FF6B00; --accent-ink:#C24700; --accent-soft:#FFF1E6;
+  --gain:#E5384E; --loss:#1F6FEB;
+  --shadow:0 1px 2px rgba(16,20,25,.04), 0 10px 28px -14px rgba(16,20,25,.18);
+  --shadow-lg:0 2px 4px rgba(16,20,25,.05), 0 18px 44px -18px rgba(16,20,25,.24);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.display{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400}
+
+.wrap{max-width:1160px;margin:0 auto;padding:36px 20px 80px}
+@media (max-width:600px){.wrap{padding:22px 14px 56px}}
+
+header{margin-bottom:26px}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
+  padding:4px 10px;border-radius:4px
+}
+h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7vw,52px);line-height:1.1;margin:0;
+  letter-spacing:-.01em;text-wrap:balance
+}
+h1 em{font-style:normal;color:var(--accent)}
+header p{margin:12px 0 0;color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.7}
+
+.grid{display:grid;grid-template-columns:352px 1fr;gap:22px;align-items:start}
+/* 그리드/플렉스 아이템의 기본 min-width:auto 는 내용의 최소 너비만큼 트랙을 넓혀
+   좁은 화면에서 페이지 전체를 가로로 밀어낸다. 명시적으로 풀어준다. */
+.grid>*,.stack>*,.panel,.panel-body,.field,.control,.stats,.stat{min-width:0}
+input,select{min-width:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr;gap:16px}}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);overflow:hidden
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px
+}
+.panel-head h2{
+  font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em
+}
+.panel-head .hint{font-size:12px;color:var(--muted)}
+.panel-body{padding:18px}
+
+.side{position:sticky;top:18px}
+@media (max-width:900px){.side{position:static}}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+label{font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+label .sub{font-weight:400;color:var(--muted);font-size:11.5px}
+.control{position:relative;display:flex;align-items:center}
+input[type=number],input[type=text],select{
+  width:100%;min-height:46px;padding:11px 13px;background:var(--surface-3);color:var(--ink);
+  border:1.5px solid var(--line-2);border-radius:9px;font:inherit;font-size:16px;
+  font-family:"JetBrains Mono","Noto Sans KR",monospace;font-variant-numeric:tabular-nums;
+  font-weight:500;appearance:none;-webkit-appearance:none;
+}
+select{font-family:"Noto Sans KR",sans-serif;background-image:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus,select:focus,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)
+}
+.suffix{
+  position:absolute;right:13px;font-size:13px;color:var(--muted);pointer-events:none;font-weight:500
+}
+input.has-suffix{padding-right:42px}
+.row{display:grid;grid-template-columns:1fr 104px;gap:9px}
+.readout{font-size:11.5px;color:var(--muted);min-height:1.2em}
+
+.seg{display:flex;border:1.5px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--surface-3)}
+.seg button{
+  flex:1;min-height:44px;padding:9px 4px;background:transparent;color:var(--ink-2);
+  border:0;border-right:1.5px solid var(--line-2);font:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;transition:background .12s
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+
+.go{
+  width:100%;margin-top:18px;min-height:50px;padding:13px;background:var(--accent);color:#fff;
+  border:0;border-radius:10px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;
+  letter-spacing:.01em;transition:filter .12s,transform .06s
+}
+.go:hover{filter:brightness(1.07)}
+.go:active{transform:translateY(1px)}
+
+/* 최종 자산 하나를 크게 띄우고 나머지는 아래에 둔다. */
+.hero{padding:26px 22px 22px;background:var(--surface);text-align:center}
+.hero .k{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+.hero .v{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(32px,7.2vw,56px);line-height:1.05;letter-spacing:-.015em;
+  word-break:keep-all
+}
+.hero .exact{
+  font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(13px,2.6vw,15px);color:var(--muted);margin-top:8px;font-weight:500
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+.stat{background:var(--surface);padding:14px 16px;min-width:0}
+.stat .k{font-size:11.5px;color:var(--muted);margin-bottom:5px;white-space:nowrap}
+.stat .v{
+  font-size:clamp(15px,3.2vw,19px);font-weight:700;letter-spacing:-.025em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.stat .sub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--gain)} .down{color:var(--loss)}
+
+.tablewrap{overflow-x:auto;max-height:440px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:1;
+  font-size:11px;letter-spacing:.03em;color:var(--muted);font-weight:700
+}
+tbody tr:hover{background:var(--surface-3)}
+td.n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-size:12.5px}
+
+.note{
+  margin-top:14px;padding:14px 16px;background:var(--accent-soft);
+  border-radius:10px;font-size:13px;line-height:1.7;color:var(--ink-2);
+  border:1px solid #FFE0C7
+}
+.note b{color:var(--ink);font-weight:700}
+
+details.more{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+details.more summary{
+  cursor:pointer;font-size:14px;font-weight:700;color:var(--accent-ink);
+  list-style:none;padding:6px 0;min-height:32px
+}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸ ";font-size:11px}
+details.more[open] summary::before{content:"▾ "}
+.more-body{padding-top:14px}
+
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-weight:700}
+
+.verdict{font-size:14.5px;line-height:1.7;margin:0}
+.verdict strong{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(20px,5vw,28px);color:var(--accent-ink);display:block;margin-top:4px
+}
+
+footer{margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+@media (max-width:600px){
+  body{font-size:14.5px}
+  .panel-body{padding:16px}
+  .panel-head{padding:13px 16px}
+  .hero{padding:22px 16px 18px}
+  .stat{padding:12px 14px}
+  footer{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ─── 사이트 껍데기 ─────────────────────────────────────── */
+.sitenav{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:20}
+.sitenav .in{max-width:1160px;margin:0 auto;padding:0 20px;display:flex;
+  align-items:center;gap:10px;min-height:58px;flex-wrap:wrap}
+.sitenav .brand{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:19px;
+  color:var(--ink);text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.sitenav .brand em{font-style:normal;color:var(--accent)}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;
+  padding:8px 10px;border-radius:7px;white-space:nowrap}
+.navlinks a:hover{background:var(--surface-2);color:var(--ink)}
+.navlinks a[aria-current="page"]{color:var(--accent-ink);font-weight:700;background:var(--accent-soft)}
+@media (max-width:600px){.sitenav .in{padding:0 14px;min-height:52px}
+  .navlinks a{font-size:12.5px;padding:7px 8px}}
+
+.sitefoot{border-top:1px solid var(--line);margin-top:44px;background:var(--surface)}
+.sitefoot .in{max-width:1160px;margin:0 auto;padding:26px 20px 42px;
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between}
+.sitefoot a{color:var(--ink-2);text-decoration:none;font-size:13px}
+.sitefoot a:hover{color:var(--accent-ink);text-decoration:underline}
+.sitefoot .links{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.sitefoot .small{font-size:12px;color:var(--muted);max-width:62ch;line-height:1.75}
+@media (max-width:600px){.sitefoot .in{padding:22px 14px 34px}}
+
+/* ─── 허브 ─────────────────────────────────────────────── */
+.landing{
+  background:
+    radial-gradient(60% 120% at 15% 0%, rgba(255,107,0,.09), transparent 60%),
+    radial-gradient(50% 100% at 85% 10%, rgba(255,107,0,.05), transparent 55%),
+    var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(38px,7vw,72px) 20px clamp(30px,5vw,52px);
+}
+.landing-in{max-width:1160px;margin:0 auto}
+.landing .eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent-soft);border:1px solid #FFDCC0;
+  font-weight:700;margin:0 0 16px;padding:5px 11px;border-radius:999px
+}
+.landing h1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(30px,6.4vw,54px);line-height:1.14;margin:0;letter-spacing:-.015em
+}
+.landing h1 em{font-style:normal;color:var(--accent)}
+.landing .lede{
+  margin:16px 0 0;color:var(--muted);max-width:56ch;
+  font-size:clamp(14px,2.6vw,15.5px);line-height:1.75
+}
+
+.search{
+  position:relative;display:flex;align-items:center;margin-top:26px;max-width:520px
+}
+.search svg{
+  position:absolute;left:16px;width:19px;height:19px;fill:none;
+  stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none
+}
+.search input{
+  width:100%;min-height:54px;padding:14px 46px 14px 46px;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--ink);border:1.5px solid var(--line-2);
+  border-radius:12px;font-family:"Noto Sans KR",sans-serif;box-shadow:var(--shadow)
+}
+.search input::placeholder{color:var(--muted);font-weight:400}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+#qclear{
+  position:absolute;right:10px;width:30px;height:30px;border:0;border-radius:50%;
+  background:var(--surface-2);color:var(--ink-2);font-size:19px;line-height:1;cursor:pointer
+}
+#qclear:hover{background:var(--line)}
+
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding:22px 0 18px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;padding:9px 15px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1.5px solid var(--line);color:var(--ink-2);
+  font:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;transition:all .12s
+}
+.tab:hover{border-color:var(--line-2);color:var(--ink)}
+.tab .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;opacity:.6;margin-left:3px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab[aria-selected="true"] .n{opacity:.8}
+
+.group{margin-bottom:28px}
+.group[hidden]{display:none}
+.group h2{
+  font-size:14px;font-weight:700;margin:0 0 12px;color:var(--muted);
+  letter-spacing:.02em;display:flex;align-items:center;gap:10px
+}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:5px;
+  padding:17px 40px 17px 18px;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;text-decoration:none;
+  box-shadow:var(--shadow);transition:border-color .12s,transform .08s
+}
+.card[hidden]{display:none}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .cname{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.card .ckw{font-size:12.5px;color:var(--muted);line-height:1.55}
+.star{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;
+  border:0;background:transparent;cursor:pointer;color:var(--line-2);
+  font-size:17px;line-height:1;border-radius:8px
+}
+.star:hover{background:var(--surface-2);color:var(--accent)}
+.star[aria-pressed="true"]{color:var(--accent)}
+.empty{
+  text-align:center;color:var(--muted);padding:44px 20px;font-size:14.5px;
+  background:var(--surface);border:1px dashed var(--line-2);border-radius:12px
+}
+
+.related{margin-top:34px}
+.related h2{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(19px,3.8vw,24px);margin:0 0 14px;letter-spacing:-.01em
+}
+.related .allink{margin:14px 0 0;font-size:13.5px}
+.related .allink a{color:var(--accent-ink);text-decoration:none;font-weight:600}
+.related .allink a:hover{text-decoration:underline}
+
+header .eyebrow a{color:var(--accent-ink);text-decoration:none}
+header .eyebrow a:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .landing{padding:30px 14px 26px}
+  .cards{grid-template-columns:1fr}
+  .tabs{padding:18px 0 14px}
+}
+
+/* ─── 본문 ─────────────────────────────────────────────── */
+.prose{max-width:1160px;margin:0 auto;padding:8px 20px 0}
+.prose article{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:30px 28px;margin-top:20px;box-shadow:var(--shadow)}
+@media (max-width:600px){.prose article{padding:22px 17px}.prose{padding:8px 14px 0}}
+.prose .doch1{
+  font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em
+}
+.prose h2{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;
+  font-size:clamp(21px,4.4vw,29px);margin:0 0 16px;letter-spacing:-.01em}
+.prose h3{font-size:clamp(16px,3.3vw,19px);font-weight:700;margin:28px 0 10px;
+  letter-spacing:-.01em;color:var(--ink)}
+.prose h3:first-of-type{margin-top:20px}
+.prose p{margin:0 0 13px;color:var(--ink-2);line-height:1.85;max-width:68ch}
+.prose strong{color:var(--ink);font-weight:700}
+.prose ul{margin:0 0 15px;padding-left:20px}
+.prose li{color:var(--ink-2);line-height:1.85;margin-bottom:6px}
+.prose a{color:var(--accent-ink);font-weight:500}
+.prose .tablewrap{margin:15px 0 20px;border:1px solid var(--line);border-radius:10px;max-height:none}
+.prose table{min-width:400px}
+.prose .n{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+.faq details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+  background:var(--surface-3);overflow:hidden}
+.faq summary{cursor:pointer;padding:15px 17px;font-weight:700;font-size:14.5px;
+  list-style:none;color:var(--ink);display:flex;gap:10px;align-items:flex-start}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";color:var(--accent);font-family:"JetBrains Mono",monospace;
+  font-weight:700;flex-shrink:0}
+.faq details[open] summary{border-bottom:1px solid var(--line);background:var(--surface)}
+.faq .a{padding:15px 17px 17px;color:var(--ink-2);line-height:1.85;font-size:14px}
+
+/* ─── 엔진이 만드는 요소 ────────────────────────────────── */
+.sidenote{margin-top:14px;font-size:12.5px}
+#extra:empty{display:none}
+</style>
+<meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "국민연금 예상 수령액 계산기", "url": "https://moducalc.kr/yeongeum/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "가입 시작 연도와 가입기간, 기준소득월액으로 노령연금 월 수령액을 계산합니다. 연도별 소득대체율 상수, 20년 초과 가산, 조기수령 감액과 연기연금 가산을 모두 반영합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "A값을 모르는데 어떻게 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "국민연금공단이 해마다 고시하는 ‘전체 가입자 평균소득월액’입니다. 기본값은 최근 수준의 어림값으로 넣어두었습니다. 정확한 금액이 필요하면 공단 고시값으로 바꿔 넣으세요. A값이 공식의 절반을 차지하므로 결과에 그대로 영향을 줍니다."}}, {"@type": "Question", "name": "B값은 지금 연봉을 넣으면 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 가입기간 전체의 기준소득월액 평균입니다. 신입 때 낮은 소득도 함께 평균에 들어가므로 현재 월급보다 낮게 잡는 편이 실제에 가깝습니다."}}, {"@type": "Question", "name": "25년 가입인데 소득대체율이 40%가 안 됩니다.", "acceptedAnswer": {"@type": "Answer", "text": "정상입니다. 40%는 40년을 가입했을 때의 값입니다. 가입기간이 절반이면 대체율도 대략 절반입니다. 가입기간이 연금액을 정하는 가장 큰 변수입니다."}}, {"@type": "Question", "name": "조기수령을 하면 나중에 원래 금액으로 돌아오나요?", "acceptedAnswer": {"@type": "Answer", "text": "돌아오지 않습니다. 감액된 금액이 평생 고정됩니다. 5년 조기수령이면 평생 70%만 받습니다."}}, {"@type": "Question", "name": "공단 예상액과 금액이 다릅니다.", "acceptedAnswer": {"@type": "Answer", "text": "공단은 실제 납부 이력과 과거 소득의 물가 재평가를 모두 반영하고, 부양가족연금액도 더합니다. 이 계산기는 공식만 적용한 오늘 화폐가치 기준값이라 차이가 납니다. 공단 ‘내 연금 알아보기’ 결과가 언제나 우선합니다."}}, {"@type": "Question", "name": "국민연금이 고갈된다는데 계산이 의미가 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "기금 소진 시점과 제도 개편은 이 계산기가 답할 수 있는 영역이 아닙니다. 이 페이지는 현행 법령의 산식을 그대로 적용해 금액을 보여줄 뿐입니다. 보험료율이나 소득대체율이 개정되면 결과도 달라집니다."}}]}]</script>
+<meta name="google-adsense-account" content="ca-pub-9144223736026563">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="sitenav"><div class="in">
+<a class="brand" href="../">모두<em>계산기</em></a>
+<div class="navlinks"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></nav>
+<div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 급여·노무</p><h1>국민연금 예상 수령액 계산기</h1><p>가입 시작 연도와 가입기간, 기준소득월액으로 노령연금 월 수령액을 계산합니다. 연도별 소득대체율 상수, 20년 초과 가산, 조기수령 감액과 연기연금 가산을 모두 반영합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
+<h3>국민연금은 낸 만큼 받는 제도가 아닙니다</h3>
+<p>가장 먼저 알아야 할 부분입니다. 연금액 공식에는 본인 소득만 들어가는 게 아니라
+<strong>전체 가입자의 평균소득(A값)</strong>이 같은 비중으로 들어갑니다.</p>
+<p><strong>기본연금액 = 상수 × (A값 + B값) × (1 + 0.05 × 20년 초과 가입연수)</strong></p>
+<ul>
+<li><strong>A값</strong> — 연금을 받기 직전 3년간 전체 가입자의 평균소득월액. 국민연금공단이 해마다 고시합니다.</li>
+<li><strong>B값</strong> — 본인이 가입기간 내내 낸 기준소득월액의 평균.</li>
+</ul>
+<p>A값이 절반을 차지하기 때문에 <strong>소득이 낮을수록 낸 돈 대비 수익률이 높고,
+소득이 높을수록 낮아집니다.</strong> 이것이 국민연금의 소득재분배 기능입니다.
+고소득자가 "낸 만큼 못 받는다"고 느끼는 이유가 공식 자체에 있습니다.</p>
+
+<h3>가입 연도마다 상수가 다릅니다</h3>
+<p>대부분의 온라인 계산기가 생략하는 부분인데, 결과 차이가 꽤 납니다.
+같은 25년을 가입해도 <strong>언제 가입했느냐</strong>에 따라 금액이 달라집니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>가입 시기</th><th>상수</th><th>소득대체율</th><th>비고</th></tr></thead>
+<tbody>
+<tr><td>1988~1998</td><td class="n">2.4</td><td class="n">70%</td><td>B값을 75%만 반영</td></tr>
+<tr><td>1999~2007</td><td class="n">1.8</td><td class="n">60%</td><td>—</td></tr>
+<tr><td>2008</td><td class="n">1.5</td><td class="n">50%</td><td>해마다 0.015씩 인하 시작</td></tr>
+<tr><td>2028 이후</td><td class="n">1.2</td><td class="n">40%</td><td>이후 고정</td></tr>
+</tbody></table></div>
+<p>가입기간이 여러 구간에 걸쳐 있으면 <strong>구간별로 따로 계산해 가입월수 비율로 합칩니다.</strong>
+이 계산기는 가입 시작 연도부터 한 해씩 상수를 매겨 더하기 때문에 단일 상수로 뭉뚱그린
+계산기보다 실제에 가깝습니다. 결과 아래 표에서 본인 가입기간이 어느 구간에 얼마나
+걸쳐 있는지 확인할 수 있습니다.</p>
+
+<h3>소득대체율 40%가 뜻하는 것</h3>
+<p>흔히 오해가 생기는 표현입니다. 여기서 40%는 <strong>‘40년을 가입했을 때’ 평균소득의 40%</strong>라는
+뜻입니다. 40년을 채우는 사람은 많지 않습니다. 20년만 가입하면 대체율은 그 절반인
+20% 수준으로 내려갑니다.</p>
+<p>계산기에서 가입기간만 바꿔가며 ‘소득대체율’ 항목을 비교해 보세요.
+가입기간이 연금액을 결정하는 가장 큰 변수라는 게 바로 보입니다.</p>
+
+<h3>20년을 넘기면 1년마다 5%씩 늘어납니다</h3>
+<p>가입기간이 240개월을 넘으면 초과분 1년마다 <strong>5%</strong>가 가산됩니다.
+25년이면 5년 초과라 25% 가산, 30년이면 50% 가산입니다.</p>
+<p>가산이 <strong>정률</strong>이라 뒤로 갈수록 체감이 큽니다.
+가입기간을 늘릴 수 있는 상황이라면 임의계속가입이나 추납(추후납부) 제도를 확인해 볼
+값어치가 있습니다. 다만 추납은 낸 만큼 기간이 늘어나는 것이라
+본인 소득 수준에 따라 유불리가 갈립니다.</p>
+
+<h3>조기수령과 연기연금 — 손익분기는 77세와 84세</h3>
+<p>수령 시기는 최대 5년 당기거나 미룰 수 있습니다.</p>
+<ul>
+<li><strong>조기노령연금</strong> — 1년 당길 때마다 <strong>6% 감액</strong>. 5년이면 30% 감액이고,
+이 금액이 <strong>평생 고정</strong>됩니다.</li>
+<li><strong>연기연금</strong> — 1년 미룰 때마다 <strong>7.2% 가산</strong>. 5년이면 36% 가산입니다.</li>
+</ul>
+<p>단순 누적액 기준으로 계산하면 이렇습니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>선택</th><th>월액</th><th>정상 수령과 총액이 같아지는 나이</th></tr></thead>
+<tbody>
+<tr><td>5년 조기 (만 60세)</td><td class="n">70%</td><td class="n">약 77세</td></tr>
+<tr><td>정상 (만 65세)</td><td class="n">100%</td><td class="n">기준</td></tr>
+<tr><td>5년 연기 (만 70세)</td><td class="n">136%</td><td class="n">약 84세</td></tr>
+</tbody></table></div>
+<p>즉 <strong>77세보다 오래 살 것 같으면 조기수령이 손해</strong>이고,
+<strong>84세를 넘겨야 연기연금이 이득</strong>입니다.
+건강 상태, 당장의 생활비, 다른 소득이 있는지에 따라 답이 달라지는 문제입니다.
+숫자만으로 정해지지 않습니다.</p>
+
+<h3>낸 돈은 언제 회수되나</h3>
+<p>보험료율은 기준소득월액의 <strong>9%</strong>입니다. 직장가입자는 절반인 4.5%만 본인이 내고
+나머지는 회사가 냅니다. 지역가입자는 9% 전액을 본인이 냅니다.</p>
+<p>계산 결과 아래에 낸 보험료 총액과 회수 기간이 나옵니다.
+대체로 <strong>전액 기준 8~10년, 본인 부담분만 보면 4~5년</strong>이면 원금이 돌아옵니다.
+평균수명을 생각하면 개인 입장에서 손해 보기 어려운 구조입니다.
+직장가입자는 회사 부담분까지 받는 셈이라 특히 그렇습니다.</p>
+
+<h3>이 계산기가 반영하지 않는 것</h3>
+<p>실제 연금액과 차이가 나는 지점을 분명히 적어 둡니다.</p>
+<ul>
+<li><strong>물가상승률 재평가</strong> — 과거 소득은 현재가치로 재평가되고, 연금 개시 후에도 매년
+물가에 연동해 오릅니다. 이 계산기 결과는 <strong>오늘의 화폐가치</strong> 기준이라
+실제 수령 시점의 액면 금액보다 작게 보입니다.</li>
+<li><strong>부양가족연금액</strong> — 배우자·자녀·부모가 있으면 정액이 더해집니다. 해마다 바뀝니다.</li>
+<li><strong>소득활동에 따른 감액</strong> — 연금을 받으면서 일정 소득 이상을 벌면 최대 5년간 감액됩니다.</li>
+<li><strong>제도 개편</strong> — 보험료율, 소득대체율, 수급 개시 연령은 법 개정 대상입니다.</li>
+</ul>
+<p>정확한 금액은 <strong>국민연금공단 ‘내 연금 알아보기’</strong>에서 실제 납부 이력으로 확인하세요.
+이 계산기는 공식이 어떻게 생겼는지, 가입기간과 수령 시기를 바꾸면 얼마나 달라지는지를
+직접 만져보는 용도입니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>A값을 모르는데 어떻게 하나요?</summary><div class="a">국민연금공단이 해마다 고시하는 ‘전체 가입자 평균소득월액’입니다. 기본값은 최근 수준의 어림값으로 넣어두었습니다. 정확한 금액이 필요하면 공단 고시값으로 바꿔 넣으세요. A값이 공식의 절반을 차지하므로 결과에 그대로 영향을 줍니다.</div></details>
+<details><summary>B값은 지금 연봉을 넣으면 되나요?</summary><div class="a">아닙니다. 가입기간 전체의 기준소득월액 평균입니다. 신입 때 낮은 소득도 함께 평균에 들어가므로 현재 월급보다 낮게 잡는 편이 실제에 가깝습니다.</div></details>
+<details><summary>25년 가입인데 소득대체율이 40%가 안 됩니다.</summary><div class="a">정상입니다. 40%는 40년을 가입했을 때의 값입니다. 가입기간이 절반이면 대체율도 대략 절반입니다. 가입기간이 연금액을 정하는 가장 큰 변수입니다.</div></details>
+<details><summary>조기수령을 하면 나중에 원래 금액으로 돌아오나요?</summary><div class="a">돌아오지 않습니다. 감액된 금액이 평생 고정됩니다. 5년 조기수령이면 평생 70%만 받습니다.</div></details>
+<details><summary>공단 예상액과 금액이 다릅니다.</summary><div class="a">공단은 실제 납부 이력과 과거 소득의 물가 재평가를 모두 반영하고, 부양가족연금액도 더합니다. 이 계산기는 공식만 적용한 오늘 화폐가치 기준값이라 차이가 납니다. 공단 ‘내 연금 알아보기’ 결과가 언제나 우선합니다.</div></details>
+<details><summary>국민연금이 고갈된다는데 계산이 의미가 있나요?</summary><div class="a">기금 소진 시점과 제도 개편은 이 계산기가 답할 수 있는 영역이 아닙니다. 이 페이지는 현행 법령의 산식을 그대로 적용해 금액을 보여줄 뿐입니다. 보험료율이나 소득대체율이 개정되면 결과도 달라집니다.</div></details></article></div><div class="wrap"><section class="related"><h2>급여·노무 계산기 더 보기</h2><div class="cards"><a class="card" href="../juhyu/"><span class="cname">주휴수당 계산기</span><span class="ckw">시급·주 근로시간으로 주휴수당과 월급 환산</span></a><a class="card" href="../insurance/"><span class="cname">4대보험 계산기</span><span class="ckw">국민연금·건강보험·고용보험 근로자/사업주 부담</span></a><a class="card" href="../salary/"><span class="cname">연봉 실수령액 계산기</span><span class="ckw">연봉에서 4대보험·소득세 빼고 월 실수령액</span></a><a class="card" href="../severance/"><span class="cname">퇴직금 계산기</span><span class="ckw">재직기간과 평균임금으로 퇴직금 산정</span></a><a class="card" href="../yeoncha/"><span class="cname">연차 개수 계산기</span><span class="ckw">입사일 기준 연차 일수와 가산 연차</span></a><a class="card" href="../silup/"><span class="cname">실업급여 계산기</span><span class="ckw">구직급여 일액·소정급여일수·총 수령액</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
+ *
+ * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
+ * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
+ *
+ *   Calc.mount({
+ *     id: "vat",
+ *     fields: [{k:"amount", label:"공급가액", suffix:"원", value:1000000}],
+ *     compute: function(v){ return { hero:{...}, stats:[...], rows:[...] }; }
+ *   });
+ */
+(function (global) {
+  "use strict";
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var F = {
+    won: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      return Math.round(n).toLocaleString("ko-KR") + "원";
+    },
+    /* 1,234,567,890 -> "12억 3,456만원". 큰 금액은 자릿수를 세지 않고 읽히게 한다. */
+    kor: function (n) {
+      if (n == null || !isFinite(n)) return "—";
+      var neg = n < 0;
+      n = Math.floor(Math.abs(n));
+      if (n < 10000) return (neg ? "-" : "") + n.toLocaleString("ko-KR") + "원";
+      var eok = Math.floor(n / 100000000), man = Math.floor((n % 100000000) / 10000);
+      var out = [];
+      if (eok) out.push(eok.toLocaleString("ko-KR") + "억");
+      if (man) out.push(man.toLocaleString("ko-KR") + "만");
+      return (neg ? "-" : "") + out.join(" ") + "원";
+    },
+    num: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: d == null ? 0 : d });
+    },
+    pct: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return n.toFixed(d == null ? 2 : d) + "%";
+    },
+    signed: function (n, d) {
+      if (n == null || !isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + n.toFixed(d == null ? 2 : d) + "%";
+    }
+  };
+
+  function Calc(spec) {
+    this.spec = spec;
+    this.key = "moducalc:" + spec.id;
+    this.root = document.getElementById("calc");
+    this.inputs = {};
+  }
+
+  Calc.prototype.build = function () {
+    var self = this, s = this.spec;
+
+    var grid = el("div", "grid");
+    var side = el("div", "side");
+    var panel = el("div", "panel");
+    panel.appendChild(el("div", "panel-head", "<h2>" + (s.formTitle || "입력") + "</h2>"));
+    var body = el("div", "panel-body");
+
+    (s.fields || []).forEach(function (f) {
+      body.appendChild(self.field(f));
+    });
+    panel.appendChild(body);
+    side.appendChild(panel);
+    if (s.sideNote) side.appendChild(el("div", "note sidenote", s.sideNote));
+    grid.appendChild(side);
+
+    var stack = el("div", "stack");
+    var res = el("div", "panel");
+    res.appendChild(el("div", "panel-head",
+      "<h2>" + (s.resultTitle || "결과") + "</h2><span class='hint' id='resHint'></span>"));
+    res.appendChild(el("div", "hero", ""));
+    res.appendChild(el("div", "stats", ""));
+    var extra = el("div", "panel-body");
+    extra.id = "extra";
+    res.appendChild(extra);
+    stack.appendChild(res);
+
+    var tbl = el("div", "panel");
+    tbl.id = "tablePanel";
+    tbl.style.display = "none";
+    tbl.appendChild(el("div", "panel-head",
+      "<h2>" + (s.tableTitle || "상세") + "</h2><span class='hint' id='tblHint'></span>"));
+    var wrap = el("div", "tablewrap");
+    wrap.appendChild(el("table", "", "<thead></thead><tbody></tbody>"));
+    tbl.appendChild(wrap);
+    stack.appendChild(tbl);
+
+    grid.appendChild(stack);
+    this.root.appendChild(grid);
+
+    this.hero = res.querySelector(".hero");
+    this.stats = res.querySelector(".stats");
+    this.extra = extra;
+    this.tablePanel = tbl;
+    this.thead = tbl.querySelector("thead");
+    this.tbody = tbl.querySelector("tbody");
+    this.hint = res.querySelector("#resHint");
+    this.tblHint = tbl.querySelector("#tblHint");
+  };
+
+  Calc.prototype.field = function (f) {
+    var self = this;
+    var wrap = el("div", "field");
+    var lab = el("label", "", f.label + (f.sub ? " <span class='sub'>" + f.sub + "</span>" : ""));
+    lab.setAttribute("for", "f_" + f.k);
+    wrap.appendChild(lab);
+
+    if (f.type === "seg") {
+      var seg = el("div", "seg");
+      f.options.forEach(function (o, i) {
+        var b = el("button", "", o.label);
+        b.type = "button";
+        b.dataset.v = o.value;
+        b.setAttribute("aria-pressed", String(i === 0));
+        b.addEventListener("click", function () {
+          seg.querySelectorAll("button").forEach(function (x) {
+            x.setAttribute("aria-pressed", "false");
+          });
+          b.setAttribute("aria-pressed", "true");
+          self.run();
+        });
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      this.inputs[f.k] = { type: "seg", node: seg };
+    } else if (f.type === "select") {
+      var sel = el("select");
+      sel.id = "f_" + f.k;
+      f.options.forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o.value; op.textContent = o.label;
+        sel.appendChild(op);
+      });
+      if (f.value != null) sel.value = f.value;
+      sel.addEventListener("change", function () { self.run(); });
+      wrap.appendChild(sel);
+      this.inputs[f.k] = { type: "select", node: sel };
+    } else {
+      var ctl = el("div", "control");
+      var inp = document.createElement("input");
+      inp.type = f.type === "date" ? "date" : "number";
+      inp.id = "f_" + f.k;
+      if (f.step != null) inp.step = f.step;
+      if (f.min != null) inp.min = f.min;
+      if (f.value != null) inp.value = f.value;
+      if (f.suffix) inp.className = "has-suffix";
+      inp.addEventListener("input", function () { self.run(); });
+      ctl.appendChild(inp);
+      if (f.suffix) ctl.appendChild(el("span", "suffix", f.suffix));
+      wrap.appendChild(ctl);
+      if (f.note) wrap.appendChild(el("div", "readout", f.note));
+      this.inputs[f.k] = { type: "num", node: inp };
+    }
+    return wrap;
+  };
+
+  Calc.prototype.values = function () {
+    var v = {};
+    for (var k in this.inputs) {
+      var it = this.inputs[k];
+      if (it.type === "seg") {
+        var on = it.node.querySelector('button[aria-pressed="true"]');
+        v[k] = on ? on.dataset.v : null;
+        if (v[k] !== null && v[k] !== "" && !isNaN(v[k])) v[k] = +v[k];
+      } else if (it.type === "select") {
+        v[k] = isNaN(it.node.value) || it.node.value === "" ? it.node.value : +it.node.value;
+      } else if (it.node.type === "date") {
+        v[k] = it.node.value;
+      } else {
+        v[k] = it.node.value === "" ? null : +it.node.value;
+      }
+    }
+    return v;
+  };
+
+  Calc.prototype.run = function () {
+    var out;
+    try {
+      out = this.spec.compute(this.values(), F);
+    } catch (e) {
+      out = { hero: { k: "오류", v: "입력값을 확인해 주세요" } };
+    }
+    if (!out) return;
+
+    var h = out.hero || {};
+    this.hero.innerHTML =
+      "<div class='k'>" + (h.k || "") + "</div>" +
+      "<div class='v display " + (h.cls || "") + "'>" + (h.v || "—") + "</div>" +
+      (h.sub ? "<div class='exact'>" + h.sub + "</div>" : "");
+
+    this.stats.innerHTML = (out.stats || []).map(function (s) {
+      return "<div class='stat'><div class='k'>" + s.k + "</div>" +
+        "<div class='v num " + (s.cls || "") + "'>" + s.v + "</div>" +
+        (s.sub ? "<div class='sub'>" + s.sub + "</div>" : "") + "</div>";
+    }).join("");
+    this.stats.style.display = (out.stats && out.stats.length) ? "" : "none";
+
+    this.extra.innerHTML = out.extra || "";
+    this.extra.style.display = out.extra ? "" : "none";
+    this.hint.textContent = out.hint || "";
+
+    if (out.rows && out.rows.length) {
+      this.tablePanel.style.display = "";
+      this.thead.innerHTML = "<tr>" + (out.cols || []).map(function (c) {
+        return "<th>" + c + "</th>";
+      }).join("") + "</tr>";
+      this.tbody.innerHTML = out.rows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          return "<td" + (i ? " class='n'" : "") + ">" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      this.tblHint.textContent = out.tableHint || "";
+    } else {
+      this.tablePanel.style.display = "none";
+    }
+
+    this.save();
+  };
+
+  Calc.prototype.save = function () {
+    try {
+      var v = {};
+      for (var k in this.inputs) {
+        var it = this.inputs[k];
+        v[k] = it.type === "seg"
+          ? (it.node.querySelector('button[aria-pressed="true"]') || {}).dataset.v
+          : it.node.value;
+      }
+      localStorage.setItem(this.key, JSON.stringify(v));
+    } catch (e) {}
+  };
+
+  Calc.prototype.load = function () {
+    try {
+      var v = JSON.parse(localStorage.getItem(this.key) || "null");
+      if (!v) return;
+      for (var k in v) {
+        var it = this.inputs[k];
+        if (!it || v[k] == null) continue;
+        if (it.type === "seg") {
+          it.node.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.v === v[k]));
+          });
+        } else {
+          it.node.value = v[k];
+        }
+      }
+    } catch (e) {}
+  };
+
+  global.Calc = {
+    fmt: F,
+    mount: function (spec) {
+      var c = new Calc(spec);
+      c.build();
+      c.load();
+      c.run();
+      return c;
+    }
+  };
+})(window);
+</script><script>
+Calc.mount({
+  id:"yeongeum",
+  formTitle:"가입 정보",
+  sideNote:"A값은 국민연금공단이 해마다 고시합니다. 기본값은 최근 수준의 어림값이니 정확한 금액이 필요하면 공단 고시값으로 바꿔 넣으세요. 공단 ‘내 연금 알아보기’ 결과가 언제나 우선합니다.",
+  fields:[
+    {k:"start", label:"가입 시작 연도", sub:"처음 보험료를 낸 해", value:2010, step:1, min:1988},
+    {k:"years", label:"총 가입기간", suffix:"년", value:25, step:1, min:1},
+    {k:"b", label:"기준소득월액 평균 (B값)", sub:"가입기간 전체의 월 소득 평균", suffix:"원", value:3000000, step:100000, min:0},
+    {k:"a", label:"A값", sub:"전체 가입자 평균소득월액, 해마다 고시", suffix:"원", value:3090000, step:10000, min:0},
+    {k:"when", label:"수령 시기", type:"seg", options:[
+      {value:"wn", label:"정상 (만 65세)"}, {value:"we", label:"조기수령"}, {value:"wd", label:"연기연금"}]},
+    {k:"adj", label:"조기·연기 연수", sub:"각각 최대 5년", suffix:"년", value:0, step:1, min:0}
+  ],
+  compute:function(v,F){
+    var A=Math.max(0,v.a||0), B=Math.max(0,v.b||0);
+    var yrs=Math.max(1, Math.round(v.years||0)), start=Math.max(1988, Math.round(v.start||1988));
+    var P=yrs*12;   /* 총 가입월수 */
+
+    /* 연도별 소득대체율 상수.
+       1988~1998 은 2.4 이지만 B값을 75% 만 반영한다 (별표 그대로).
+       2008 년 1.5 에서 해마다 0.015 씩 깎여 2028 년 1.2 로 고정된다. */
+    function konst(y){
+      if(y<=1998) return 2.4;
+      if(y<=2007) return 1.8;
+      return Math.max(1.2, 1.5 - 0.015*(y-2008));
+    }
+    function weight(y){ return y<=1998 ? 0.75 : 1.0; }
+
+    /* 구간별로 (상수 × (A + w·B)) 를 가입월수 비율로 가중합한다. */
+    var sum=0, cAvg=0, era={};
+    for(var i=0;i<yrs;i++){
+      var y=start+i, c=konst(y);
+      sum += c*(A + weight(y)*B) * (12/P);
+      cAvg += c/yrs;
+      var key = y<=1998 ? "1988~1998" : (y<=2007 ? "1999~2007" : "2008 이후");
+      era[key]=(era[key]||0)+1;
+    }
+
+    /* 20년(240개월) 초과분은 1년마다 5% 가산 */
+    var over=Math.max(0, P-240);
+    var bonus=1 + 0.05*over/12;
+    var basicYear=sum*bonus;
+    var m0=basicYear/12;                       /* 정상 수령 월액 */
+
+    /* 조기 1년당 -6%, 연기 1년당 +7.2%. 둘 다 5년이 상한. */
+    var adj=Math.min(5, Math.max(0, Math.round(v.adj||0)));
+    var rate=1, label="만 65세 수령";
+    if(v.when==="we"){ rate=1-0.06*adj; label="만 "+(65-adj)+"세 조기수령 (−"+F.num(adj*6)+"%)"; }
+    else if(v.when==="wd"){ rate=1+0.072*adj; label="만 "+(65+adj)+"세 연기수령 (+"+F.num(adj*7.2,1)+"%)"; }
+    else adj=0;
+    var m=m0*rate;
+
+    /* 낸 보험료와 회수 시점. 보험료율 9% (직장은 본인 4.5% + 회사 4.5%) */
+    var paidAll=B*0.09*P, paidSelf=B*0.045*P;
+    var backAll = m>0 ? paidAll/m : 0;         /* 개월 */
+    var backSelf = m>0 ? paidSelf/m : 0;
+
+    var repl = B>0 ? m/B*100 : 0;
+
+    var eraRows=[];
+    ["1988~1998","1999~2007","2008 이후"].forEach(function(k){
+      if(era[k]) eraRows.push([k, era[k]+"년",
+        k==="1988~1998" ? "2.4 (B값 75%)" : (k==="1999~2007" ? "1.8" : "1.5 → 1.2"),
+        F.num(era[k]/yrs*100,1)+"%"]);
+    });
+
+    return {
+      hero:{k:"예상 월 수령액", v:F.won(m), sub:label+" · 가입 "+yrs+"년", cls:"up"},
+      stats:[
+        {k:"연 수령액", v:F.kor(m*12), sub:F.won(m*12)},
+        {k:"소득대체율", v:F.pct(repl,1), sub:"B값 "+F.won(B)+" 대비"},
+        {k:"20년 초과 가산", v: over>0 ? "+"+F.pct(0.05*over/12*100,1) : "없음",
+         sub: over>0 ? Math.floor(over/12)+"년 "+(over%12)+"개월 초과" : "20년 이하"}
+      ],
+      hint:"평균 상수 "+F.num(cAvg,3),
+      cols:["가입 구간","기간","소득대체율 상수","비중"],
+      rows:eraRows,
+      tableHint:"가입 연도에 따라 상수가 달라 구간별로 나눠 계산합니다",
+      extra:"<div class='note'>"+
+        "가입기간 동안 낸 보험료는 <b>"+F.kor(paidAll)+"</b>입니다 "+
+        "(직장가입자라면 본인 부담은 절반인 <b>"+F.kor(paidSelf)+"</b>). "+
+        "지금 계산된 월 "+F.won(m)+"으로 받으면 <b>"+F.num(backAll/12,1)+"년</b>이면 "+
+        "전액이, 본인 부담분만 보면 <b>"+F.num(backSelf/12,1)+"년</b>이면 회수됩니다."+
+        (adj>0 && v.when==="we"
+          ? "<br><br>조기수령은 <b>평생 "+F.num(adj*6)+"% 깎인 금액</b>으로 고정됩니다. "+
+            "먼저 받기 시작한 "+adj+"년치를 정상 수령이 따라잡는 시점은 대략 만 "+
+            F.num(65 + (1-0.06*adj)/0.06, 0)+"세 언저리입니다."
+          : "")+
+        (adj>0 && v.when==="wd"
+          ? "<br><br>연기연금은 <b>평생 "+F.num(adj*7.2,1)+"% 늘어난 금액</b>으로 고정되지만 "+
+            adj+"년치를 포기합니다. 포기한 금액을 되찾는 시점은 대략 만 "+
+            F.num(65 + (1+0.072*adj)/0.072, 0)+"세 언저리입니다."
+          : "")+
+        "<br><br>실제 연금은 여기에 <b>물가상승률 재평가</b>가 매년 붙습니다. "+
+        "위 금액은 오늘의 화폐가치 기준이라 실제 수령 시점의 액면 금액보다 작게 보입니다."+
+        "</div>"
+    };
+  }
+});</script>
+<footer class="sitefoot"><div class="in">
+<div class="small">
+  <strong>모두계산기</strong> · 급여, 대출, 세금, 부동산 계산을 한곳에서.<br>
+  계산 결과는 입력한 값에 대한 산술 결과이며 법률·세무·투자 자문이 아닙니다.
+  세율과 요율은 해마다 바뀌므로 중요한 판단에는 관계 기관 자료를 확인하세요.<br>
+  문의 <a href="mailto:gimm93882@gmail.com">gimm93882@gmail.com</a>
+</div>
+<div class="links"><a href="../">전체 계산기</a>
+<a href="../about.html">소개</a>
+<a href="../privacy.html">개인정보처리방침</a>
+<a href="../terms.html">이용약관</a></div>
+</div></footer>
+</body>
+</html>
