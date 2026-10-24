@@ -371,7 +371,7 @@ header .eyebrow a:hover{text-decoration:underline}
 #extra:empty{display:none}
 </style>
 <meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "날짜 계산기", "url": "https://moducalc.kr/date/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "당일이 포함되나요?", "acceptedAnswer": {"@type": "Answer", "text": "기본 계산은 당일을 빼고 셉니다. 결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다."}}, {"@type": "Question", "name": "공휴일과 주말을 뺀 영업일도 셀 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "현재는 달력상 일수만 계산합니다. 영업일 계산은 공휴일 지정이 해마다 달라져 별도 확인이 필요합니다."}}, {"@type": "Question", "name": "날짜를 비워두면 어떻게 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "오늘 날짜가 기준으로 들어갑니다."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "날짜 계산기", "url": "https://moducalc.kr/date/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "당일이 포함되나요?", "acceptedAnswer": {"@type": "Answer", "text": "기본 계산은 당일을 빼고 셉니다(민법 제157조 초일불산입). 결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다. 다만 기간이 오전 0시부터 시작하거나 나이를 계산할 때는 초일을 넣습니다."}}, {"@type": "Question", "name": "‘3개월 후’는 90일인가요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 월 단위 기간은 날짜를 더하지 않고 달력으로 계산합니다. 1월 10일부터 3개월이면 4월 9일에 만료하고, 실제 일수는 89일입니다. 어느 달에 걸치느냐에 따라 89~92일로 달라집니다."}}, {"@type": "Question", "name": "1월 31일부터 1개월이면 언제까지인가요?", "acceptedAnswer": {"@type": "Answer", "text": "2월 28일(윤년이면 29일)까지입니다. 2월에는 31일이 없으므로 그 달의 말일에 만료합니다(민법 제160조 3항)."}}, {"@type": "Question", "name": "공휴일과 주말을 뺀 영업일도 셀 수 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "현재는 달력상 일수만 계산합니다. 공휴일 지정이 해마다 달라지고 대체공휴일·임시공휴일이 추가되기 때문입니다. 주 5일 기준으로 달력 일수에 5/7을 곱하면 근사치는 나옵니다."}}, {"@type": "Question", "name": "신고 기한 마지막 날이 토요일이면 어떻게 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "다음 영업일로 넘어갑니다(민법 제161조). 이 계산기는 달력 일수만 세므로 휴일 보정은 반영하지 않습니다. 실제 기한은 해당 기관에서 확인하세요."}}, {"@type": "Question", "name": "기념일 100일은 왜 하루 차이가 나나요?", "acceptedAnswer": {"@type": "Answer", "text": "기념일은 만난 날을 1일째로 세는 관행이라 달력으로는 99일 뒤가 ‘100일’이 됩니다. ‘N일 후’ 기능에 99를 넣으시면 그 날짜가 나옵니다."}}, {"@type": "Question", "name": "날짜를 비워두면 어떻게 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "오늘 날짜가 기준으로 들어갑니다."}}]}]</script>
 <meta name="google-adsense-account" content="ca-pub-9144223736026563">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
 </head>
@@ -384,27 +384,83 @@ header .eyebrow a:hover{text-decoration:underline}
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
 <div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 부동산·생활</p><h1>날짜 계산기</h1><p>두 날짜 사이의 일수를 세거나, 기준일에서 N일 뒤·앞의 날짜를 계산합니다.</p></header><div id="calc"></div></div><div class="prose"><article>
-<h3>당일을 세느냐 마느냐</h3>
-<p>날짜 계산에서 다툼이 생기는 지점입니다. 이 계산기는 기본적으로 <strong>당일을 빼고</strong>
-셉니다. 1월 1일에서 1월 2일까지는 1일입니다. 당일을 포함하는 방식(초일 산입)으로 세면 2일이 됩니다.</p>
-<p>민법에서는 기간을 일·주·월·년으로 정한 때 초일을 넣지 않는 것이 원칙이지만,
-오전 0시부터 시작하는 경우나 개별 법령이 따로 정한 경우에는 초일을 넣습니다.
-계약서상 기한이나 법정 기간은 해당 규정을 확인하셔야 합니다.</p>
+<h3>당일을 세느냐 마느냐 — 초일불산입</h3>
+<p>날짜 계산에서 다툼이 가장 많이 생기는 지점입니다. 이 계산기는 기본적으로
+<strong>당일을 빼고</strong> 셉니다. 1월 1일에서 1월 2일까지는 1일입니다.
+당일을 포함해서 세면(초일 산입) 2일이 됩니다.</p>
+<p>민법 제157조는 기간을 일·주·월·년으로 정한 때 <strong>초일을 산입하지 않는 것</strong>을
+원칙으로 합니다. 다만 두 가지 예외가 있습니다.</p>
+<ul>
+<li><strong>기간이 오전 0시부터 시작하는 때</strong>는 초일을 넣습니다(제157조 단서).
+예를 들어 계약이 3월 1일 0시부터 효력이 생긴다면 3월 1일이 1일째입니다.</li>
+<li><strong>나이 계산</strong>은 출생일을 넣습니다(제158조). 그래서 만 나이는
+생일 당일에 한 살이 올라갑니다.</li>
+</ul>
+<p>결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다.</p>
+
+<h3>기간이 끝나는 날</h3>
+<p>세는 것보다 헷갈리는 게 만료일입니다. 민법은 이렇게 정하고 있습니다.</p>
+<ul>
+<li><strong>말일이 끝나야 기간이 끝납니다</strong>(제159조). "3월 31일까지"는
+3월 31일 밤 12시까지입니다. 3월 30일이 아닙니다.</li>
+<li><strong>말일이 토요일이나 공휴일이면 다음 날로 넘어갑니다</strong>(제161조).
+신고 기한이 토요일이면 월요일까지입니다. 이 계산기는 달력상 일수만 세므로
+이 부분은 직접 확인하셔야 합니다.</li>
+</ul>
+
+<h3>"3개월 후", "1년 후"는 며칠인가</h3>
+<p>월이나 년으로 정한 기간은 날짜를 더하는 게 아니라 <strong>달력으로 계산</strong>합니다
+(제160조). 3개월을 90일로 바꿔 세지 않습니다.</p>
+<p>기산일에 해당하는 날의 <strong>전날</strong>에 끝납니다. 1월 10일부터 3개월이면
+4월 10일이 아니라 <strong>4월 9일</strong>에 만료합니다.</p>
+<p>해당하는 날이 없으면 그 달의 말일에 끝납니다(제160조 3항).
+1월 31일부터 1개월이면 2월 31일이 없으므로 <strong>2월 28일</strong>(윤년이면 29일)에 만료합니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>기산일</th><th>기간</th><th>만료일</th></tr></thead>
+<tbody>
+<tr><td>1월 10일</td><td>3개월</td><td class="n">4월 9일</td></tr>
+<tr><td>1월 31일</td><td>1개월</td><td class="n">2월 28일 (윤년 29일)</td></tr>
+<tr><td>3월 15일</td><td>1년</td><td class="n">다음 해 3월 14일</td></tr>
+<tr><td>8월 31일</td><td>6개월</td><td class="n">다음 해 2월 28일</td></tr>
+</tbody></table></div>
+<p>이 계산기의 '두 날짜 사이' 기능으로 위 날짜를 넣으면 실제 일수가 나옵니다.
+같은 "3개월"이라도 어느 달에 걸치느냐에 따라 89일에서 92일까지 달라집니다.</p>
 
 <h3>디데이 표기</h3>
-<p>아직 오지 않은 날은 D-숫자, 지나간 날은 D+숫자로 씁니다.
-시험일이 30일 남았으면 D-30, 개업한 지 100일이 지났으면 D+100입니다.</p>
+<p>아직 오지 않은 날은 <strong>D-숫자</strong>, 지나간 날은 <strong>D+숫자</strong>로 씁니다.
+시험일이 30일 남았으면 D-30, 개업한 지 100일이 지났으면 D+100입니다.
+당일은 D-day 또는 D-0으로 적습니다.</p>
+<p>기념일은 관행이 조금 다릅니다. 100일·200일은 보통 <strong>만난 날을 1일째로 세서</strong>
+계산합니다. 그래서 달력으로는 99일 뒤가 '100일'이 됩니다.
+이 계산기로는 'N일 후' 기능에 99를 넣으면 그 날짜가 나옵니다.</p>
+
+<h3>영업일은 다릅니다</h3>
+<p>이 계산기는 <strong>달력상 일수</strong>만 셉니다. 주말과 공휴일을 빼는 영업일 계산은
+하지 않습니다. 공휴일 지정이 해마다 바뀌고 대체공휴일·임시공휴일이 추가되기 때문입니다.</p>
+<p>대략적인 감은 잡을 수 있습니다. 주 5일 기준으로 <strong>달력 7일 ≈ 영업일 5일</strong>이라
+달력 일수에 5/7을 곱하면 근사치가 나옵니다. 30일이면 약 21영업일입니다.
+다만 연휴가 끼면 어긋나므로 정확한 영업일은 달력을 직접 세셔야 합니다.</p>
 
 <h3>어디에 쓰나</h3>
 <ul>
-<li>계약 만료일까지 남은 기간 확인</li>
-<li>수습 기간·계약직 종료일 계산</li>
-<li>세금 신고 기한까지 남은 일수</li>
-<li>기념일·기일 디데이</li>
-<li>배송·정산 예정일에서 N일 뒤 날짜 뽑기</li>
+<li><strong>계약</strong> — 만료일까지 남은 기간, 갱신 거절 통보 기한, 중도해지 예고 기간</li>
+<li><strong>근로</strong> — 수습 기간 종료일, 계약직 만료일, 퇴직 예고 기간</li>
+<li><strong>세무</strong> — 신고·납부 기한까지 남은 일수(단, 말일이 휴일이면 익일로 밀립니다)</li>
+<li><strong>부동산</strong> — 잔금일까지 남은 기간, 전입신고·확정일자 기한</li>
+<li><strong>생활</strong> — 기념일 디데이, 수험일 카운트다운, 배송·정산 예정일 역산</li>
 </ul>
-</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>당일이 포함되나요?</summary><div class="a">기본 계산은 당일을 빼고 셉니다. 결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다.</div></details>
-<details><summary>공휴일과 주말을 뺀 영업일도 셀 수 있나요?</summary><div class="a">현재는 달력상 일수만 계산합니다. 영업일 계산은 공휴일 지정이 해마다 달라져 별도 확인이 필요합니다.</div></details>
+
+<h3>이 계산기가 답하지 않는 것</h3>
+<p>여기 적은 민법 조문은 기간 계산의 <strong>일반 원칙</strong>입니다. 개별 법령이나
+계약서에 따로 정한 내용이 있으면 그쪽이 우선합니다. 세법·근로기준법·소송 기한처럼
+기간을 놓치면 권리가 사라지는 사안은 <strong>반드시 해당 규정과 담당 기관을 확인</strong>하세요.
+이 페이지는 법률 자문이 아니라 날짜를 세는 도구입니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>당일이 포함되나요?</summary><div class="a">기본 계산은 당일을 빼고 셉니다(민법 제157조 초일불산입). 결과 아래에 당일을 포함한 일수도 함께 표시하니 필요한 쪽을 쓰시면 됩니다. 다만 기간이 오전 0시부터 시작하거나 나이를 계산할 때는 초일을 넣습니다.</div></details>
+<details><summary>‘3개월 후’는 90일인가요?</summary><div class="a">아닙니다. 월 단위 기간은 날짜를 더하지 않고 달력으로 계산합니다. 1월 10일부터 3개월이면 4월 9일에 만료하고, 실제 일수는 89일입니다. 어느 달에 걸치느냐에 따라 89~92일로 달라집니다.</div></details>
+<details><summary>1월 31일부터 1개월이면 언제까지인가요?</summary><div class="a">2월 28일(윤년이면 29일)까지입니다. 2월에는 31일이 없으므로 그 달의 말일에 만료합니다(민법 제160조 3항).</div></details>
+<details><summary>공휴일과 주말을 뺀 영업일도 셀 수 있나요?</summary><div class="a">현재는 달력상 일수만 계산합니다. 공휴일 지정이 해마다 달라지고 대체공휴일·임시공휴일이 추가되기 때문입니다. 주 5일 기준으로 달력 일수에 5/7을 곱하면 근사치는 나옵니다.</div></details>
+<details><summary>신고 기한 마지막 날이 토요일이면 어떻게 되나요?</summary><div class="a">다음 영업일로 넘어갑니다(민법 제161조). 이 계산기는 달력 일수만 세므로 휴일 보정은 반영하지 않습니다. 실제 기한은 해당 기관에서 확인하세요.</div></details>
+<details><summary>기념일 100일은 왜 하루 차이가 나나요?</summary><div class="a">기념일은 만난 날을 1일째로 세는 관행이라 달력으로는 99일 뒤가 ‘100일’이 됩니다. ‘N일 후’ 기능에 99를 넣으시면 그 날짜가 나옵니다.</div></details>
 <details><summary>날짜를 비워두면 어떻게 되나요?</summary><div class="a">오늘 날짜가 기준으로 들어갑니다.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../pyeong/"><span class="cname">평수 계산기</span><span class="ckw">평 ↔ ㎡ 변환, 전용률 확인</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a><a class="card" href="../yangdo/"><span class="cname">양도소득세 계산기</span><span class="ckw">양도차익·장특공제 반영한 양도세와 지방소득세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와

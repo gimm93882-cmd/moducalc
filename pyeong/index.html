@@ -371,7 +371,7 @@ header .eyebrow a:hover{text-decoration:underline}
 #extra:empty{display:none}
 </style>
 <meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "평수 계산기", "url": "https://moducalc.kr/pyeong/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "평과 제곱미터를 서로 변환합니다. 공급면적과 전용면적 차이, 전용률도 함께 확인할 수 있습니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "1평은 몇 제곱미터인가요?", "acceptedAnswer": {"@type": "Answer", "text": "약 3.3058㎡입니다. 정확히는 400/121 ㎡입니다."}}, {"@type": "Question", "name": "84㎡는 왜 34평이라고 하나요?", "acceptedAnswer": {"@type": "Answer", "text": "84㎡는 전용면적이고 34평은 공급면적 기준이기 때문입니다. 84㎡ 자체를 평으로 바꾸면 25.4평입니다."}}, {"@type": "Question", "name": "전용률은 어느 정도가 보통인가요?", "acceptedAnswer": {"@type": "Answer", "text": "아파트는 대체로 70~80%대, 오피스텔은 그보다 낮은 경우가 많습니다. 같은 평형이어도 전용률이 높을수록 실제 사용 공간이 넓습니다."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "평수 계산기", "url": "https://moducalc.kr/pyeong/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "평과 제곱미터를 서로 변환합니다. 공급면적과 전용면적 차이, 전용률도 함께 확인할 수 있습니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "1평은 몇 제곱미터인가요?", "acceptedAnswer": {"@type": "Answer", "text": "3.305785㎡입니다. 사방 6자의 넓이이고 1자가 10/33미터라서 (60/33)²으로 나온 값입니다. 반대로 1㎡는 0.3025평입니다."}}, {"@type": "Question", "name": "84㎡면 34평 아닌가요?", "acceptedAnswer": {"@type": "Answer", "text": "84㎡를 평으로 바꾸면 25.4평입니다. 34평은 전용면적이 아니라 공급면적(전용 + 계단·복도 등 주거공용) 기준이라 숫자가 다릅니다. 같은 집을 두 가지 기준으로 부르고 있는 것입니다."}}, {"@type": "Question", "name": "전용률은 몇 %가 보통인가요?", "acceptedAnswer": {"@type": "Answer", "text": "계단식 아파트가 75~83%로 가장 높고, 복도식 70~75%, 주상복합 65~75%, 오피스텔은 50~60% 수준입니다. 전용률이 낮으면 같은 평형·같은 가격이어도 실제로 쓰는 공간이 좁습니다."}}, {"@type": "Question", "name": "발코니는 면적에 포함되나요?", "acceptedAnswer": {"@type": "Answer", "text": "서비스면적이라 전용·공급·계약 어느 면적에도 들어가지 않습니다. 그래서 확장하면 서류상 면적은 그대로인데 실사용 공간은 늘어납니다. 같은 84㎡라도 체감 넓이가 달라지는 이유입니다."}}, {"@type": "Question", "name": "오피스텔 30평과 아파트 30평이 왜 다른가요?", "acceptedAnswer": {"@type": "Answer", "text": "전용률 차이 때문입니다. 오피스텔은 업무시설로 분류돼 공용면적 산정 기준이 달라 전용률이 50~60% 수준입니다. 같은 ‘30평’이라도 실사용 면적이 10평 가까이 차이날 수 있습니다."}}, {"@type": "Question", "name": "계약서에는 왜 평이 안 적혀 있나요?", "acceptedAnswer": {"@type": "Answer", "text": "평은 법정 계량 단위가 아닙니다. 2007년부터 거래·증명에 사용이 금지돼 등기부와 계약서에는 모두 ㎡로 적습니다. 광고만 평으로 하는 경우가 많습니다."}}]}]</script>
 <meta name="google-adsense-account" content="ca-pub-9144223736026563">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
 </head>
@@ -384,41 +384,90 @@ header .eyebrow a:hover{text-decoration:underline}
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
 <div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 부동산·생활</p><h1>평수 계산기</h1><p>평과 제곱미터를 서로 변환합니다. 공급면적과 전용면적 차이, 전용률도 함께 확인할 수 있습니다.</p></header><div id="calc"></div></div><div class="prose"><article>
-<h3>1평은 정확히 몇 제곱미터인가</h3>
-<p>1평 = 400/121 ㎡ = 약 3.3058㎡입니다. 반대로 1㎡는 약 0.3025평입니다.
-간단히 <strong>㎡에 0.3025를 곱하면 평</strong>, <strong>평에 3.3058을 곱하면 ㎡</strong>입니다.</p>
+<h3>1평은 정확히 얼마인가</h3>
+<p><strong>1평 = 3.305785㎡</strong> 입니다. 어디서 나온 숫자냐면, 1평은 사방 6자(尺)의
+넓이이고 1자는 10/33미터입니다. 즉 (60/33)² = 3.30578… 가 됩니다.</p>
+<p>반대로 <strong>1㎡ = 0.3025평</strong>입니다. 암산할 때는 <strong>㎡에 0.3을 곱하면 평</strong>,
+<strong>평에 3.3을 곱하면 ㎡</strong>로 기억하면 거의 맞습니다.
+84㎡면 대략 25평, 59㎡면 대략 18평입니다.</p>
+<p>참고로 평은 법정 계량 단위가 아닙니다. 2007년부터 거래·증명에 평을 쓰는 것이
+금지돼 등기부와 계약서에는 모두 ㎡로 적힙니다. 그래서 광고는 평으로 하고
+서류는 ㎡로 되어 있는 상황이 생깁니다.</p>
 
 <h3>84㎡가 왜 34평이라고 불리나</h3>
-<p>혼동이 가장 많은 부분입니다. 84㎡를 그대로 평으로 바꾸면 25.4평입니다.
-그런데 광고에서는 34평형이라고 합니다. 기준이 다르기 때문입니다.</p>
+<p>가장 많이 헷갈리는 부분입니다. <strong>84㎡를 평으로 바꾸면 25.4평</strong>입니다.
+34평이 아닙니다. 그런데 부동산에서는 84㎡를 '34평형'이라고 부릅니다.</p>
+<p>둘이 다른 면적을 가리키기 때문입니다.</p>
 <ul>
-<li><strong>전용면적</strong> — 현관문 안쪽, 실제로 우리 집만 쓰는 공간. 84㎡가 이것입니다.</li>
-<li><strong>공급면적</strong> — 전용면적 + 계단·복도 등 주거공용면적. 34평은 이쪽 기준입니다.</li>
-<li><strong>계약면적</strong> — 공급면적 + 지하주차장 등 기타공용면적.</li>
+<li><strong>84㎡ = 전용면적</strong> — 우리 집 현관문 안쪽, 실제로 쓰는 공간</li>
+<li><strong>34평 = 공급면적</strong> — 전용면적 + 주거공용면적(계단·복도·엘리베이터)</li>
 </ul>
-<p>같은 84㎡라도 공용면적이 얼마나 붙느냐에 따라 체감 넓이가 달라집니다.</p>
+<p>84㎡에 주거공용면적 약 28㎡가 더해져 공급면적 112㎡가 되고, 이것을 평으로 바꾸면
+약 34평입니다. <strong>같은 집을 두 가지 기준으로 부르고 있는 것</strong>입니다.</p>
 
-<h3>전용률을 보면 실속을 알 수 있습니다</h3>
-<p>전용률 = 전용면적 ÷ 공급면적입니다. 아파트는 보통 70~80%대이고,
-오피스텔은 50%대까지 내려가기도 합니다. 전용률이 낮으면 같은 평형이라도
-실제 사용하는 공간이 좁습니다. 계약서의 전용면적을 이 계산기에 넣으면
-전용률이 바로 나옵니다.</p>
+<h3>면적 용어 정리</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>용어</th><th>범위</th><th>어디에 쓰나</th></tr></thead>
+<tbody>
+<tr><td><strong>전용면적</strong></td><td>현관 안쪽 실사용 공간</td><td>청약, 세금, 등기부</td></tr>
+<tr><td>주거공용면적</td><td>계단·복도·엘리베이터</td><td>—</td></tr>
+<tr><td><strong>공급면적</strong></td><td>전용 + 주거공용</td><td>분양가, ‘◯◯평형’</td></tr>
+<tr><td>기타공용면적</td><td>지하주차장·관리사무소·경비실</td><td>—</td></tr>
+<tr><td><strong>계약면적</strong></td><td>공급 + 기타공용</td><td>분양 계약서</td></tr>
+<tr><td>서비스면적</td><td>발코니 (확장 대상)</td><td>어느 면적에도 안 들어감</td></tr>
+</tbody></table></div>
+<p><strong>서비스면적이 함정입니다.</strong> 발코니는 전용·공급·계약 어느 면적에도
+포함되지 않습니다. 그래서 발코니를 확장하면 서류상 면적은 그대로인데
+실제로 쓰는 공간은 늘어납니다. 같은 84㎡라도 발코니 설계에 따라
+체감 넓이가 꽤 달라지는 이유입니다.</p>
 
-<h3>자주 쓰는 평형 환산</h3>
+<h3>전용률 — 이 숫자를 봐야 합니다</h3>
+<p><strong>전용률 = 전용면적 ÷ 공급면적 × 100</strong></p>
+<p>분양가는 공급면적 기준으로 매겨지는데 실제로 사는 건 전용면적입니다.
+전용률이 낮으면 <strong>같은 평형, 같은 가격이어도 집이 좁습니다.</strong></p>
+<div class="tablewrap"><table>
+<thead><tr><th>유형</th><th>전용률</th><th>특징</th></tr></thead>
+<tbody>
+<tr><td>아파트 (계단식)</td><td class="n">75~83%</td><td>가장 높은 편</td></tr>
+<tr><td>아파트 (복도식)</td><td class="n">70~75%</td><td>공용 복도가 길다</td></tr>
+<tr><td>주상복합</td><td class="n">65~75%</td><td>커뮤니티·로비 면적이 크다</td></tr>
+<tr><td>오피스텔</td><td class="n">50~60%</td><td>가장 낮다</td></tr>
+</tbody></table></div>
+<p>오피스텔 전용률이 낮은 건 업무시설로 분류돼 공용면적 산정 기준이 다르기 때문입니다.
+<strong>오피스텔 '30평'과 아파트 '30평'은 실사용 면적이 10평 가까이 차이날 수 있습니다.</strong>
+계산기의 전용면적 칸에 숫자를 넣으면 전용률이 바로 나옵니다.</p>
+
+<h3>자주 보는 평형 환산표</h3>
 <div class="tablewrap"><table>
 <thead><tr><th>전용면적</th><th>평 환산</th><th>흔히 부르는 이름</th></tr></thead>
 <tbody>
-<tr><td>39㎡</td><td class="n">11.8평</td><td>17평형</td></tr>
-<tr><td>49㎡</td><td class="n">14.8평</td><td>21평형</td></tr>
+<tr><td>39㎡</td><td class="n">11.8평</td><td>16평형</td></tr>
+<tr><td>49㎡</td><td class="n">14.8평</td><td>20평형</td></tr>
 <tr><td>59㎡</td><td class="n">17.8평</td><td>24~25평형</td></tr>
 <tr><td>74㎡</td><td class="n">22.4평</td><td>30평형</td></tr>
 <tr><td>84㎡</td><td class="n">25.4평</td><td>33~34평형</td></tr>
 <tr><td>101㎡</td><td class="n">30.6평</td><td>40평형</td></tr>
+<tr><td>114㎡</td><td class="n">34.5평</td><td>45평형</td></tr>
+<tr><td>134㎡</td><td class="n">40.5평</td><td>51~53평형</td></tr>
 </tbody></table></div>
-<p>평형 이름은 단지마다 공용면적이 달라 차이가 납니다.</p>
-</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>1평은 몇 제곱미터인가요?</summary><div class="a">약 3.3058㎡입니다. 정확히는 400/121 ㎡입니다.</div></details>
-<details><summary>84㎡는 왜 34평이라고 하나요?</summary><div class="a">84㎡는 전용면적이고 34평은 공급면적 기준이기 때문입니다. 84㎡ 자체를 평으로 바꾸면 25.4평입니다.</div></details>
-<details><summary>전용률은 어느 정도가 보통인가요?</summary><div class="a">아파트는 대체로 70~80%대, 오피스텔은 그보다 낮은 경우가 많습니다. 같은 평형이어도 전용률이 높을수록 실제 사용 공간이 넓습니다.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../date/"><span class="cname">날짜 계산기</span><span class="ckw">디데이, 날짜 사이 일수, N일 후</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a><a class="card" href="../yangdo/"><span class="cname">양도소득세 계산기</span><span class="ckw">양도차익·장특공제 반영한 양도세와 지방소득세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
+<p>'◯◯평형'은 단지마다 전용률이 달라 같은 전용면적이라도 다르게 불립니다.
+<strong>비교할 때는 평형이 아니라 전용면적(㎡)으로 보셔야</strong> 정확합니다.</p>
+
+<h3>땅 면적 — 평과 함께 쓰는 단위</h3>
+<p>토지는 단위가 또 다릅니다.</p>
+<ul>
+<li><strong>1정보(町步)</strong> = 3,000평 = 9,917㎡ ≈ 1헥타르</li>
+<li><strong>1단보(段步)</strong> = 300평 = 991.7㎡</li>
+<li><strong>1헥타르(ha)</strong> = 10,000㎡ = 3,025평</li>
+<li><strong>1에이커</strong> = 4,047㎡ = 1,224평</li>
+</ul>
+<p>농지나 임야 거래에서 아직 쓰이는 단위입니다. 계산기에 ㎡로 넣으면 평이 나옵니다.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>1평은 몇 제곱미터인가요?</summary><div class="a">3.305785㎡입니다. 사방 6자의 넓이이고 1자가 10/33미터라서 (60/33)²으로 나온 값입니다. 반대로 1㎡는 0.3025평입니다.</div></details>
+<details><summary>84㎡면 34평 아닌가요?</summary><div class="a">84㎡를 평으로 바꾸면 25.4평입니다. 34평은 전용면적이 아니라 공급면적(전용 + 계단·복도 등 주거공용) 기준이라 숫자가 다릅니다. 같은 집을 두 가지 기준으로 부르고 있는 것입니다.</div></details>
+<details><summary>전용률은 몇 %가 보통인가요?</summary><div class="a">계단식 아파트가 75~83%로 가장 높고, 복도식 70~75%, 주상복합 65~75%, 오피스텔은 50~60% 수준입니다. 전용률이 낮으면 같은 평형·같은 가격이어도 실제로 쓰는 공간이 좁습니다.</div></details>
+<details><summary>발코니는 면적에 포함되나요?</summary><div class="a">서비스면적이라 전용·공급·계약 어느 면적에도 들어가지 않습니다. 그래서 확장하면 서류상 면적은 그대로인데 실사용 공간은 늘어납니다. 같은 84㎡라도 체감 넓이가 달라지는 이유입니다.</div></details>
+<details><summary>오피스텔 30평과 아파트 30평이 왜 다른가요?</summary><div class="a">전용률 차이 때문입니다. 오피스텔은 업무시설로 분류돼 공용면적 산정 기준이 달라 전용률이 50~60% 수준입니다. 같은 ‘30평’이라도 실사용 면적이 10평 가까이 차이날 수 있습니다.</div></details>
+<details><summary>계약서에는 왜 평이 안 적혀 있나요?</summary><div class="a">평은 법정 계량 단위가 아닙니다. 2007년부터 거래·증명에 사용이 금지돼 등기부와 계약서에는 모두 ㎡로 적습니다. 광고만 평으로 하는 경우가 많습니다.</div></details></article></div><div class="wrap"><section class="related"><h2>부동산·생활 계산기 더 보기</h2><div class="cards"><a class="card" href="../date/"><span class="cname">날짜 계산기</span><span class="ckw">디데이, 날짜 사이 일수, N일 후</span></a><a class="card" href="../jeonwolse/"><span class="cname">전월세 전환 계산기</span><span class="ckw">전세↔월세 환산, 전환율 역산</span></a><a class="card" href="../brokerage/"><span class="cname">부동산 중개보수 계산기</span><span class="ckw">매매·임대차 거래금액별 중개보수 상한</span></a><a class="card" href="../bmi/"><span class="cname">BMI·칼로리 계산기</span><span class="ckw">체질량지수, 기초대사량, 하루 필요 칼로리</span></a><a class="card" href="../chwideukse/"><span class="cname">취득세 계산기</span><span class="ckw">주택 취득세·지방교육세·농특세 합계</span></a><a class="card" href="../yangdo/"><span class="cname">양도소득세 계산기</span><span class="ckw">양도차익·장특공제 반영한 양도세와 지방소득세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
  * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.

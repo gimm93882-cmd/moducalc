@@ -371,7 +371,7 @@ header .eyebrow a:hover{text-decoration:underline}
 #extra:empty{display:none}
 </style>
 <meta name="naver-site-verification" content="15df205c4023c25937e958e86ac041be4a3f75ff">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "카드 수수료 계산기", "url": "https://moducalc.kr/card/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "카드 결제금액에서 수수료를 빼고 실제로 입금되는 금액을 계산합니다. 월 매출 기준 부담액도 확인할 수 있습니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "수수료 부가세는 무엇인가요?", "acceptedAnswer": {"@type": "Answer", "text": "가맹점 수수료에도 부가가치세가 붙는 구조입니다. 카드사 정산 방식에 따라 표시가 다르므로 실제 정산내역서와 대조해 보시고, 포함/미포함을 골라 계산하세요."}}, {"@type": "Question", "name": "우대수수료율은 어떻게 확인하나요?", "acceptedAnswer": {"@type": "Answer", "text": "여신금융협회 가맹점 수수료 조회 서비스나 거래 중인 카드사 고객센터에서 확인할 수 있습니다. 매출 구간이 바뀌면 요율도 조정되므로 주기적으로 확인하는 편이 좋습니다."}}, {"@type": "Question", "name": "입금은 언제 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "카드사와 결제대행사에 따라 다르며 보통 영업일 기준 2~5일이 걸립니다. 이 계산기는 금액만 계산하며 입금 일정은 다루지 않습니다."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "카드 수수료 계산기", "url": "https://moducalc.kr/card/", "applicationCategory": "FinanceApplication", "operatingSystem": "All", "inLanguage": "ko", "description": "카드 결제금액에서 수수료를 빼고 실제로 입금되는 금액을 계산합니다. 월 매출 기준 부담액도 확인할 수 있습니다.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "카드 수수료는 손님이 내나요, 가게가 내나요?", "acceptedAnswer": {"@type": "Answer", "text": "가맹점이 냅니다. 손님은 결제금액 전액을 내고, 가맹점 통장에는 수수료를 뺀 금액이 들어옵니다. 손님에게 수수료를 떠넘기거나 카드 결제를 거절하는 것은 여신전문금융업법상 금지돼 있습니다."}}, {"@type": "Question", "name": "내 가게 수수료율은 어디서 확인하나요?", "acceptedAnswer": {"@type": "Answer", "text": "여신금융협회 ‘카드 수수료율 조회’ 또는 각 카드사 가맹점 사이트에서 확인할 수 있습니다. 우대 대상인데 일반요율로 잡혀 있는 경우가 흔하니 한 번은 조회해 보세요."}}, {"@type": "Question", "name": "수수료에 부가세가 붙나요?", "acceptedAnswer": {"@type": "Answer", "text": "붙습니다. 수수료율 1.5%면 부가세 10%가 더해져 실제로는 1.65%가 빠집니다. 다만 일반과세자는 이 부가세를 매입세액으로 공제받을 수 있어 실질 부담은 1.5%에 가깝습니다."}}, {"@type": "Question", "name": "우대수수료율은 어떻게 정해지나요?", "acceptedAnswer": {"@type": "Answer", "text": "연 매출 규모에 따른 구간으로 정해지고 매출이 작을수록 낮습니다. 구체적인 요율과 구간은 금융위원회가 주기적으로 조정하므로 이 계산기에 상수로 넣지 않고 입력 항목으로 열어두었습니다."}}, {"@type": "Question", "name": "배달앱 매출도 이 계산기로 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "카드 수수료 부분만 됩니다. 배달앱은 결제 수수료와 별개로 중개 이용료·광고비·배달비 부담분이 따로 빠지므로 실수령액은 더 줄어듭니다. 앱 정산서를 함께 보셔야 합니다."}}, {"@type": "Question", "name": "매출은 입금액으로 잡으면 되나요?", "acceptedAnswer": {"@type": "Answer", "text": "아닙니다. 매출은 결제금액 전액으로 잡고, 카드 수수료는 따로 필요경비로 처리합니다. 수수료를 뺀 입금액을 매출로 적으면 매출 누락이 됩니다."}}]}]</script>
 <meta name="google-adsense-account" content="ca-pub-9144223736026563">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9144223736026563" crossorigin="anonymous"></script>
 </head>
@@ -384,29 +384,79 @@ header .eyebrow a:hover{text-decoration:underline}
 <a href="../terms.html">이용약관</a></div>
 </div></nav>
 <div class="wrap"><header><p class="eyebrow"><a href="../">전체 계산기</a> · 사업·세금</p><h1>카드 수수료 계산기</h1><p>카드 결제금액에서 수수료를 빼고 실제로 입금되는 금액을 계산합니다. 월 매출 기준 부담액도 확인할 수 있습니다.</p></header><div id="calc"></div></div><div class="prose"><article>
-<h3>실제로 입금되는 금액은 결제금액이 아닙니다</h3>
-<p>손님이 5만원을 카드로 결제해도 가맹점 통장에 5만원이 들어오지 않습니다.
-카드사 가맹점 수수료를 뺀 금액이 입금됩니다. 수수료율이 1.5%라면 750원이 빠져
-49,250원이 들어옵니다.</p>
+<h3>수수료는 가맹점이 냅니다</h3>
+<p>카드 결제가 일어나면 수수료는 <strong>손님이 아니라 가맹점</strong>이 부담합니다.
+5만원짜리를 팔고 수수료율이 1.5%라면 손님은 5만원을 내지만
+가맹점 통장에는 수수료 750원을 뺀 <strong>49,250원</strong>이 들어옵니다.</p>
+<p>손님에게 수수료를 떠넘기거나, 현금 결제에만 할인해 주는 것은
+여신전문금융업법상 금지돼 있습니다. 카드 결제를 거절하는 것도 마찬가지입니다.</p>
 
-<h3>우대수수료율을 받고 있는지 확인하세요</h3>
-<p>영세·중소가맹점은 연매출 구간에 따라 낮은 우대수수료율이 적용됩니다.
-매출 규모가 바뀌었는데 요율이 그대로라면 손해를 보고 있을 수 있습니다.
-여신금융협회나 거래 카드사에서 본인 가맹점의 적용 요율을 조회할 수 있고,
-소급 환급을 받을 수 있는 경우도 있습니다.</p>
+<h3>우대수수료율 — 영세·중소가맹점</h3>
+<p>수수료율은 모든 가맹점이 같지 않습니다. <strong>연 매출 규모에 따라 우대요율</strong>이
+적용되고, 매출이 작을수록 요율이 낮습니다. 구간은 대략 연 매출
+3억 이하 / 3~5억 / 5~10억 / 10~30억으로 나뉘며, 이 구간을 넘으면
+우대 대상에서 빠져 일반요율이 적용됩니다.</p>
+<p><strong>구체적인 요율과 구간은 금융위원회가 주기적으로 조정합니다.</strong>
+그래서 이 계산기는 요율을 상수로 박지 않고 입력 항목으로 열어두었습니다.
+본인 요율은 카드사 가맹점 사이트나 여신금융협회
+'카드 수수료율 조회'에서 확인해 그 값을 넣으시면 정확합니다.</p>
+<p>우대 대상인데 일반요율로 잡혀 있는 경우가 생각보다 흔합니다.
+사업 초기에 매출 추정으로 요율이 정해진 뒤 갱신이 안 된 경우입니다.
+<strong>한 번은 꼭 조회해 보세요.</strong> 소급 환급이 되는 경우가 있습니다.</p>
 
-<h3>연 단위로 보면 금액이 달라 보입니다</h3>
-<p>건당 750원은 작아 보이지만 월 카드매출 2,000만원에 1.5%면 월 30만원, 연 360만원입니다.
-요율이 0.5%p만 낮아져도 연 120만원이 남습니다. 이 계산기의 월·연 수수료 항목이
-그 규모를 보여줍니다.</p>
+<h3>결제 수단마다 요율이 다릅니다</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>수단</th><th>특징</th></tr></thead>
+<tbody>
+<tr><td>신용카드</td><td>가장 높은 편. 할부·무이자 행사 시 가맹점 부담이 더 붙는 경우가 있다</td></tr>
+<tr><td>체크카드</td><td>신용카드보다 낮다</td></tr>
+<tr><td>간편결제 (페이)</td><td>카드 수수료에 플랫폼 결제대행 수수료가 더해지는 구조가 많다</td></tr>
+<tr><td>배달앱 주문</td><td>결제 수수료와 별개로 중개 수수료·광고비가 따로 빠진다</td></tr>
+</tbody></table></div>
+<p>특히 <strong>배달앱은 카드 수수료만 보면 안 됩니다.</strong> 중개 이용료, 결제 수수료,
+배달비 부담분이 각각 빠지기 때문에 실수령액이 훨씬 줄어듭니다.
+이 계산기는 카드 수수료만 계산하니, 배달 매출은 앱 정산서를 따로 보셔야 합니다.</p>
 
-<h3>마진 계산에 수수료를 넣어야 합니다</h3>
-<p>카드 결제 비중이 높은 업종에서 수수료를 원가에 넣지 않으면 실제 마진이
-계산보다 낮게 나옵니다. <a href="../margin/">마진율 계산기</a>의 원가 항목에
-수수료까지 반영하세요.</p>
-</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>수수료 부가세는 무엇인가요?</summary><div class="a">가맹점 수수료에도 부가가치세가 붙는 구조입니다. 카드사 정산 방식에 따라 표시가 다르므로 실제 정산내역서와 대조해 보시고, 포함/미포함을 골라 계산하세요.</div></details>
-<details><summary>우대수수료율은 어떻게 확인하나요?</summary><div class="a">여신금융협회 가맹점 수수료 조회 서비스나 거래 중인 카드사 고객센터에서 확인할 수 있습니다. 매출 구간이 바뀌면 요율도 조정되므로 주기적으로 확인하는 편이 좋습니다.</div></details>
-<details><summary>입금은 언제 되나요?</summary><div class="a">카드사와 결제대행사에 따라 다르며 보통 영업일 기준 2~5일이 걸립니다. 이 계산기는 금액만 계산하며 입금 일정은 다루지 않습니다.</div></details></article></div><div class="wrap"><section class="related"><h2>사업·세금 계산기 더 보기</h2><div class="cards"><a class="card" href="../bugagse/"><span class="cname">부가세 계산기</span><span class="ckw">공급가액에서 더하거나 합계액에서 역산</span></a><a class="card" href="../margin/"><span class="cname">마진율 계산기</span><span class="ckw">원가·판매가로 마진율, 목표 마진율로 판매가 역산</span></a><a class="card" href="../jeungyeo/"><span class="cname">증여세 계산기</span><span class="ckw">관계별 증여재산공제 반영한 증여세</span></a><a class="card" href="../jonghap/"><span class="cname">종합소득세 계산기</span><span class="ckw">프리랜서·사업자 종합소득세 개략 계산</span></a><a class="card" href="../sangsokse/"><span class="cname">상속세 계산기</span><span class="ckw">일괄공제·배우자공제 반영한 상속세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
+<h3>수수료에 붙는 부가세</h3>
+<p>카드 수수료에는 <strong>부가가치세 10%</strong>가 붙습니다. 수수료율 1.5%라면
+실제로 빠지는 금액은 1.65%입니다. 50,000원 결제 기준으로 750원이 아니라 825원입니다.</p>
+<p>계산기의 '수수료 부가세' 항목을 '10% 추가'로 두면 이 금액이 반영됩니다.
+카드사 정산 명세서에 따라 표기 방식이 다르니, 명세서와 맞춰보고 설정하세요.</p>
+<p>다만 이 부가세는 <strong>매입세액으로 공제받을 수 있습니다.</strong>
+일반과세자라면 부가세 신고 때 돌려받는 금액이라 실질 부담은 1.5%에 가깝습니다.
+간이과세자는 매입세액 공제에 제약이 있어 다릅니다.</p>
+
+<h3>연간으로 보면 금액이 큽니다</h3>
+<p>건당 750원은 작아 보이지만 쌓이면 다릅니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>월 카드매출</th><th>1.5% 기준 월 수수료</th><th>연간</th></tr></thead>
+<tbody>
+<tr><td>1,000만원</td><td class="n">15만원</td><td class="n">180만원</td></tr>
+<tr><td>2,000만원</td><td class="n">30만원</td><td class="n">360만원</td></tr>
+<tr><td>5,000만원</td><td class="n">75만원</td><td class="n">900만원</td></tr>
+<tr><td>1억원</td><td class="n">150만원</td><td class="n">1,800만원</td></tr>
+</tbody></table></div>
+<p><strong>요율 0.3%포인트 차이가 연 매출 2억이면 60만원입니다.</strong>
+우대요율 적용 여부를 확인할 값어치가 충분합니다.
+계산기에 월 매출을 넣으면 월·연 수수료가 바로 나옵니다.</p>
+
+<h3>세금 계산할 때 주의</h3>
+<p>카드 수수료는 <strong>필요경비로 인정</strong>되므로 종합소득세 신고 때 비용 처리할 수 있습니다.
+다만 매출은 수수료를 뺀 입금액이 아니라 <strong>결제금액 전액</strong>으로 잡아야 합니다.
+5만원을 팔았으면 매출은 5만원이고, 수수료 825원은 따로 경비로 넣는 구조입니다.
+입금액 49,175원을 매출로 적으면 매출 누락이 됩니다.</p>
+
+<h3>이 계산기가 답하지 않는 것</h3>
+<p>요율과 우대 구간은 정책에 따라 바뀝니다. 이 계산기는 입력한 요율로
+금액만 계산하며, 본인에게 어떤 요율이 적용되는지는 알려주지 않습니다.
+정확한 요율은 <strong>여신금융협회 카드 수수료율 조회</strong> 또는
+카드사 가맹점 사이트에서 확인하세요.</p>
+</article><article class="faq"><h2 id="faq">자주 묻는 질문</h2><details><summary>카드 수수료는 손님이 내나요, 가게가 내나요?</summary><div class="a">가맹점이 냅니다. 손님은 결제금액 전액을 내고, 가맹점 통장에는 수수료를 뺀 금액이 들어옵니다. 손님에게 수수료를 떠넘기거나 카드 결제를 거절하는 것은 여신전문금융업법상 금지돼 있습니다.</div></details>
+<details><summary>내 가게 수수료율은 어디서 확인하나요?</summary><div class="a">여신금융협회 ‘카드 수수료율 조회’ 또는 각 카드사 가맹점 사이트에서 확인할 수 있습니다. 우대 대상인데 일반요율로 잡혀 있는 경우가 흔하니 한 번은 조회해 보세요.</div></details>
+<details><summary>수수료에 부가세가 붙나요?</summary><div class="a">붙습니다. 수수료율 1.5%면 부가세 10%가 더해져 실제로는 1.65%가 빠집니다. 다만 일반과세자는 이 부가세를 매입세액으로 공제받을 수 있어 실질 부담은 1.5%에 가깝습니다.</div></details>
+<details><summary>우대수수료율은 어떻게 정해지나요?</summary><div class="a">연 매출 규모에 따른 구간으로 정해지고 매출이 작을수록 낮습니다. 구체적인 요율과 구간은 금융위원회가 주기적으로 조정하므로 이 계산기에 상수로 넣지 않고 입력 항목으로 열어두었습니다.</div></details>
+<details><summary>배달앱 매출도 이 계산기로 되나요?</summary><div class="a">카드 수수료 부분만 됩니다. 배달앱은 결제 수수료와 별개로 중개 이용료·광고비·배달비 부담분이 따로 빠지므로 실수령액은 더 줄어듭니다. 앱 정산서를 함께 보셔야 합니다.</div></details>
+<details><summary>매출은 입금액으로 잡으면 되나요?</summary><div class="a">아닙니다. 매출은 결제금액 전액으로 잡고, 카드 수수료는 따로 필요경비로 처리합니다. 수수료를 뺀 입금액을 매출로 적으면 매출 누락이 됩니다.</div></details></article></div><div class="wrap"><section class="related"><h2>사업·세금 계산기 더 보기</h2><div class="cards"><a class="card" href="../bugagse/"><span class="cname">부가세 계산기</span><span class="ckw">공급가액에서 더하거나 합계액에서 역산</span></a><a class="card" href="../margin/"><span class="cname">마진율 계산기</span><span class="ckw">원가·판매가로 마진율, 목표 마진율로 판매가 역산</span></a><a class="card" href="../jeungyeo/"><span class="cname">증여세 계산기</span><span class="ckw">관계별 증여재산공제 반영한 증여세</span></a><a class="card" href="../jonghap/"><span class="cname">종합소득세 계산기</span><span class="ckw">프리랜서·사업자 종합소득세 개략 계산</span></a><a class="card" href="../sangsokse/"><span class="cname">상속세 계산기</span><span class="ckw">일괄공제·배우자공제 반영한 상속세</span></a></div><p class="allink"><a href="../">전체 계산기 보기 →</a></p></section></div><script>/* 계산기 공용 엔진.
  *
  * 계산기마다 폼과 렌더링을 새로 짜지 않는다. 각 계산기는 필드 정의와
  * compute(v) 하나만 제공하고, 화면 구성·포맷·저장은 전부 여기서 처리한다.
