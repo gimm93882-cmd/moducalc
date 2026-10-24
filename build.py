@@ -82,7 +82,6 @@ SHELL = u"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="keywords" content="{keywords}">
 <link rel="canonical" href="{base}{path}">
 <meta name="theme-color" content="#FF6B00">
 <link rel="icon" href="{favicon}">
@@ -118,27 +117,9 @@ SHELL = u"""<!doctype html>
 """
 
 
-def keyword_list(items):
-    """사이트 전체 계산기 이름과 설명에서 키워드를 뽑는다.
-
-    구글은 meta keywords 를 무시한다(2009년부터). 네이버도 쓰지 않는다.
-    순위에는 영향이 없고, 사이트가 무엇을 다루는지 기계적으로 드러내는 용도다.
-    실제 검색 노출은 각 페이지의 title·본문이 결정한다.
-    """
-    words = []
-    for c in items:
-        name = c["name"]
-        words.append(name)
-        # "부가세 계산기" -> "부가세" 도 함께 넣는다
-        stem = name.replace(u" 계산기", "").strip()
-        if stem and stem != name:
-            words.append(stem)
-    seen, out = set(), []
-    for w in words:
-        if w not in seen:
-            seen.add(w)
-            out.append(w)
-    return ", ".join(out)
+def verify_head():
+    """검색엔진 소유 확인 메타 태그."""
+    return "".join('\n<meta name="%s" content="%s">' % (n, v) for n, v in VERIFY)
 
 
 def nav_html(up, path):
@@ -153,9 +134,11 @@ def nav_html(up, path):
     return nav, foot
 
 
-def verify_head():
-    """검색엔진 소유 확인 메타 태그."""
-    return "".join('\n<meta name="%s" content="%s">' % (n, v) for n, v in VERIFY)
+def verify_only_head():
+    """광고 없이 사이트 소유 확인 메타 태그만. 콘텐츠 페이지가 아닌 곳에 쓴다."""
+    if not ADSENSE:
+        return ""
+    return '\n<meta name="google-adsense-account" content="%s">' % ADSENSE
 
 
 def adsense_head():
@@ -168,17 +151,15 @@ def adsense_head():
             % (ADSENSE, ADSENSE))
 
 
-KEYWORDS = ""   # main() 에서 채운다
-
-
-def shell(path, title, desc, body, up="", jsonld=None):
+def shell(path, title, desc, body, up="", jsonld=None, ads=True):
     nav, foot = nav_html(up, path)
     ld = ('\n<script type="application/ld+json">%s</script>'
           % json.dumps(jsonld, ensure_ascii=False)) if jsonld else ""
     return SHELL.format(title=title, desc=desc, base=BASE, path=path, site=SITE,
-                        favicon=FAVICON, css=CSS, jsonld=ld, adsense=adsense_head(),
+                        favicon=FAVICON, css=CSS, jsonld=ld,
+                        adsense=adsense_head() if ads else verify_only_head(),
                         verify=verify_head(), nav=nav, up=up or "./", body=body,
-                        contact=CONTACT, footlinks=foot, keywords=KEYWORDS)
+                        contact=CONTACT, footlinks=foot)
 
 
 def faq_block(faq):
@@ -306,10 +287,10 @@ def hub_page(items):
                  body, up="", jsonld=[ld, faq_ld(content.HUB_FAQ)])
 
 
-def doc_page(path, title, desc, heading, html):
+def doc_page(path, title, desc, heading, html, ads=False):
     # 문서 페이지의 대표 제목은 h1 이어야 한다. h2 로 두면 페이지에 h1 이 없어진다.
     body = u'<div class="prose"><article><h1 class="doch1">%s</h1>%s</article></div>' % (heading, html)
-    return shell(path, title, desc, body, up="")
+    return shell(path, title, desc, body, up="", ads=ads)
 
 
 def write(rel, html):
@@ -323,17 +304,11 @@ def write(rel, html):
 
 _LASTMOD_DB = os.path.join(ROOT, "lastmod.json")
 
-# 모든 페이지의 <meta name="keywords"> 에 계산기 전체 목록이 들어간다.
-# 그래서 계산기를 하나 추가하면 39개 페이지가 전부 다시 쓰이고,
-# 순진하게 파일 변경을 보면 매일 "전 페이지가 바뀌었다"가 된다.
-# 사이트맵이 매일 그렇게 말하면 lastmod 는 신호로서 값어치를 잃는다.
-# 이 줄만 빼고 내용을 비교한다.
-_KW_LINE = re.compile(r'(?m)^<meta name="keywords".*$')
 
 
 def _fingerprint(rel):
     t = io.open(os.path.join(ROOT, rel), encoding="utf-8").read()
-    return hashlib.sha1(_KW_LINE.sub("", t).encode("utf-8")).hexdigest()
+    return hashlib.sha1(t.encode("utf-8")).hexdigest()
 
 
 def load_lastmod():
@@ -373,9 +348,6 @@ def main():
                      u"승률을 넣으면 실제 기대값으로 다시 계산합니다."}
     items = calcs.CALCS + [bokri]
 
-    global KEYWORDS
-    KEYWORDS = keyword_list(items)
-
     total = 0
     total += write("index.html", hub_page(items))
 
@@ -408,6 +380,26 @@ def main():
         "/about.html", u"소개 | 모두계산기",
         u"모두계산기를 만든 이유와 계산 방식, 문의처 안내.",
         u"소개", content.ABOUT % (len(items), CONTACT, CONTACT)))
+
+    # 404. 깃허브 기본 404 는 영문 "File not found" 뿐이라 탐색 경로가 없다.
+    # 애드센스 2부가 "콘텐츠가 없음을 알려 주는 404 페이지"를 광고 제외 대상으로
+    # 명시하므로 광고는 넣지 않고, 대신 돌아갈 길을 준다.
+    popular = [c for c in items if c["slug"] in
+               ("salary", "severance", "insurance", "loan", "yeongeum", "chwideukse")]
+    links = "".join(u'<li><a href="/%s/">%s</a></li>' % (c["slug"], c["name"])
+                    for c in popular)
+    total += write("404.html", shell(
+        "/404.html", u"페이지를 찾을 수 없습니다 | 모두계산기",
+        u"요청하신 주소에 페이지가 없습니다. 전체 계산기 목록에서 찾아보세요.",
+        u'<div class="prose"><article>'
+        u'<h1 class="doch1">페이지를 찾을 수 없습니다</h1>'
+        u'<p>주소가 바뀌었거나, 잘못 입력하셨거나, 삭제된 페이지입니다.</p>'
+        u'<p><a href="/">전체 계산기 목록으로 가기</a></p>'
+        u'<h2>많이 찾는 계산기</h2><ul>%s</ul>'
+        u'<p>찾으시는 계산기가 목록에 없다면 '
+        u'<a href="mailto:%s">%s</a> 로 알려 주세요.</p>'
+        u'</article></div>' % (links, CONTACT, CONTACT),
+        up="", ads=False))
 
     urls = ["/"] + ["/%s/" % c["slug"] for c in items] + \
            ["/about.html", "/privacy.html", "/terms.html"]
